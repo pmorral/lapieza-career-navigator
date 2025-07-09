@@ -1,0 +1,291 @@
+import { useState } from "react";
+import { Play, MessageSquare, FileText, Star, Clock, Mic, MicOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+interface InterviewSession {
+  id: string;
+  jobTitle: string;
+  company: string;
+  date: string;
+  duration: string;
+  score: number;
+  feedback: string[];
+  improvements: string[];
+  status: 'completed' | 'in-progress' | 'scheduled';
+}
+
+export function MockInterviews() {
+  const [jobDescription, setJobDescription] = useState('');
+  const [isInterviewActive, setIsInterviewActive] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState('');
+  const [interviews] = useState<InterviewSession[]>([
+    {
+      id: '1',
+      jobTitle: 'Senior Frontend Developer',
+      company: 'Tech Corp',
+      date: '2024-01-15',
+      duration: '25 min',
+      score: 85,
+      feedback: [
+        'Strong technical knowledge demonstrated',
+        'Good communication skills',
+        'Confident in explaining complex concepts'
+      ],
+      improvements: [
+        'Practice behavioral questions more',
+        'Prepare specific examples for leadership scenarios',
+        'Work on concise answers'
+      ],
+      status: 'completed'
+    },
+    {
+      id: '2',
+      jobTitle: 'Full Stack Engineer',
+      company: 'StartupXYZ',
+      date: '2024-01-10',
+      duration: '30 min',
+      score: 78,
+      feedback: [
+        'Solid problem-solving approach',
+        'Good understanding of system design',
+        'Enthusiastic and engaged'
+      ],
+      improvements: [
+        'Improve answer structure (STAR method)',
+        'Practice coding questions out loud',
+        'Research company culture better'
+      ],
+      status: 'completed'
+    }
+  ]);
+
+  const startInterview = () => {
+    if (!jobDescription.trim()) return;
+    
+    // Simulate AI generating interview questions
+    const questions = [
+      "Tell me about yourself and your experience with frontend development.",
+      "How do you approach debugging a complex issue in a React application?",
+      "Describe a challenging project you've worked on and how you overcame obstacles.",
+      "How do you stay updated with the latest technologies and trends?",
+      "Where do you see yourself in 5 years?"
+    ];
+    
+    setCurrentQuestion(questions[0]);
+    setIsInterviewActive(true);
+  };
+
+  const endInterview = () => {
+    setIsInterviewActive(false);
+    setIsRecording(false);
+    setCurrentQuestion('');
+  };
+
+  const toggleRecording = () => {
+    setIsRecording(!isRecording);
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-success';
+    if (score >= 60) return 'text-warning';
+    return 'text-destructive';
+  };
+
+  const getScoreBadge = (score: number) => {
+    if (score >= 80) return 'success';
+    if (score >= 60) return 'warning';
+    return 'destructive';
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold">Mock Interviews</h2>
+          <p className="text-muted-foreground">Practice interviews with AI and get actionable feedback</p>
+        </div>
+        
+        <Button variant="professional">
+          <Play className="w-4 h-4 mr-2" />
+          Start New Interview
+        </Button>
+      </div>
+
+      {/* Interview Setup */}
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-primary" />
+            Start AI Interview
+          </CardTitle>
+          <CardDescription>
+            Paste the job description to generate personalized interview questions
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="job-description">Job Description</Label>
+            <Textarea
+              id="job-description"
+              placeholder="Paste the job description here..."
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              rows={6}
+              className="mt-2"
+            />
+          </div>
+          
+          <div className="flex gap-2">
+            <Button 
+              onClick={startInterview}
+              disabled={!jobDescription.trim() || isInterviewActive}
+              variant="professional"
+              className="flex-1"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Start AI Interview
+            </Button>
+            
+            <Button 
+              variant="outline"
+              onClick={() => setJobDescription('')}
+              disabled={isInterviewActive}
+            >
+              Clear
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Active Interview */}
+      {isInterviewActive && (
+        <Card className="shadow-card border-primary">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              Interview in Progress
+            </CardTitle>
+            <CardDescription>
+              AI is conducting your interview session
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 bg-accent rounded-lg">
+              <p className="font-medium mb-2">Current Question:</p>
+              <p className="text-sm">{currentQuestion}</p>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={toggleRecording}
+                variant={isRecording ? "destructive" : "success"}
+                size="lg"
+              >
+                {isRecording ? (
+                  <>
+                    <MicOff className="w-4 h-4 mr-2" />
+                    Stop Recording
+                  </>
+                ) : (
+                  <>
+                    <Mic className="w-4 h-4 mr-2" />
+                    Start Recording
+                  </>
+                )}
+              </Button>
+              
+              <div className="flex-1 text-center">
+                <p className="text-sm text-muted-foreground">
+                  {isRecording ? 'Recording your response...' : 'Click to start recording your answer'}
+                </p>
+              </div>
+              
+              <Button
+                onClick={endInterview}
+                variant="outline"
+              >
+                End Interview
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Interview History */}
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" />
+            Interview History
+          </CardTitle>
+          <CardDescription>
+            Review your past interviews and feedback
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {interviews.map((interview) => (
+              <div key={interview.id} className="border rounded-lg p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="font-medium">{interview.jobTitle}</h3>
+                    <p className="text-sm text-muted-foreground">{interview.company}</p>
+                  </div>
+                  <Badge variant={getScoreBadge(interview.score) as any}>
+                    {interview.score}/100
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>{interview.duration}</span>
+                  </div>
+                  <span>{new Date(interview.date).toLocaleDateString()}</span>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-success mb-2">Strengths</h4>
+                    <ul className="space-y-1">
+                      {interview.feedback.map((item, index) => (
+                        <li key={index} className="text-sm flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-success rounded-full mt-2 flex-shrink-0"></div>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-warning mb-2">Areas for Improvement</h4>
+                    <ul className="space-y-1">
+                      {interview.improvements.map((item, index) => (
+                        <li key={index} className="text-sm flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 bg-warning rounded-full mt-2 flex-shrink-0"></div>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="mt-4 pt-3 border-t">
+                  <Button variant="outline" size="sm">
+                    View Full Report
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
