@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit, Trash2, ExternalLink, MessageSquare } from "lucide-react";
+import { Plus, Edit, Trash2, ExternalLink, MessageSquare, FileText, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
+interface Note {
+  id: string;
+  text: string;
+  date: string;
+  type: 'interview' | 'general' | 'feedback';
+}
 
 interface JobApplication {
   id: string;
@@ -17,7 +25,7 @@ interface JobApplication {
   url: string;
   status: 'applied' | 'first-call' | 'advancing' | 'rejected' | 'accepted';
   dateApplied: string;
-  notes: string;
+  notes: Note[];
 }
 
 export function JobTracker() {
@@ -30,7 +38,20 @@ export function JobTracker() {
       url: 'https://linkedin.com/jobs/123456',
       status: 'advancing',
       dateApplied: '2024-01-15',
-      notes: 'Great interview with the team lead. Discussed React architecture and scalability challenges.'
+      notes: [
+        {
+          id: '1',
+          text: 'Great interview with the team lead. Discussed React architecture and scalability challenges.',
+          date: '2024-01-16',
+          type: 'interview'
+        },
+        {
+          id: '2',
+          text: 'Follow-up email sent with portfolio examples.',
+          date: '2024-01-17',
+          type: 'general'
+        }
+      ]
     },
     {
       id: '2',
@@ -40,7 +61,14 @@ export function JobTracker() {
       url: 'https://angel.co/jobs/789012',
       status: 'first-call',
       dateApplied: '2024-01-20',
-      notes: 'Initial screening call scheduled for next week.'
+      notes: [
+        {
+          id: '3',
+          text: 'Initial screening call scheduled for next week.',
+          date: '2024-01-20',
+          type: 'general'
+        }
+      ]
     }
   ]);
 
@@ -50,10 +78,13 @@ export function JobTracker() {
     platform: '',
     url: '',
     status: 'applied',
-    notes: ''
+    notes: []
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(null);
+  const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
+  const [newNote, setNewNote] = useState({ text: '', type: 'general' as Note['type'] });
 
   const statusColumns = [
     { key: 'applied', label: 'Applied', color: 'bg-blue-100 text-blue-800' },
@@ -73,7 +104,7 @@ export function JobTracker() {
         url: newApplication.url || '',
         status: newApplication.status as JobApplication['status'] || 'applied',
         dateApplied: new Date().toISOString().split('T')[0],
-        notes: newApplication.notes || ''
+        notes: []
       };
       
       setApplications([...applications, application]);
@@ -83,7 +114,7 @@ export function JobTracker() {
         platform: '',
         url: '',
         status: 'applied',
-        notes: ''
+        notes: []
       });
       setIsDialogOpen(false);
     }
@@ -171,13 +202,14 @@ export function JobTracker() {
               </div>
               
               <div>
-                <Label htmlFor="notes">Notes</Label>
+                <Label htmlFor="notes">Initial Notes</Label>
                 <Textarea
                   id="notes"
-                  value={newApplication.notes}
-                  onChange={(e) => setNewApplication({...newApplication, notes: e.target.value})}
-                  placeholder="Add any notes about the application..."
+                  value=""
+                  onChange={() => {}}
+                  placeholder="Add notes after creating the application..."
                   rows={3}
+                  disabled
                 />
               </div>
               
@@ -241,12 +273,12 @@ export function JobTracker() {
                       Applied: {new Date(app.dateApplied).toLocaleDateString()}
                     </div>
                     
-                    {app.notes && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <MessageSquare className="w-3 h-3" />
-                        <span className="line-clamp-1">{app.notes}</span>
-                      </div>
-                    )}
+                     {app.notes.length > 0 && (
+                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                         <MessageSquare className="w-3 h-3" />
+                         <span className="line-clamp-1">{app.notes.length} nota{app.notes.length > 1 ? 's' : ''}</span>
+                       </div>
+                     )}
                     
                     <div className="flex flex-wrap gap-1 mt-2">
                       {statusColumns.map((status) => (

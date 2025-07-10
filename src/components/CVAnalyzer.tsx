@@ -88,6 +88,14 @@ export function CVAnalyzer() {
               </label>
             </div>
             
+            <div className="text-center pt-2">
+              <p className="text-sm text-muted-foreground mb-3">¿No tienes un CV? Comienza con una plantilla</p>
+              <Button variant="outline" size="sm" onClick={() => downloadTemplate("basic")}>
+                <Download className="w-4 h-4 mr-2" />
+                Acceder a Templates Predeterminados
+              </Button>
+            </div>
+            
             {uploadedFile && (
               <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
                 <FileText className="w-4 h-4 text-primary" />

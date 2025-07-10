@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus } from "lucide-react";
+import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +8,10 @@ import { LinkedInOptimizer } from "./LinkedInOptimizer";
 import { JobTracker } from "./JobTracker";
 import { ELearningHub } from "./ELearningHub";
 import { MockInterviews } from "./MockInterviews";
+import { CareerCoach } from "./CareerCoach";
+import { AdditionalServices } from "./AdditionalServices";
+import { ReferAndEarn } from "./ReferAndEarn";
+import { GeneralSettings } from "./GeneralSettings";
 
 export function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
@@ -19,6 +23,10 @@ export function Dashboard() {
     { id: "job-tracker", label: "Job Tracker", icon: Target },
     { id: "learning", label: "E-Learning", icon: BookOpen },
     { id: "interviews", label: "Mock Interviews", icon: MessageSquare },
+    { id: "career-coach", label: "Career Coach", icon: UserCheck },
+    { id: "services", label: "Servicios Adicionales", icon: DollarSign },
+    { id: "referrals", label: "Refiere y Gana", icon: Gift },
+    { id: "settings", label: "Configuración", icon: Settings },
   ];
 
   const renderContent = () => {
@@ -33,6 +41,14 @@ export function Dashboard() {
         return <ELearningHub />;
       case "interviews":
         return <MockInterviews />;
+      case "career-coach":
+        return <CareerCoach />;
+      case "services":
+        return <AdditionalServices />;
+      case "referrals":
+        return <ReferAndEarn />;
+      case "settings":
+        return <GeneralSettings />;
       default:
         return <DashboardOverview />;
     }

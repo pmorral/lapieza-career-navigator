@@ -1,0 +1,189 @@
+import { Calendar, DollarSign, Clock, Users, Briefcase } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+export function AdditionalServices() {
+  const services = [
+    {
+      id: "interview-30",
+      title: "Entrevista con Career Coach",
+      duration: "30 minutos",
+      price: 35,
+      description: "Sesión personalizada para revisar tu CV, estrategia de búsqueda o preparación para entrevistas",
+      features: ["Análisis personalizado", "Feedback inmediato", "Plan de acción", "Grabación de la sesión"],
+      icon: Users,
+      popular: false
+    },
+    {
+      id: "interview-60", 
+      title: "Entrevista Extendida",
+      duration: "1 hora",
+      price: 50,
+      description: "Sesión completa para revisar múltiples aspectos de tu perfil profesional y estrategia",
+      features: ["Revisión completa", "Mock interview", "Estrategia LinkedIn", "Plan 30 días", "Seguimiento"],
+      icon: Users,
+      popular: true
+    },
+    {
+      id: "consultation",
+      title: "Asesoría General de Empleabilidad",
+      duration: "30 minutos",
+      price: 35,
+      description: "Orientación general sobre tu carrera profesional y estrategias de empleabilidad",
+      features: ["Análisis de perfil", "Roadmap profesional", "Recomendaciones", "Recursos adicionales"],
+      icon: Briefcase,
+      popular: false
+    },
+    {
+      id: "job-recommendations",
+      title: "Recomendación de Vacantes",
+      duration: "Entrega en 48h",
+      price: 50,
+      description: "Paquete de 20 vacantes personalizadas y seleccionadas específicamente para tu perfil",
+      features: ["20 vacantes afines", "Análisis de match", "Enlaces directos", "Tips por vacante"],
+      icon: Briefcase,
+      popular: false
+    }
+  ];
+
+  const handleBookService = (serviceId: string) => {
+    // Aquí se implementaría la lógica de pago/booking
+    console.log(`Booking service: ${serviceId}`);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">Servicios Adicionales</h2>
+        <p className="text-muted-foreground">Acelera tu desarrollo profesional con servicios personalizados</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {services.map((service) => (
+          <Card key={service.id} className={`shadow-card relative ${service.popular ? 'border-primary' : ''}`}>
+            {service.popular && (
+              <Badge className="absolute -top-3 left-4 bg-primary text-primary-foreground">
+                Más Popular
+              </Badge>
+            )}
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <service.icon className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-lg">{service.title}</CardTitle>
+                  <CardDescription className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    {service.duration}
+                  </CardDescription>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-primary">${service.price}</div>
+                  <div className="text-xs text-muted-foreground">USD</div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">{service.description}</p>
+              
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Incluye:</h4>
+                <ul className="space-y-1">
+                  {service.features.map((feature, index) => (
+                    <li key={index} className="text-sm text-muted-foreground flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <Button 
+                className="w-full" 
+                variant={service.popular ? "default" : "outline"}
+                onClick={() => handleBookService(service.id)}
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Agendar Ahora
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Upcoming Sessions */}
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-primary" />
+            Sesiones Programadas
+          </CardTitle>
+          <CardDescription>
+            Tus próximas citas con career coaches
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 p-4 bg-accent rounded-lg">
+              <div className="text-center">
+                <div className="text-sm font-medium">MAR</div>
+                <div className="text-2xl font-bold text-primary">15</div>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium">Entrevista con Career Coach</h4>
+                <p className="text-sm text-muted-foreground">10:00 AM - 10:30 AM</p>
+                <p className="text-sm text-muted-foreground">Revisión de estrategia LinkedIn</p>
+              </div>
+              <Badge variant="secondary">Confirmada</Badge>
+            </div>
+            
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground">No tienes más sesiones programadas</p>
+              <Button variant="outline" size="sm" className="mt-2">
+                <Calendar className="w-4 h-4 mr-2" />
+                Agendar Nueva Sesión
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment History */}
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="w-5 h-5 text-primary" />
+            Historial de Servicios
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-2 border-b border-border">
+              <div>
+                <p className="font-medium">Entrevista con Career Coach</p>
+                <p className="text-sm text-muted-foreground">8 Mar 2024 - 30 min</p>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">$35 USD</p>
+                <Badge variant="secondary" className="text-xs">Completado</Badge>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between py-2 border-b border-border">
+              <div>
+                <p className="font-medium">Recomendación de Vacantes</p>
+                <p className="text-sm text-muted-foreground">1 Mar 2024 - 20 vacantes</p>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">$50 USD</p>
+                <Badge variant="secondary" className="text-xs">Entregado</Badge>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
