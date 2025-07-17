@@ -12,17 +12,21 @@ import { CareerCoach } from "./CareerCoach";
 import { AdditionalServices } from "./AdditionalServices";
 import { ReferAndEarn } from "./ReferAndEarn";
 import { GeneralSettings } from "./GeneralSettings";
+import { AutomatedMessages } from "./AutomatedMessages";
+import { CVBoost } from "./CVBoost";
 
 export function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
 
   const menuItems = [
     { id: "overview", label: "Dashboard", icon: Home },
-    { id: "cv-analyzer", label: "CV Analyzer", icon: FileText },
+    { id: "learning", label: "E-learning", icon: BookOpen },
+    { id: "cv-boost", label: "CV Boost", icon: FileText },
+    { id: "cv-analyzer", label: "CV Analys", icon: FileText },
     { id: "linkedin", label: "LinkedIn Optimizer", icon: Users },
     { id: "job-tracker", label: "Job Tracker", icon: Target },
-    { id: "learning", label: "E-Learning", icon: BookOpen },
-    { id: "interviews", label: "Mock Interviews", icon: MessageSquare },
+    { id: "interviews", label: "Mock Interview", icon: MessageSquare },
+    { id: "automated-messages", label: "Mensajes Automatizados", icon: Users },
     { id: "career-coach", label: "Career Coach", icon: UserCheck },
     { id: "services", label: "Servicios Adicionales", icon: DollarSign },
     { id: "referrals", label: "Refiere y Gana", icon: Gift },
@@ -31,6 +35,8 @@ export function Dashboard() {
 
   const renderContent = () => {
     switch (activeSection) {
+      case "cv-boost":
+        return <CVBoost />;
       case "cv-analyzer":
         return <CVAnalyzer />;
       case "linkedin":
@@ -41,6 +47,8 @@ export function Dashboard() {
         return <ELearningHub />;
       case "interviews":
         return <MockInterviews />;
+      case "automated-messages":
+        return <AutomatedMessages />;
       case "career-coach":
         return <CareerCoach />;
       case "services":
@@ -177,19 +185,35 @@ function DashboardOverview() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button variant="outline" className="w-full justify-start">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start"
+              onClick={() => setActiveSection("cv-boost")}
+            >
               <Upload className="w-4 h-4 mr-2" />
-              Upload CV for Analysis
+              CV Boost
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start"
+              onClick={() => setActiveSection("linkedin")}
+            >
               <Users className="w-4 h-4 mr-2" />
               Optimize LinkedIn Profile
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start"
+              onClick={() => setActiveSection("job-tracker")}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Job Application
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start"
+              onClick={() => setActiveSection("interviews")}
+            >
               <Play className="w-4 h-4 mr-2" />
               Start Mock Interview
             </Button>
@@ -200,35 +224,31 @@ function DashboardOverview() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-primary" />
-              Recent Activity
+              Sesiones de Comunidad
             </CardTitle>
             <CardDescription>
-              Your latest career development activities
+              Acceso a sesiones quincenales y grupo de WhatsApp
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">CV analyzed and improved</p>
-                  <p className="text-xs text-muted-foreground">2 hours ago</p>
-                </div>
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="font-medium mb-2">Enlace a la próxima sesión:</h4>
+              <div className="p-3 bg-accent rounded-lg">
+                <p className="text-sm font-medium">Sesión: Estrategias de Networking</p>
+                <p className="text-xs text-muted-foreground">Jueves 25 de Julio, 2024 - 7:00 PM (Hora México)</p>
+                <Button size="sm" className="mt-2">
+                  <Play className="w-4 h-4 mr-2" />
+                  Acceder a la sesión
+                </Button>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-success rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Applied to Software Engineer position</p>
-                  <p className="text-xs text-muted-foreground">5 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-info rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Completed mock interview</p>
-                  <p className="text-xs text-muted-foreground">1 day ago</p>
-                </div>
-              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium mb-2">Liga de Acceso al grupo de WhatsApp:</h4>
+              <Button variant="outline" size="sm" className="w-full">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Unirse al grupo de comunidad
+              </Button>
             </div>
           </CardContent>
         </Card>

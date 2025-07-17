@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface InterviewSession {
   id: string;
@@ -21,6 +22,7 @@ interface InterviewSession {
 
 export function MockInterviews() {
   const [jobDescription, setJobDescription] = useState('');
+  const [language, setLanguage] = useState('');
   const [isInterviewActive, setIsInterviewActive] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
@@ -130,6 +132,20 @@ export function MockInterviews() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
+            <Label className="text-base font-medium">Idioma de la entrevista</Label>
+            <RadioGroup value={language} onValueChange={setLanguage} className="mt-2">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="spanish" id="spanish" />
+                <Label htmlFor="spanish">Español</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="english" id="english" />
+                <Label htmlFor="english">Inglés</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div>
             <Label htmlFor="job-description">Job Description</Label>
             <Textarea
               id="job-description"
@@ -144,7 +160,7 @@ export function MockInterviews() {
           <div className="flex gap-2">
             <Button 
               onClick={startInterview}
-              disabled={!jobDescription.trim() || isInterviewActive}
+              disabled={!jobDescription.trim() || !language || isInterviewActive}
               variant="professional"
               className="flex-1"
             >

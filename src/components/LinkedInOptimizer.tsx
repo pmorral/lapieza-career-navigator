@@ -5,9 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 export function LinkedInOptimizer() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [language, setLanguage] = useState('');
   const [optimizedContent, setOptimizedContent] = useState<any>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const { toast } = useToast();
@@ -79,6 +82,20 @@ export function LinkedInOptimizer() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div>
+              <Label className="text-base font-medium">Idioma del contenido</Label>
+              <RadioGroup value={language} onValueChange={setLanguage} className="mt-2">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="spanish" id="spanish" />
+                  <Label htmlFor="spanish">Español</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="english" id="english" />
+                  <Label htmlFor="english">Inglés</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
             <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
               <input
                 type="file"
@@ -111,7 +128,7 @@ export function LinkedInOptimizer() {
             
             <Button
               onClick={optimizeProfile}
-              disabled={!uploadedFile || isOptimizing}
+              disabled={!uploadedFile || !language || isOptimizing}
               className="w-full"
               variant="professional"
             >
@@ -124,7 +141,7 @@ export function LinkedInOptimizer() {
                 <>
                   <Users className="w-4 h-4 mr-2" />
                   Optimize with AI
-                </>
+                <//>
               )}
             </Button>
           </CardContent>

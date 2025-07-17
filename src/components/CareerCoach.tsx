@@ -109,49 +109,6 @@ export function CareerCoach() {
         </Card>
       </div>
 
-      {/* Recent Messages */}
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="w-5 h-5 text-primary" />
-            Mensajes Recientes
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex gap-3">
-              <Avatar className="w-8 h-8">
-                <AvatarImage src={coachInfo.photo} alt={coachInfo.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                  MG
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="bg-accent p-3 rounded-lg rounded-tl-none">
-                  <p className="text-sm">Hola! He revisado tu CV actualizado. Excelente trabajo con las mejoras que discutimos. ¿Te parece si agendamos una sesión para revisar tu estrategia de LinkedIn?</p>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Hace 2 horas</p>
-              </div>
-            </div>
-            
-            <div className="flex gap-3 justify-end">
-              <div className="flex-1 max-w-xs">
-                <div className="bg-primary text-primary-foreground p-3 rounded-lg rounded-tr-none">
-                  <p className="text-sm">¡Perfecto! Sí, me gustaría agendar la sesión para LinkedIn. ¿Tienes disponibilidad el viernes?</p>
-                </div>
-                <p className="text-xs text-muted-foreground text-right mt-1">Hace 1 hora</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="pt-4 border-t mt-4">
-            <Button variant="outline" className="w-full">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Ver conversación completa
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

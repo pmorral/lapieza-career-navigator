@@ -25,77 +25,119 @@ export function ELearningHub() {
   const [courses] = useState<Course[]>([
     {
       id: '1',
-      title: 'Master Your CV: From Average to Outstanding',
-      description: 'Learn how to create compelling CVs that get noticed by recruiters and pass ATS systems.',
+      title: 'Onboarding',
+      description: 'Introducción a la plataforma y conceptos básicos de empleabilidad',
       instructor: 'Maria Rodriguez',
-      duration: '2h 30m',
-      lessons: 12,
+      duration: '1h',
+      lessons: 4,
       rating: 4.8,
       enrolled: 1250,
+      progress: 100,
+      category: 'Onboarding',
+      thumbnail: 'onboarding-course',
+      isPremium: false
+    },
+    {
+      id: '2',
+      title: 'Define tu perfil profesional',
+      description: 'Identifica tus fortalezas, valores y objetivos profesionales',
+      instructor: 'Carlos Mendez',
+      duration: '2h',
+      lessons: 8,
+      rating: 4.9,
+      enrolled: 950,
       progress: 75,
+      category: 'Perfil',
+      thumbnail: 'profile-course',
+      isPremium: false
+    },
+    {
+      id: '3',
+      title: 'CV & ATS',
+      description: 'Crea un CV optimizado para sistemas de seguimiento de candidatos',
+      instructor: 'Ana Silva',
+      duration: '2.5h',
+      lessons: 10,
+      rating: 4.7,
+      enrolled: 2100,
+      progress: 50,
       category: 'CV',
       thumbnail: 'cv-course',
       isPremium: false
     },
     {
-      id: '2',
-      title: 'LinkedIn Mastery: Building Your Professional Brand',
-      description: 'Transform your LinkedIn profile into a powerful career tool that attracts opportunities.',
-      instructor: 'Carlos Mendez',
-      duration: '3h 15m',
-      lessons: 18,
-      rating: 4.9,
-      enrolled: 950,
-      progress: 45,
+      id: '4',
+      title: 'LinkedIn Boost: Potencia tu Marca Personal',
+      description: 'Maximiza tu presencia profesional en LinkedIn para atraer oportunidades',
+      instructor: 'Roberto Garcia',
+      duration: '2h',
+      lessons: 8,
+      rating: 4.6,
+      enrolled: 800,
+      progress: 25,
       category: 'LinkedIn',
       thumbnail: 'linkedin-course',
-      isPremium: true
+      isPremium: false
     },
     {
-      id: '3',
-      title: 'Interview Success: Ace Any Interview',
-      description: 'Master the art of interviewing with proven techniques and real-world scenarios.',
-      instructor: 'Ana Silva',
-      duration: '4h 45m',
-      lessons: 25,
-      rating: 4.7,
-      enrolled: 2100,
+      id: '5',
+      title: 'Dominando la estrategia de búsqueda laboral',
+      description: 'Técnicas efectivas para encontrar y aplicar a las mejores oportunidades',
+      instructor: 'Elena Morales',
+      duration: '3h',
+      lessons: 12,
+      rating: 4.8,
+      enrolled: 1500,
       progress: 0,
-      category: 'Interview',
+      category: 'Búsqueda',
+      thumbnail: 'job-search-course',
+      isPremium: false
+    },
+    {
+      id: '6',
+      title: 'Proceso de selección: Entrevistas y Seguimiento para el éxito laboral',
+      description: 'Domina las entrevistas laborales y el seguimiento post-entrevista',
+      instructor: 'Luis Herrera',
+      duration: '3.5h',
+      lessons: 14,
+      rating: 4.7,
+      enrolled: 1200,
+      progress: 0,
+      category: 'Entrevistas',
       thumbnail: 'interview-course',
       isPremium: false
     },
     {
-      id: '4',
-      title: 'Negotiation Skills for Better Offers',
-      description: 'Learn how to negotiate salary and benefits effectively in your career.',
-      instructor: 'Roberto Garcia',
-      duration: '2h 10m',
-      lessons: 10,
-      rating: 4.6,
-      enrolled: 800,
-      progress: 20,
-      category: 'Negotiation',
-      thumbnail: 'negotiation-course',
-      isPremium: true
+      id: '7',
+      title: 'Soporte emocional en la búsqueda de empleo',
+      description: 'Mantén la motivación y gestiona el estrés durante tu búsqueda laboral',
+      instructor: 'Carmen López',
+      duration: '1.5h',
+      lessons: 6,
+      rating: 4.9,
+      enrolled: 890,
+      progress: 0,
+      category: 'Bienestar',
+      thumbnail: 'emotional-course',
+      isPremium: false
     },
     {
-      id: '5',
-      title: 'Job Search Strategy: Finding Hidden Opportunities',
-      description: 'Discover advanced job search techniques and tap into the hidden job market.',
-      instructor: 'Elena Morales',
-      duration: '3h 30m',
-      lessons: 16,
+      id: '8',
+      title: 'Oferta Laboral, Negociación y Adaptación exitosa',
+      description: 'Negocia ofertas laborales y adáptate exitosamente a tu nuevo empleo',
+      instructor: 'Miguel Torres',
+      duration: '2h',
+      lessons: 8,
       rating: 4.8,
-      enrolled: 1500,
-      progress: 60,
-      category: 'Job Search',
-      thumbnail: 'job-search-course',
+      enrolled: 750,
+      progress: 0,
+      category: 'Negociación',
+      thumbnail: 'negotiation-course',
       isPremium: false
     }
   ]);
 
-  const categories = ['All', 'CV', 'LinkedIn', 'Interview', 'Negotiation', 'Job Search'];
+  const categories = ['All', 'Onboarding', 'Perfil', 'CV', 'LinkedIn', 'Búsqueda', 'Entrevistas', 'Bienestar', 'Negociación'];
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   const filteredCourses = selectedCategory === 'All' 
@@ -137,13 +179,22 @@ export function ELearningHub() {
 
       {/* Course Categories */}
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
-          {categories.map((category) => (
-            <TabsTrigger key={category} value={category}>
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-1">
+          {categories.slice(0, 5).map((category) => (
+            <TabsTrigger key={category} value={category} className="text-xs">
               {category}
             </TabsTrigger>
           ))}
         </TabsList>
+        {categories.length > 5 && (
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-1 mt-2">
+            {categories.slice(5).map((category) => (
+              <TabsTrigger key={category} value={category} className="text-xs">
+                {category}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        )}
         
         <TabsContent value={selectedCategory} className="space-y-6">
           {/* Course Stats */}

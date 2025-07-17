@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Upload, Download, FileText, Sparkles, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, Download, FileText, Sparkles, CheckCircle, AlertCircle, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 export function CVAnalyzer() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [jobDescription, setJobDescription] = useState("");
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -53,16 +56,23 @@ export function CVAnalyzer() {
 
   return (
     <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">CV Analys</h2>
+        <p className="text-muted-foreground">
+          Optimiza tu CV para una vacante específica con análisis de IA
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upload Section */}
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="w-5 h-5 text-primary" />
-              Upload Your CV
+              Sube tu CV actualizado
             </CardTitle>
             <CardDescription>
-              Upload your current CV to get AI-powered analysis and improvements
+              Primero sube tu CV actual para el análisis
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -80,151 +90,135 @@ export function CVAnalyzer() {
               >
                 <FileText className="w-12 h-12 text-muted-foreground" />
                 <p className="text-sm font-medium">
-                  Click to upload or drag and drop
+                  Click para subir tu CV
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  PDF, DOC, or DOCX files only
+                  PDF, DOC, o DOCX solamente
                 </p>
               </label>
-            </div>
-            
-            <div className="text-center pt-2">
-              <p className="text-sm text-muted-foreground mb-3">¿No tienes un CV? Comienza con una plantilla</p>
-              <Button variant="outline" size="sm" onClick={() => downloadTemplate("basic")}>
-                <Download className="w-4 h-4 mr-2" />
-                Acceder a Templates Predeterminados
-              </Button>
             </div>
             
             {uploadedFile && (
               <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
                 <FileText className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium">{uploadedFile.name}</span>
-                <Badge variant="secondary">Ready</Badge>
+                <Badge variant="secondary">Listo</Badge>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Job Description Section */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-primary" />
+              Descripción de la vacante
+            </CardTitle>
+            <CardDescription>
+              Pega la descripción del puesto para optimizar tu CV
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="job-description">Descripción completa del puesto</Label>
+              <Textarea
+                id="job-description"
+                placeholder="Pega aquí la descripción completa de la vacante a la que quieres aplicar..."
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                rows={10}
+              />
+            </div>
             
             <Button
               onClick={analyzeCV}
-              disabled={!uploadedFile || isAnalyzing}
+              disabled={!uploadedFile || !jobDescription || isAnalyzing}
               className="w-full"
               variant="professional"
             >
               {isAnalyzing ? (
                 <>
                   <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-                  Analyzing CV...
+                  Optimizando CV...
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Analyze CV with AI
+                  Optimizar CV para esta vacante
                 </>
               )}
             </Button>
           </CardContent>
         </Card>
-
-        {/* Analysis Results */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-success" />
-              Analysis Results
-            </CardTitle>
-            <CardDescription>
-              AI-powered insights and recommendations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!analysisResult ? (
-              <div className="text-center py-8">
-                <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  Upload and analyze your CV to see results
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Overall Score</span>
-                    <span className="text-2xl font-bold text-primary">{analysisResult.score}/100</span>
-                  </div>
-                  <Progress value={analysisResult.score} className="h-2" />
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="font-medium text-success mb-2">Strengths</h4>
-                    <ul className="space-y-1">
-                      {analysisResult.strengths.map((strength: string, index: number) => (
-                        <li key={index} className="text-sm flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                          {strength}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium text-warning mb-2">Improvements</h4>
-                    <ul className="space-y-1">
-                      {analysisResult.improvements.map((improvement: string, index: number) => (
-                        <li key={index} className="text-sm flex items-start gap-2">
-                          <AlertCircle className="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
-                          {improvement}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
 
-      {/* CV Templates */}
+      {/* Optimized CV Results */}
       {analysisResult && (
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Download className="w-5 h-5 text-primary" />
-              Download Improved CV Templates
+              <CheckCircle className="w-5 h-5 text-success" />
+              CV Optimizado para la Vacante
             </CardTitle>
             <CardDescription>
-              Choose from 3 professionally designed templates with your optimized content
+              Tu CV ha sido reorganizado y optimizado para esta oportunidad específica
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { name: "Professional", description: "Clean and modern design" },
-                { name: "Creative", description: "Eye-catching and unique" },
-                { name: "Classic", description: "Traditional and timeless" }
-              ].map((template) => (
-                <div key={template.name} className="border rounded-lg p-4 text-center">
-                  <div className="w-full h-32 bg-gradient-subtle rounded-lg mb-3 flex items-center justify-center">
-                    <FileText className="w-8 h-8 text-muted-foreground" />
+            <div className="space-y-4">
+              <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
+                <h4 className="font-medium text-success mb-2">Optimizaciones realizadas:</h4>
+                <ul className="space-y-1 text-sm text-success">
+                  <li>• Encabezado optimizado con headline profesional</li>
+                  <li>• Perfil profesional alineado al puesto objetivo</li>
+                  <li>• Experiencia reorganizada y redactada para esta vacante</li>
+                  <li>• Skills categorizadas y priorizadas según requisitos</li>
+                  <li>• Estructura optimizada para ATS</li>
+                </ul>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { 
+                    name: "Profesional", 
+                    description: "Para perfiles jr u operativos",
+                    color: "bg-blue-100"
+                  },
+                  { 
+                    name: "Creativo", 
+                    description: "Para perfiles de Marketing y Diseño",
+                    color: "bg-purple-100"
+                  },
+                  { 
+                    name: "Clásico", 
+                    description: "Para perfiles Sr.",
+                    color: "bg-gray-100"
+                  }
+                ].map((template) => (
+                  <div key={template.name} className="border rounded-lg p-4 text-center">
+                    <div className={`w-full h-24 ${template.color} rounded-lg mb-3 flex items-center justify-center`}>
+                      <FileText className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-medium mb-1">{template.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{template.description}</p>
+                    <Button
+                      onClick={() => downloadTemplate(template.name)}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Descargar
+                    </Button>
                   </div>
-                  <h3 className="font-medium mb-1">{template.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{template.description}</p>
-                  <Button
-                    onClick={() => downloadTemplate(template.name)}
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </Button>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
+
     </div>
   );
 }
