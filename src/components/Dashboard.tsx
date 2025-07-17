@@ -58,7 +58,7 @@ export function Dashboard() {
       case "settings":
         return <GeneralSettings />;
       default:
-        return <DashboardOverview />;
+        return <DashboardOverview setActiveSection={setActiveSection} />;
     }
   };
 
@@ -124,7 +124,7 @@ export function Dashboard() {
   );
 }
 
-function DashboardOverview() {
+function DashboardOverview({ setActiveSection }: { setActiveSection: (section: string) => void }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

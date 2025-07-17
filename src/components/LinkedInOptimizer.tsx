@@ -141,7 +141,7 @@ export function LinkedInOptimizer() {
                 <>
                   <Users className="w-4 h-4 mr-2" />
                   Optimize with AI
-                <//>
+                </>
               )}
             </Button>
           </CardContent>
