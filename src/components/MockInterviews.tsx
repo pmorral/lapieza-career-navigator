@@ -15,7 +15,7 @@ interface InterviewSession {
   date: string;
   duration: string;
   score: number;
-  feedback: string[];
+  feedback: string;
   improvements: string[];
   status: 'completed' | 'in-progress' | 'scheduled';
 }
@@ -34,11 +34,7 @@ export function MockInterviews() {
       date: '2024-01-15',
       duration: '25 min',
       score: 85,
-      feedback: [
-        'Strong technical knowledge demonstrated',
-        'Good communication skills',
-        'Confident in explaining complex concepts'
-      ],
+      feedback: "Conocimiento técnico sólido demostrado. Buenas habilidades de comunicación. Confiado al explicar conceptos complejos.",
       improvements: [
         'Practice behavioral questions more',
         'Prepare specific examples for leadership scenarios',
@@ -53,11 +49,7 @@ export function MockInterviews() {
       date: '2024-01-10',
       duration: '30 min',
       score: 78,
-      feedback: [
-        'Solid problem-solving approach',
-        'Good understanding of system design',
-        'Enthusiastic and engaged'
-      ],
+      feedback: "Enfoque sólido para resolver problemas. Buen entendimiento del diseño de sistemas. Entusiasta y comprometido.",
       improvements: [
         'Improve answer structure (STAR method)',
         'Practice coding questions out loud',
@@ -306,17 +298,12 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-medium text-success mb-2">Strengths</h4>
-                    <ul className="space-y-1">
-                      {interview.feedback.map((item, index) => (
-                        <li key={index} className="text-sm flex items-start gap-2">
-                          <div className="w-1.5 h-1.5 bg-success rounded-full mt-2 flex-shrink-0"></div>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
+                <div>
+                  <h4 className="font-medium text-success mb-2">Feedback</h4>
+                  <div className="text-sm whitespace-pre-line p-3 bg-accent rounded-lg">
+                    {interview.feedback}
                   </div>
+                </div>
                   
                   <div>
                     <h4 className="font-medium text-warning mb-2">Areas for Improvement</h4>
