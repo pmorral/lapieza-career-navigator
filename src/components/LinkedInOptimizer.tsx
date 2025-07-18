@@ -36,24 +36,20 @@ export function LinkedInOptimizer() {
     // Simulate AI optimization
     setTimeout(() => {
       setOptimizedContent({
-        headline: "Senior Software Engineer | Full-Stack Developer | React & Node.js Expert | Building Scalable Web Applications",
-        summary: "Experienced software engineer with 5+ years of expertise in full-stack development. Proven track record of delivering high-quality web applications using React, Node.js, and modern technologies. Passionate about creating efficient, scalable solutions that drive business growth.",
-        experience: [
-          {
-            title: "Senior Software Engineer",
-            company: "Tech Solutions Inc.",
-            description: "Led development of enterprise web applications serving 10,000+ users. Implemented React-based frontend architectures and Node.js backend systems. Mentored junior developers and improved code quality through comprehensive testing strategies."
-          }
-        ],
-        skills: [
-          "JavaScript", "React", "Node.js", "TypeScript", "Python", "AWS", "MongoDB", "PostgreSQL"
-        ],
-        improvements: [
-          "Added specific metrics and achievements",
-          "Optimized keywords for better visibility",
-          "Enhanced professional summary",
-          "Improved skill organization"
-        ]
+        spanish: {
+          headline: "Ingeniero de Software Senior | Desarrollador Full-Stack | Experto en React & Node.js | Construcción de Aplicaciones Web Escalables",
+          summary: "Ingeniero de software experimentado con más de 5 años de experiencia en desarrollo full-stack. Historial comprobado en la entrega de aplicaciones web de alta calidad usando React, Node.js y tecnologías modernas. 💻\n\nApasionado por crear soluciones eficientes y escalables que impulsen el crecimiento empresarial. Mi experiencia incluye liderazgo de equipos, arquitectura de sistemas y optimización de procesos. 🚀\n\n¿Interesado en conectar? Escríbeme a: ejemplo@email.com 📧",
+          skills: [
+            "JavaScript", "React", "Node.js", "TypeScript", "Python", "AWS", "MongoDB", "PostgreSQL", "Git", "Docker"
+          ]
+        },
+        english: {
+          headline: "Senior Software Engineer | Full-Stack Developer | React & Node.js Expert | Building Scalable Web Applications",
+          summary: "Experienced software engineer with 5+ years of expertise in full-stack development. Proven track record of delivering high-quality web applications using React, Node.js, and modern technologies. 💻\n\nPassionate about creating efficient, scalable solutions that drive business growth. My experience includes team leadership, system architecture, and process optimization. 🚀\n\nInterested in connecting? Reach out to me at: ejemplo@email.com 📧",
+          skills: [
+            "JavaScript", "React", "Node.js", "TypeScript", "Python", "AWS", "MongoDB", "PostgreSQL", "Git", "Docker"
+          ]
+        }
       });
       setIsOptimizing(false);
     }, 3000);
@@ -75,26 +71,13 @@ export function LinkedInOptimizer() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="w-5 h-5 text-primary" />
-              Upload LinkedIn Profile
+              Subir CV Optimizado
             </CardTitle>
             <CardDescription>
-              Upload your LinkedIn profile PDF (More → Save to PDF) for AI optimization
+              Sube tu CV optimizado para generar contenido para LinkedIn
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label className="text-base font-medium">Idioma del contenido</Label>
-              <RadioGroup value={language} onValueChange={setLanguage} className="mt-2">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="spanish" id="spanish" />
-                  <Label htmlFor="spanish">Español</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="english" id="english" />
-                  <Label htmlFor="english">Inglés</Label>
-                </div>
-              </RadioGroup>
-            </div>
 
             <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
               <input
@@ -110,10 +93,10 @@ export function LinkedInOptimizer() {
               >
                 <Linkedin className="w-12 h-12 text-muted-foreground" />
                 <p className="text-sm font-medium">
-                  Click to upload LinkedIn PDF
+                  Click para subir CV optimizado (PDF)
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  PDF files only
+                  Solo archivos PDF
                 </p>
               </label>
             </div>
@@ -128,19 +111,19 @@ export function LinkedInOptimizer() {
             
             <Button
               onClick={optimizeProfile}
-              disabled={!uploadedFile || !language || isOptimizing}
+              disabled={!uploadedFile || isOptimizing}
               className="w-full"
               variant="professional"
             >
               {isOptimizing ? (
                 <>
                   <Users className="w-4 h-4 mr-2 animate-spin" />
-                  Optimizing Profile...
+                  Generando contenido para LinkedIn...
                 </>
               ) : (
                 <>
                   <Users className="w-4 h-4 mr-2" />
-                  Optimize with AI
+                  Generar Contenido LinkedIn
                 </>
               )}
             </Button>
@@ -198,76 +181,123 @@ export function LinkedInOptimizer() {
         <div className="space-y-6">
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-success" />
-                Optimized LinkedIn Content
-              </CardTitle>
-              <CardDescription>
-                AI-optimized content ready to copy to your LinkedIn profile
-              </CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-success" />
+              Contenido Optimizado para LinkedIn
+            </CardTitle>
+            <CardDescription>
+              Contenido optimizado por IA listo para copiar a tu perfil de LinkedIn
+            </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Headline */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium">Professional Headline</h3>
-                  <Button
-                    onClick={() => copyToClipboard(optimizedContent.headline)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy
-                  </Button>
+              {/* Contenido en Español */}
+              <div className="border-b pb-6">
+                <h2 className="text-lg font-semibold mb-4">🇪🇸 Contenido en Español</h2>
+                
+                {/* Headline Español */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">Titular Profesional</h3>
+                    <Button
+                      onClick={() => copyToClipboard(optimizedContent.spanish.headline)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copiar
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={optimizedContent.spanish.headline}
+                    readOnly
+                    className="min-h-[60px]"
+                  />
                 </div>
-                <Textarea
-                  value={optimizedContent.headline}
-                  readOnly
-                  className="min-h-[60px]"
-                />
+
+                {/* Summary Español */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">Acerca de (About)</h3>
+                    <Button
+                      onClick={() => copyToClipboard(optimizedContent.spanish.summary)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copiar
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={optimizedContent.spanish.summary}
+                    readOnly
+                    className="min-h-[120px]"
+                  />
+                </div>
+
+                {/* Skills Español */}
+                <div>
+                  <h3 className="font-medium mb-2">Aptitudes Recomendadas</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {optimizedContent.spanish.skills.map((skill: string, index: number) => (
+                      <Badge key={index} variant="secondary">{skill}</Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Summary */}
+              {/* Contenido en Inglés */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium">About Section</h3>
-                  <Button
-                    onClick={() => copyToClipboard(optimizedContent.summary)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy
-                  </Button>
+                <h2 className="text-lg font-semibold mb-4">🇺🇸 Content in English</h2>
+                
+                {/* Headline English */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">Professional Headline</h3>
+                    <Button
+                      onClick={() => copyToClipboard(optimizedContent.english.headline)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={optimizedContent.english.headline}
+                    readOnly
+                    className="min-h-[60px]"
+                  />
                 </div>
-                <Textarea
-                  value={optimizedContent.summary}
-                  readOnly
-                  className="min-h-[120px]"
-                />
-              </div>
 
-              {/* Skills */}
-              <div>
-                <h3 className="font-medium mb-2">Recommended Skills</h3>
-                <div className="flex flex-wrap gap-2">
-                  {optimizedContent.skills.map((skill: string, index: number) => (
-                    <Badge key={index} variant="secondary">{skill}</Badge>
-                  ))}
+                {/* Summary English */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">About Section</h3>
+                    <Button
+                      onClick={() => copyToClipboard(optimizedContent.english.summary)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={optimizedContent.english.summary}
+                    readOnly
+                    className="min-h-[120px]"
+                  />
                 </div>
-              </div>
 
-              {/* Improvements */}
-              <div>
-                <h3 className="font-medium mb-2">Key Improvements Made</h3>
-                <ul className="space-y-1">
-                  {optimizedContent.improvements.map((improvement: string, index: number) => (
-                    <li key={index} className="text-sm flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-                      {improvement}
-                    </li>
-                  ))}
-                </ul>
+                {/* Skills English */}
+                <div>
+                  <h3 className="font-medium mb-2">Recommended Skills</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {optimizedContent.english.skills.map((skill: string, index: number) => (
+                      <Badge key={index} variant="secondary">{skill}</Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -22,7 +22,7 @@ export function Dashboard() {
     { id: "overview", label: "Dashboard", icon: Home },
     { id: "learning", label: "E-learning", icon: BookOpen },
     { id: "cv-boost", label: "CV Boost", icon: FileText },
-    { id: "cv-analyzer", label: "CV Analys", icon: FileText },
+    { id: "cv-analyzer", label: "CV Analyst", icon: FileText },
     { id: "linkedin", label: "LinkedIn Optimizer", icon: Users },
     { id: "job-tracker", label: "Job Tracker", icon: Target },
     { id: "interviews", label: "Mock Interview", icon: MessageSquare },

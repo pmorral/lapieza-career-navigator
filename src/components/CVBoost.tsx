@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase } from "lucide-react";
+import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -27,11 +27,24 @@ export function CVBoost() {
   const processCV = async () => {
     setIsProcessing(true);
     
-    // Simulate AI processing
+    // Simulate AI processing for feedback generation
     setTimeout(() => {
       setResult({
-        optimizedContent: "CV optimizado generado exitosamente",
-        templates: ["professional", "creative", "classic"]
+        feedback: {
+          strengths: [
+            "Experiencia relevante en el área objetivo",
+            "Habilidades técnicas bien definidas",
+            "Trayectoria profesional consistente",
+            "Logros cuantificables mencionados"
+          ],
+          improvements: [
+            "Añadir más métricas específicas de impacto",
+            "Mejorar la descripción del perfil profesional",
+            "Incluir palabras clave relevantes para ATS",
+            "Optimizar formato para mejor legibilidad"
+          ]
+        },
+        recommendedTemplate: "Profesional"
       });
       setIsProcessing(false);
       setCurrentStep(3);
@@ -178,12 +191,12 @@ export function CVBoost() {
                 {isProcessing ? (
                   <>
                     <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-                    Procesando CV...
+                    Analizando y generando feedback...
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Optimizar CV
+                    Analizar CV y Generar Feedback
                   </>
                 )}
               </Button>
@@ -197,9 +210,9 @@ export function CVBoost() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">CV Boost - Resultados</h2>
+        <h2 className="text-2xl font-bold mb-2">CV Boost - Análisis Completado</h2>
         <p className="text-muted-foreground">
-          Tu CV ha sido optimizado exitosamente
+          Hemos analizado tu CV y generado un feedback detallado
         </p>
       </div>
 
@@ -208,14 +221,46 @@ export function CVBoost() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-success" />
-              CV Optimizado
+              Análisis de CV
             </CardTitle>
             <CardDescription>
-              Contenido mejorado según tus especificaciones
+              Feedback detallado sobre tu CV actual
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* Puntos Fuertes */}
+              <div>
+                <h3 className="font-medium mb-3 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-success" />
+                  Puntos Fuertes de tu CV
+                </h3>
+                <ul className="space-y-2">
+                  {result?.feedback?.strengths?.map((strength: string, index: number) => (
+                    <li key={index} className="text-sm flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-success rounded-full mt-2 flex-shrink-0" />
+                      {strength}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Puntos a Mejorar */}
+              <div>
+                <h3 className="font-medium mb-3 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-warning" />
+                  Puntos a Mejorar
+                </h3>
+                <ul className="space-y-2">
+                  {result?.feedback?.improvements?.map((improvement: string, index: number) => (
+                    <li key={index} className="text-sm flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-warning rounded-full mt-2 flex-shrink-0" />
+                      {improvement}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
               <div className="p-4 bg-accent rounded-lg">
                 <h4 className="font-medium mb-2">Configuración aplicada:</h4>
                 <div className="space-y-1 text-sm">
@@ -233,18 +278,6 @@ export function CVBoost() {
                   </div>
                 </div>
               </div>
-              
-              <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
-                <p className="text-sm text-success font-medium">
-                  ✓ CV optimizado con estructura profesional
-                </p>
-                <p className="text-sm text-success font-medium">
-                  ✓ Contenido alineado al puesto objetivo
-                </p>
-                <p className="text-sm text-success font-medium">
-                  ✓ Keywords optimizadas para ATS
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -253,14 +286,20 @@ export function CVBoost() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="w-5 h-5 text-primary" />
-              Descargar Templates
+              Templates Disponibles
             </CardTitle>
             <CardDescription>
-              Elige el diseño que mejor se adapte a tu perfil
+              Para obtener tu CV optimizado, selecciona uno de nuestros templates
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              <div className="p-3 bg-info/10 border border-info/20 rounded-lg mb-4">
+                <p className="text-sm text-info font-medium">
+                  Template recomendado: {result?.recommendedTemplate}
+                </p>
+              </div>
+              
               {[
                 { 
                   name: "Profesional", 
@@ -286,10 +325,13 @@ export function CVBoost() {
                     <div className="flex-1">
                       <h3 className="font-medium">{template.name}</h3>
                       <p className="text-sm text-muted-foreground">{template.description}</p>
+                      {template.name === result?.recommendedTemplate && (
+                        <Badge variant="secondary" className="mt-1">Recomendado</Badge>
+                      )}
                     </div>
                     <Button
                       onClick={() => downloadTemplate(template.name)}
-                      variant="outline"
+                      variant={template.name === result?.recommendedTemplate ? "default" : "outline"}
                       size="sm"
                     >
                       <Download className="w-4 h-4 mr-2" />

@@ -26,7 +26,7 @@ export function MockInterviews() {
   const [isInterviewActive, setIsInterviewActive] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
-  const [interviews] = useState<InterviewSession[]>([
+  const [interviews, setInterviews] = useState<InterviewSession[]>([
     {
       id: '1',
       jobTitle: 'Senior Frontend Developer',
@@ -84,6 +84,45 @@ export function MockInterviews() {
   };
 
   const endInterview = () => {
+    // Simulate AI feedback generation in Spanish
+    const feedback = `Basándome en la descripción de la vacante proporcionada, aquí está mi evaluación:
+
+FORTALEZAS IDENTIFICADAS:
+• Conocimiento técnico sólido relacionado con los requisitos del puesto
+• Buena articulación de ideas y comunicación clara
+• Ejemplos relevantes que demuestran experiencia práctica
+
+ÁREAS DE MEJORA:
+• Aplicar más consistentemente la metodología STAR en las respuestas
+• Profundizar en ejemplos específicos que conecten con los requisitos de la vacante
+• Mostrar mayor conocimiento sobre la cultura y valores de la empresa
+
+METODOLOGÍA STAR:
+La metodología STAR es una técnica estructurada para responder preguntas de entrevista:
+- Situación: Describe el contexto o situación
+- Tarea: Explica la tarea que tenías que realizar
+- Acción: Detalla las acciones específicas que tomaste
+- Resultado: Comparte los resultados obtenidos con métricas cuando sea posible
+
+Aplicar esta metodología te ayudará a dar respuestas más estructuradas y convincentes.`;
+
+    const newInterview = {
+      id: Date.now().toString(),
+      jobTitle: "Software Engineer", 
+      company: "Tech Corp",
+      date: new Date().toISOString().split('T')[0],
+      duration: "45 min",
+      score: 8.5,
+      feedback,
+      improvements: [
+        "Practicar más preguntas conductuales usando metodología STAR",
+        "Preparar ejemplos específicos para escenarios de liderazgo", 
+        "Investigar a fondo la cultura de la empresa"
+      ],
+      status: "completed" as const
+    };
+
+    setInterviews(prev => [newInterview, ...prev]);
     setIsInterviewActive(false);
     setIsRecording(false);
     setCurrentQuestion('');

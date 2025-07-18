@@ -13,34 +13,51 @@ export function AutomatedMessages() {
     {
       id: "networking",
       title: "Networking",
-      description: "Mensajes para establecer conexiones profesionales",
+      description: "Mensajes para hacer networking profesional",
       icon: Users,
       examples: [
+        "Hola (Nombre del Perfil),\nHe solicitado el puesto de (nombre de la vacante) en (compañía) y estoy muy interesado en aportar a su equipo. ¿Podríamos coordinar una breve charla para explorar cómo puedo contribuir?\nSaludos,\n[Tu Nombre]",
         "Hola [Nombre], me gustaría conectar contigo para expandir mi red profesional en [Industria].",
-        "Vi tu perfil y me interesa mucho tu experiencia en [Área]. ¿Podríamos conectar?",
         "Hola [Nombre], estoy explorando oportunidades en [Empresa/Industria] y me encantaría conocer tu perspectiva."
       ]
     },
     {
       id: "follow-up",
-      title: "Seguimiento de procesos",
-      description: "Mensajes para dar seguimiento a aplicaciones y entrevistas",
+      title: "Seguimiento de Procesos",
+      description: "Mensajes para dar seguimiento a aplicaciones",
       icon: MessageSquare,
       examples: [
-        "Estimado/a [Nombre], espero se encuentre bien. Quería dar seguimiento a mi aplicación para la posición de [Puesto].",
-        "Hola [Nombre], muchas gracias por la entrevista del [Fecha]. Quedo a la espera de los siguientes pasos.",
-        "Buenos días [Nombre], ¿hay alguna actualización sobre el proceso de selección para [Puesto]?"
+        "Buen día [Nombre], espero te encuentres bien. Quería dar seguimiento a mi aplicación para la posición de [Puesto]. Estoy interesado en conocer los siguientes pasos."
       ]
     },
     {
       id: "emails",
-      title: "Correos profesionales",
-      description: "Templates para correos formales y de negocios",
+      title: "Correos Profesionales",
+      description: "Templates para correos formales y seguimiento",
       icon: Mail,
       examples: [
-        "Asunto: Aplicación para la posición de [Puesto] - [Tu nombre]",
-        "Asunto: Seguimiento - Entrevista [Puesto] - [Fecha]",
-        "Asunto: Agradecimiento por la oportunidad - [Tu nombre]"
+        "Asunto: Aplicación para la posición de [Puesto] - [Tu nombre]\n\nHola (nombre del reclutador), soy (nombre y perfil profesional), te contacto porque he visto la vacante de (nombre de la vacante) en (página de careers, LinkedIn, OCC, bolsas de trabajo, correo, etc.).\n\nEstoy sumamente interesado en esta oferta de trabajo, ya que he seguido de cerca el crecimiento de (nombre de la empresa/organización) como (mencionar algunos proyectos, cultura laboral, etc.,) y me encantaría formar parte del equipo.\n\nA lo largo de mi carrera, he desarrollado habilidades en (mencionar habilidades relevantes para la posición), además, mi experiencia en (mencionar experiencia relevante y logros, si es cuantificable, mejor) me ha permitido enfrentar desafíos y trabajar eficazmente en entornos dinámicos.\n\nAdjunto mi CV y (portafolio dependerá del perfil) para tu/su consideración, ya que me encantaría ser parte del proceso de selección para la vacante.\nAgradezco la oportunidad de considerar mi candidatura para esta posición. Estoy disponible para programar una entrevista y hablar sobre mi experiencia y habilidades.\n\nExcelente día.\nSaludos.\n\nNombre\nPerfil profesional\nContacto",
+        "Asunto: Seguimiento - Entrevista [Puesto] - [Fecha]\nNota: Dar seguimiento a entrevista después de 24 hrs\n\nHola [Nombre] ¿Cómo estás? Solo quería agradecerte por tu tiempo ayer. Me gustó mucho poder platicar contigo y conocer más acerca de la vacante.\n\nMe siento muy identificado con lo que están haciendo en [compañía] y los proyectos como [explicar lo que hablaron en la entrevista]. Me emociona la idea de poder formar parte del equipo y ayudarles en su crecimiento.\n\nPor favor, avísame si tienes cualquier duda adicional acerca de mi. Mientras seguiré al pendiente de las noticias del proceso.\nExcelente día.\nSaludos.\n\nNombre"
+      ]
+    },
+    {
+      id: "negotiation",
+      title: "Negociación",
+      description: "Templates para negociar ofertas laborales",
+      icon: "💼",
+      examples: [
+        "Asunto: Revisión de propuesta salarial – [Tu nombre]\n\nHola [Nombre]\n\nMuchas gracias por la oferta, estoy muy emocionado por la oportunidad y realmente me interesa ser parte de (nombre de la compañía).\n\nDespués de revisar la carta oferta, el salario es menos de lo que estoy buscando en mi siguiente posición.\n\nDe acuerdo a mi experiencia y habilidades como (..ajustándolos a la vacante..) estoy entre $XXXX a $XXXX.\n\n¿Hay alguna manera de acercarse al rango? De igual manera, me encuentro abierto a escuchar otros beneficios que pueden ofrecer.\n\nMuchas gracias por la atención.\n\nNombre\nPerfil profesional\nContacto",
+        "Asunto: Posible ajuste en términos de la oferta\n\nHola [Nombre]\n\nMuchas gracias por la oferta, estoy muy emocionado por la oportunidad y realmente me interesa ser parte de (nombre de la compañía). Estoy muy entusiasmado con la posibilidad de contribuir al equipo y realmente me interesa la oportunidad de trabajar con ustedes.\n\nQuisiera mencionar que he recibido otra oferta de empleo con un paquete compensatorio más alto. Dada mi experiencia y las habilidades específicas que aporto, especialmente en (mencionar las habilidades relevantes), estaba evaluando ofertas en el rango de $XXXX a $XXXX.\n\n¿Existe la posibilidad de revisar el salario ofrecido o discutir otros beneficios complementarios que podrían hacer que su oferta sea más competitiva? Estoy abierto a explorar diferentes opciones y me gustaría encontrar un acuerdo que beneficie a ambas partes.\n\nAgradezco su consideración y espero que podamos encontrar un término medio que refleje el valor que puedo aportar, además, estoy muy interesando en (compañía) por (hablar sobre el interés con la empresa).\n\nNombre\nPerfil profesional\nContacto"
+      ]
+    },
+    {
+      id: "rejection",
+      title: "Rechazar Oferta",
+      description: "Templates para rechazar ofertas profesionalmente",
+      icon: "❌",
+      examples: [
+        "Asunto: Agradecimiento por la oferta – [Tu nombre]\n\nHola [Nombre],\n\nGracias por la oportunidad de considerarme para el proceso de (vacante) en (empresa).\n\nDisfruté aprendiendo más sobre el rol, y la cultura de la organización.\n\nDespués de una cuidadosa consideración, he llegado a una decisión difícil. Desafortunadamente, tengo que rechazar esta oportunidad en este momento debido a que tengo otros objetivos profesionales que me gustaría enfocarme. (opcional agregar los objetivos profesionales).\n\nAgradezco sinceramente la oferta y quiero expresar mi gratitud por la oportunidad de conocer al equipo, esperando que en el futuro podamos coincidir para colaborar juntos.\n\nLes deseo todo lo mejor para encontrar al candidato adecuado para el puesto.\n\n¡Saludos!\n\nNombre\nPerfil profesional\nContacto",
+        "Asunto: Seguimiento sobre propuesta de trabajo\n\nHola [Nombre]\n\nGracias por la oportunidad de considerarme para el proceso de (vacante) en (empresa).\n\nDisfruté aprendiendo más sobre el rol, y la cultura de la organización.\n\nDespués de una cuidadosa consideración, he llegado a una decisión difícil. Desafortunadamente, tengo que rechazar esta oportunidad en este momento debido a que estoy buscando otro tipo de retos profesionales que me permitan crecer como (perfil profesional).\n\nSin embargo, me gustaría referir a estos candidatos que considero hacen buen fit con lo que buscan:\n\n-Nombre, LinkedIn, Contacto\n-Nombre, LinkedIn, Contacto\n\nAgradezco sinceramente la oferta y quiero expresar mi gratitud por la oportunidad de conocer a su equipo. Le deseo todo lo mejor y espero que en un futuro podamos volver a coincidir en otra oportunidad.\n\n¡Saludos!\n\nNombre\nPerfil profesional\nContacto"
       ]
     }
   ];
