@@ -28,14 +28,19 @@ export function LoginPage({ onLogin, onBackToLanding }: LoginPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-            Academy by LaPieza
-          </h1>
-          <p className="text-muted-foreground">
-            {isLogin ? "Inicia sesión para acceder" : "Crea tu cuenta"}
-          </p>
-        </div>
+          <div className="text-center mb-8">
+            <img 
+              src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
+              alt="Academy by LaPieza" 
+              className="h-16 mx-auto mb-4"
+            />
+            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+              Academy by LaPieza
+            </h1>
+            <p className="text-muted-foreground">
+              {isLogin ? "Inicia sesión para acceder" : "Crea tu cuenta - Requiere membresía $359 USD"}
+            </p>
+          </div>
 
         <Card className="shadow-card">
           <CardHeader className="space-y-1">
@@ -45,7 +50,7 @@ export function LoginPage({ onLogin, onBackToLanding }: LoginPageProps) {
             <CardDescription className="text-center">
               {isLogin 
                 ? "Ingresa tus credenciales para acceder a tu cuenta"
-                : "Completa tus datos para crear una nueva cuenta"
+                : "Completa tus datos para crear tu cuenta. Requiere membresía de $359 USD (6 meses)"
               }
             </CardDescription>
           </CardHeader>

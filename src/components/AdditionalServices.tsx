@@ -113,42 +113,6 @@ export function AdditionalServices() {
         ))}
       </div>
 
-      {/* Upcoming Sessions */}
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary" />
-            Sesiones Programadas
-          </CardTitle>
-          <CardDescription>
-            Tus próximas citas con career coaches
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 bg-accent rounded-lg">
-              <div className="text-center">
-                <div className="text-sm font-medium">MAR</div>
-                <div className="text-2xl font-bold text-primary">15</div>
-              </div>
-              <div className="flex-1">
-                <h4 className="font-medium">Entrevista con Career Coach</h4>
-                <p className="text-sm text-muted-foreground">10:00 AM - 10:30 AM</p>
-                <p className="text-sm text-muted-foreground">Revisión de estrategia LinkedIn</p>
-              </div>
-              <Badge variant="secondary">Confirmada</Badge>
-            </div>
-            
-            <div className="text-center py-4">
-              <p className="text-sm text-muted-foreground">No tienes más sesiones programadas</p>
-              <Button variant="outline" size="sm" className="mt-2">
-                <Calendar className="w-4 h-4 mr-2" />
-                Agendar Nueva Sesión
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Payment History */}
       <Card className="shadow-card">

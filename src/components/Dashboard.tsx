@@ -62,9 +62,16 @@ export function Dashboard() {
         <div className="fixed inset-y-0 left-0 w-64 bg-card border-r border-border shadow-card">
           <div className="flex flex-col h-full">
             <div className="p-6">
-              <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Academy by LaPieza
-              </h1>
+              <div className="flex items-center gap-3 mb-2">
+                <img 
+                  src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
+                  alt="Academy by LaPieza" 
+                  className="h-8"
+                />
+                <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  Academy by LaPieza
+                </h1>
+              </div>
               <p className="text-sm text-muted-foreground mt-1">
                 Impulsa tu potencial profesional
               </p>
@@ -74,7 +81,11 @@ export function Dashboard() {
               {menuItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setActiveSection(item.id)}
+                  onClick={() => {
+                    setActiveSection(item.id);
+                    // Scroll to top when section changes
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
                     activeSection === item.id
                       ? "bg-primary/10 text-primary border border-primary/20"
