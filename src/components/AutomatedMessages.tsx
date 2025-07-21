@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, MessageSquare, Users, Mail } from "lucide-react";
+import { Send, MessageSquare, Users, Mail, Briefcase, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,7 +44,7 @@ export function AutomatedMessages() {
       id: "negotiation",
       title: "Negociación",
       description: "Templates para negociar ofertas laborales",
-      icon: "💼",
+      icon: Briefcase,
       examples: [
         "Asunto: Revisión de propuesta salarial – [Tu nombre]\n\nHola [Nombre]\n\nMuchas gracias por la oferta, estoy muy emocionado por la oportunidad y realmente me interesa ser parte de (nombre de la compañía).\n\nDespués de revisar la carta oferta, el salario es menos de lo que estoy buscando en mi siguiente posición.\n\nDe acuerdo a mi experiencia y habilidades como (..ajustándolos a la vacante..) estoy entre $XXXX a $XXXX.\n\n¿Hay alguna manera de acercarse al rango? De igual manera, me encuentro abierto a escuchar otros beneficios que pueden ofrecer.\n\nMuchas gracias por la atención.\n\nNombre\nPerfil profesional\nContacto",
         "Asunto: Posible ajuste en términos de la oferta\n\nHola [Nombre]\n\nMuchas gracias por la oferta, estoy muy emocionado por la oportunidad y realmente me interesa ser parte de (nombre de la compañía). Estoy muy entusiasmado con la posibilidad de contribuir al equipo y realmente me interesa la oportunidad de trabajar con ustedes.\n\nQuisiera mencionar que he recibido otra oferta de empleo con un paquete compensatorio más alto. Dada mi experiencia y las habilidades específicas que aporto, especialmente en (mencionar las habilidades relevantes), estaba evaluando ofertas en el rango de $XXXX a $XXXX.\n\n¿Existe la posibilidad de revisar el salario ofrecido o discutir otros beneficios complementarios que podrían hacer que su oferta sea más competitiva? Estoy abierto a explorar diferentes opciones y me gustaría encontrar un acuerdo que beneficie a ambas partes.\n\nAgradezco su consideración y espero que podamos encontrar un término medio que refleje el valor que puedo aportar, además, estoy muy interesando en (compañía) por (hablar sobre el interés con la empresa).\n\nNombre\nPerfil profesional\nContacto"
@@ -54,7 +54,7 @@ export function AutomatedMessages() {
       id: "rejection",
       title: "Rechazar Oferta",
       description: "Templates para rechazar ofertas profesionalmente",
-      icon: "❌",
+      icon: X,
       examples: [
         "Asunto: Agradecimiento por la oferta – [Tu nombre]\n\nHola [Nombre],\n\nGracias por la oportunidad de considerarme para el proceso de (vacante) en (empresa).\n\nDisfruté aprendiendo más sobre el rol, y la cultura de la organización.\n\nDespués de una cuidadosa consideración, he llegado a una decisión difícil. Desafortunadamente, tengo que rechazar esta oportunidad en este momento debido a que tengo otros objetivos profesionales que me gustaría enfocarme. (opcional agregar los objetivos profesionales).\n\nAgradezco sinceramente la oferta y quiero expresar mi gratitud por la oportunidad de conocer al equipo, esperando que en el futuro podamos coincidir para colaborar juntos.\n\nLes deseo todo lo mejor para encontrar al candidato adecuado para el puesto.\n\n¡Saludos!\n\nNombre\nPerfil profesional\nContacto",
         "Asunto: Seguimiento sobre propuesta de trabajo\n\nHola [Nombre]\n\nGracias por la oportunidad de considerarme para el proceso de (vacante) en (empresa).\n\nDisfruté aprendiendo más sobre el rol, y la cultura de la organización.\n\nDespués de una cuidadosa consideración, he llegado a una decisión difícil. Desafortunadamente, tengo que rechazar esta oportunidad en este momento debido a que estoy buscando otro tipo de retos profesionales que me permitan crecer como (perfil profesional).\n\nSin embargo, me gustaría referir a estos candidatos que considero hacen buen fit con lo que buscan:\n\n-Nombre, LinkedIn, Contacto\n-Nombre, LinkedIn, Contacto\n\nAgradezco sinceramente la oferta y quiero expresar mi gratitud por la oportunidad de conocer a su equipo. Le deseo todo lo mejor y espero que en un futuro podamos volver a coincidir en otra oportunidad.\n\n¡Saludos!\n\nNombre\nPerfil profesional\nContacto"
