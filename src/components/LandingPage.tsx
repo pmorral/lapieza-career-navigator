@@ -11,11 +11,11 @@ interface LandingPageProps {
 
 export function LandingPage({ onAccessDashboard }: LandingPageProps) {
   const [showLogin, setShowLogin] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("academy");
 
   if (showLogin) {
     return <LoginPage onLogin={onAccessDashboard} onBackToLanding={() => setShowLogin(false)} />;
   }
-  const [selectedPlan, setSelectedPlan] = useState("academy");
 
   const features = [
     {
