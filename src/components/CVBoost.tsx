@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 
 export function CVBoost() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedTemplate, setSelectedTemplate] = useState("");
   const [language, setLanguage] = useState("");
   const [relocation, setRelocation] = useState("");
   const [targetPosition, setTargetPosition] = useState("");
@@ -119,96 +118,109 @@ export function CVBoost() {
         <div>
           <h2 className="text-2xl font-bold mb-2">CV Boost</h2>
           <p className="text-muted-foreground">
-            Selecciona un template y optimiza tu CV con IA
+            Optimiza tu CV con IA para destacar en el mercado laboral
           </p>
         </div>
 
-        <Card className="shadow-card max-w-4xl mx-auto">
-          <CardHeader>
-            <CardTitle>Selecciona tu Template Favorito</CardTitle>
-            <CardDescription>
-              Elige uno de nuestros 5 templates recomendados que podrás descargar
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {templates.map((template) => (
-                <div 
-                  key={template.name}
-                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                    selectedTemplate === template.name 
-                      ? 'border-primary ring-2 ring-primary/20' 
-                      : 'border-border hover:border-primary/50'
-                  }`}
-                  onClick={() => setSelectedTemplate(template.name)}
-                >
-                  <div className="flex flex-col items-center gap-3">
-                    <div className={`w-16 h-20 ${template.color} rounded flex items-center justify-center`}>
-                      <FileText className="w-8 h-8 text-muted-foreground" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Configuración Principal */}
+          <div className="lg:col-span-2">
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle>Configuración de tu CV</CardTitle>
+                <CardDescription>
+                  Responde estas preguntas para personalizar las correcciones de IA
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <Label className="text-base font-medium">¿En qué idioma deseas las correcciones?</Label>
+                  <RadioGroup value={language} onValueChange={setLanguage} className="mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="spanish" id="spanish" />
+                      <Label htmlFor="spanish">Español</Label>
                     </div>
-                    <div className="text-center">
-                      <h3 className="font-medium">{template.name}</h3>
-                      <p className="text-sm text-muted-foreground">{template.description}</p>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="english" id="english" />
+                      <Label htmlFor="english">Inglés</Label>
                     </div>
-                    {selectedTemplate === template.name && (
-                      <Badge variant="secondary">Seleccionado</Badge>
-                    )}
-                  </div>
+                  </RadioGroup>
                 </div>
-              ))}
-            </div>
 
-            <div className="space-y-4 pt-6 border-t">
-              <div>
-                <Label className="text-base font-medium">¿En qué idioma deseas las correcciones?</Label>
-                <RadioGroup value={language} onValueChange={setLanguage} className="mt-2">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="spanish" id="spanish" />
-                    <Label htmlFor="spanish">Español</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="english" id="english" />
-                    <Label htmlFor="english">Inglés</Label>
-                  </div>
-                </RadioGroup>
-              </div>
+                <div>
+                  <Label className="text-base font-medium">¿Estás abierto/a a reubicación?</Label>
+                  <RadioGroup value={relocation} onValueChange={setRelocation} className="mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="yes" />
+                      <Label htmlFor="yes">Sí</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="no" />
+                      <Label htmlFor="no">No</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
 
-              <div>
-                <Label className="text-base font-medium">¿Estás abierto/a a reubicación?</Label>
-                <RadioGroup value={relocation} onValueChange={setRelocation} className="mt-2">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="yes" />
-                    <Label htmlFor="yes">Sí</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="no" />
-                    <Label htmlFor="no">No</Label>
-                  </div>
-                </RadioGroup>
-              </div>
+                <div>
+                  <Label className="text-base font-medium">¿A qué puesto estás aplicando?</Label>
+                  <Textarea 
+                    placeholder="Describe el puesto o tipo de posición que buscas..."
+                    value={targetPosition}
+                    onChange={(e) => setTargetPosition(e.target.value)}
+                    className="mt-2"
+                    rows={3}
+                  />
+                </div>
 
-              <div>
-                <Label className="text-base font-medium">¿A qué puesto estás aplicando?</Label>
-                <Textarea 
-                  placeholder="Describe el puesto o tipo de posición que buscas..."
-                  value={targetPosition}
-                  onChange={(e) => setTargetPosition(e.target.value)}
-                  className="mt-2"
-                  rows={3}
-                />
-              </div>
-            </div>
+                <Button 
+                  onClick={() => setCurrentStep(2)}
+                  disabled={!language || !relocation || !targetPosition}
+                  className="w-full"
+                  variant="professional"
+                >
+                  Continuar
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
 
-            <Button 
-              onClick={() => setCurrentStep(2)}
-              disabled={!selectedTemplate || !language || !relocation || !targetPosition}
-              className="w-full"
-              variant="professional"
-            >
-              Continuar
-            </Button>
-          </CardContent>
-        </Card>
+          {/* Templates Opcionales */}
+          <div>
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Download className="w-5 h-5 text-primary" />
+                  Templates Disponibles
+                </CardTitle>
+                <CardDescription>
+                  Descarga templates profesionales (opcional)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {templates.map((template) => (
+                  <div key={template.name} className="border rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-10 ${template.color} rounded flex items-center justify-center`}>
+                        <FileText className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm">{template.name}</h3>
+                        <p className="text-xs text-muted-foreground truncate">{template.description}</p>
+                      </div>
+                      <Button
+                        onClick={() => downloadTemplate(template.name)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Download className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -304,29 +316,6 @@ export function CVBoost() {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        {/* Template Seleccionado */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Download className="w-5 h-5 text-primary" />
-              Template Seleccionado: {selectedTemplate}
-            </CardTitle>
-            <CardDescription>
-              Puedes descargar tu template seleccionado aquí
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={() => downloadTemplate(selectedTemplate)}
-              variant="default"
-              className="w-full"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Descargar Template {selectedTemplate}
-            </Button>
-          </CardContent>
-        </Card>
-
         {/* Correcciones por Sección */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {Object.entries(result?.sections || {}).map(([sectionKey, sectionData]: [string, any]) => (
@@ -363,28 +352,67 @@ export function CVBoost() {
           ))}
         </div>
 
-        {/* Configuración Aplicada */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle>Configuración Aplicada</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4" />
-                <span>Idioma: {language === "spanish" ? "Español" : "Inglés"}</span>
+        {/* Templates Opcionales y Configuración */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Templates Disponibles */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Download className="w-5 h-5 text-primary" />
+                Templates Disponibles
+              </CardTitle>
+              <CardDescription>
+                Descarga templates profesionales para aplicar tus correcciones
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {templates.map((template) => (
+                <div key={template.name} className="border rounded-lg p-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-12 ${template.color} rounded flex items-center justify-center`}>
+                      <FileText className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-sm">{template.name}</h3>
+                      <p className="text-xs text-muted-foreground">{template.description}</p>
+                    </div>
+                    <Button
+                      onClick={() => downloadTemplate(template.name)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Descargar
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Configuración Aplicada */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle>Configuración Aplicada</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  <span>Idioma: {language === "spanish" ? "Español" : "Inglés"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>Reubicación: {relocation === "yes" ? "Sí" : "No"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Briefcase className="w-4 h-4" />
+                  <span>Puesto: {targetPosition}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                <span>Reubicación: {relocation === "yes" ? "Sí" : "No"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4" />
-                <span>Puesto: {targetPosition}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <div className="flex justify-center">
@@ -393,7 +421,7 @@ export function CVBoost() {
             setCurrentStep(1);
             setResult(null);
             setUploadedFile(null);
-            setSelectedTemplate("");
+            
             setLanguage("");
             setRelocation("");
             setTargetPosition("");
