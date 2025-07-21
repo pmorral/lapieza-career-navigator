@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Play, MessageSquare, FileText, Star, Clock, Mic, MicOff } from "lucide-react";
+import { useState, useRef } from "react";
+import { Play, MessageSquare, FileText, Star, Clock, Mic, MicOff, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,6 +26,8 @@ export function MockInterviews() {
   const [isInterviewActive, setIsInterviewActive] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
+  const [uploadedCV, setUploadedCV] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [interviews, setInterviews] = useState<InterviewSession[]>([
     {
       id: '1',
@@ -120,6 +122,20 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
     setCurrentQuestion('');
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type === 'application/pdf') {
+      setUploadedCV(file);
+    }
+  };
+
+  const removeCV = () => {
+    setUploadedCV(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const toggleRecording = () => {
     setIsRecording(!isRecording);
   };
@@ -174,6 +190,51 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
                 <Label htmlFor="english">Inglés</Label>
               </div>
             </RadioGroup>
+          </div>
+
+          <div>
+            <Label htmlFor="cv-upload">Subir CV (Opcional)</Label>
+            <div className="mt-2 space-y-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="cv-upload"
+              />
+              
+              {!uploadedCV ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full h-20 border-dashed"
+                >
+                  <div className="text-center">
+                    <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      Haz clic para subir tu CV (PDF)
+                    </p>
+                  </div>
+                </Button>
+              ) : (
+                <div className="flex items-center justify-between p-3 bg-accent rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-primary" />
+                    <span className="text-sm font-medium">{uploadedCV.name}</span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={removeCV}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
