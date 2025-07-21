@@ -157,8 +157,33 @@ export function ELearningHub() {
     return 'Completed';
   };
 
+  const completedCourses = courses.filter(c => c.progress === 100).length;
+  const totalCourses = courses.length;
+  const overallProgress = Math.round((completedCourses / totalCourses) * 100);
+
   return (
     <div className="space-y-6">
+      {/* Learning Progress Card */}
+      <Card className="relative overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-medium">Progreso de Aprendizaje</CardTitle>
+          <CardDescription>Tu avance en el programa de capacitación</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-primary mb-2">{overallProgress}%</div>
+          <p className="text-sm text-muted-foreground mb-4">
+            {completedCourses} de {totalCourses} cursos completados
+          </p>
+          <div className="w-full bg-secondary rounded-full h-3">
+            <div 
+              className="bg-gradient-primary h-3 rounded-full transition-all duration-300" 
+              style={{ width: `${overallProgress}%` }}
+            ></div>
+          </div>
+        </CardContent>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-primary"></div>
+      </Card>
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">E-Learning Hub</h2>

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard } from "lucide-react";
+import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LinkedInOptimizer } from "./LinkedInOptimizer";
 import { JobTracker } from "./JobTracker";
 import { ELearningHub } from "./ELearningHub";
@@ -27,7 +28,6 @@ export function Dashboard() {
     { id: "automated-messages", label: "Templates de Empleabilidad", icon: Users },
     { id: "services", label: "Servicios Adicionales", icon: DollarSign },
     { id: "referrals", label: "Refiere y Gana", icon: Gift },
-    { id: "settings", label: "Configuración", icon: Settings },
   ];
 
   const renderContent = () => {
@@ -50,6 +50,8 @@ export function Dashboard() {
         return <ReferAndEarn />;
       case "settings":
         return <GeneralSettings />;
+      case "membership":
+        return <MembershipDetails />;
       default:
         return <DashboardOverview setActiveSection={setActiveSection} />;
     }
@@ -109,10 +111,25 @@ export function Dashboard() {
                   Gestiona tu desarrollo profesional
                 </p>
               </div>
-              <Button variant="professional" size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Acción Rápida
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <User className="w-4 h-4 mr-2" />
+                    Mi Perfil
+                    <ChevronDown className="w-4 h-4 ml-2" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => setActiveSection("settings")}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Configuración
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveSection("membership")}>
+                    <FileBarChart className="w-4 h-4 mr-2" />
+                    Mi Membresía
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
@@ -128,53 +145,7 @@ export function Dashboard() {
 function DashboardOverview({ setActiveSection }: { setActiveSection: (section: string) => void }) {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="relative overflow-hidden">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">CV Optimizados</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">3</div>
-            <p className="text-xs text-muted-foreground">CVs optimizados este mes</p>
-          </CardContent>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-primary"></div>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Aplicaciones Laborales</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success">12</div>
-            <p className="text-xs text-muted-foreground">Aplicaciones activas</p>
-          </CardContent>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-success"></div>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Entrevistas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-info">8</div>
-            <p className="text-xs text-muted-foreground">Entrevistas simuladas completadas</p>
-          </CardContent>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-info"></div>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Progreso de Aprendizaje</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-warning">65%</div>
-            <p className="text-xs text-muted-foreground">Cursos completados</p>
-          </CardContent>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-warning"></div>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -257,44 +228,6 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileBarChart className="w-5 h-5 text-primary" />
-              Mi Membresía
-            </CardTitle>
-            <CardDescription>
-              Acceso por 6 meses - Gestiona tu cuenta
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Plan:</span>
-                <span className="font-medium">Academy Premium</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Válido hasta:</span>
-                <span className="font-medium text-warning">31 Jul 2024</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Precio pagado:</span>
-                <span className="font-medium">$359 USD</span>
-              </div>
-            </div>
-            
-            <div className="pt-2 border-t space-y-2">
-              <Button variant="outline" size="sm" className="w-full">
-                <CreditCard className="w-4 h-4 mr-2" />
-                Descargar Invoice
-              </Button>
-              <Button variant="outline" size="sm" className="w-full">
-                <Download className="w-4 h-4 mr-2" />
-                Historial de Pagos
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
@@ -336,6 +269,51 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function MembershipDetails() {
+  return (
+    <div className="space-y-6">
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileBarChart className="w-5 h-5 text-primary" />
+            Mi Membresía
+          </CardTitle>
+          <CardDescription>
+            Acceso por 6 meses - Gestiona tu cuenta
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Plan:</span>
+              <span className="font-medium">Academy Premium</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Válido hasta:</span>
+              <span className="font-medium text-warning">31 Jul 2024</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Precio pagado:</span>
+              <span className="font-medium">$359 USD</span>
+            </div>
+          </div>
+          
+          <div className="pt-2 border-t space-y-2">
+            <Button variant="outline" size="sm" className="w-full">
+              <CreditCard className="w-4 h-4 mr-2" />
+              Descargar Invoice
+            </Button>
+            <Button variant="outline" size="sm" className="w-full">
+              <Download className="w-4 h-4 mr-2" />
+              Historial de Pagos
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
