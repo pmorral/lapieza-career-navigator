@@ -3,7 +3,6 @@ import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Downloa
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CVAnalyzer } from "./CVAnalyzer";
 import { LinkedInOptimizer } from "./LinkedInOptimizer";
 import { JobTracker } from "./JobTracker";
 import { ELearningHub } from "./ELearningHub";
@@ -19,14 +18,13 @@ export function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
 
   const menuItems = [
-    { id: "overview", label: "Dashboard", icon: Home },
+    { id: "overview", label: "Panel Principal", icon: Home },
     { id: "learning", label: "E-learning", icon: BookOpen },
     { id: "cv-boost", label: "CV Boost", icon: FileText },
-    { id: "cv-analyzer", label: "CV Analyst", icon: FileText },
-    { id: "linkedin", label: "LinkedIn Optimizer", icon: Users },
-    { id: "job-tracker", label: "Job Tracker", icon: Target },
-    { id: "interviews", label: "Mock Interview", icon: MessageSquare },
-    { id: "automated-messages", label: "Mensajes Automatizados", icon: Users },
+    { id: "linkedin", label: "Optimizador LinkedIn", icon: Users },
+    { id: "job-tracker", label: "Seguimiento de Trabajos", icon: Target },
+    { id: "interviews", label: "Entrevistas Simuladas", icon: MessageSquare },
+    { id: "automated-messages", label: "Templates de Empleabilidad", icon: Users },
     { id: "career-coach", label: "Career Coach", icon: UserCheck },
     { id: "services", label: "Servicios Adicionales", icon: DollarSign },
     { id: "referrals", label: "Refiere y Gana", icon: Gift },
@@ -37,8 +35,6 @@ export function Dashboard() {
     switch (activeSection) {
       case "cv-boost":
         return <CVBoost />;
-      case "cv-analyzer":
-        return <CVAnalyzer />;
       case "linkedin":
         return <LinkedInOptimizer />;
       case "job-tracker":
@@ -73,7 +69,7 @@ export function Dashboard() {
                 Academy by LaPieza
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Boost your career potential
+                Impulsa tu potencial profesional
               </p>
             </div>
             
@@ -102,15 +98,15 @@ export function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-foreground">
-                  {menuItems.find(item => item.id === activeSection)?.label || "Dashboard"}
+                  {menuItems.find(item => item.id === activeSection)?.label || "Panel Principal"}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Manage your career development journey
+                  Gestiona tu desarrollo profesional
                 </p>
               </div>
               <Button variant="professional" size="sm">
                 <Plus className="w-4 h-4 mr-2" />
-                Quick Action
+                Acción Rápida
               </Button>
             </div>
           </header>
@@ -130,44 +126,44 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="relative overflow-hidden">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">CV Analysis</CardTitle>
+            <CardTitle className="text-sm font-medium">CV Optimizados</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-primary">3</div>
-            <p className="text-xs text-muted-foreground">CVs analyzed this month</p>
+            <p className="text-xs text-muted-foreground">CVs optimizados este mes</p>
           </CardContent>
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-primary"></div>
         </Card>
 
         <Card className="relative overflow-hidden">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Job Applications</CardTitle>
+            <CardTitle className="text-sm font-medium">Aplicaciones Laborales</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">12</div>
-            <p className="text-xs text-muted-foreground">Active applications</p>
+            <p className="text-xs text-muted-foreground">Aplicaciones activas</p>
           </CardContent>
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-success"></div>
         </Card>
 
         <Card className="relative overflow-hidden">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Interviews</CardTitle>
+            <CardTitle className="text-sm font-medium">Entrevistas</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-info">8</div>
-            <p className="text-xs text-muted-foreground">Mock interviews completed</p>
+            <p className="text-xs text-muted-foreground">Entrevistas simuladas completadas</p>
           </CardContent>
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-info"></div>
         </Card>
 
         <Card className="relative overflow-hidden">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Learning Progress</CardTitle>
+            <CardTitle className="text-sm font-medium">Progreso de Aprendizaje</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-warning">65%</div>
-            <p className="text-xs text-muted-foreground">Courses completed</p>
+            <p className="text-xs text-muted-foreground">Cursos completados</p>
           </CardContent>
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-warning"></div>
         </Card>
@@ -178,10 +174,10 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5 text-primary" />
-              Quick Actions
+              Acciones Rápidas
             </CardTitle>
             <CardDescription>
-              Get started with your career development
+              Comienza tu desarrollo profesional
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -199,7 +195,7 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
               onClick={() => setActiveSection("linkedin")}
             >
               <Users className="w-4 h-4 mr-2" />
-              Optimize LinkedIn Profile
+              Optimizar Perfil LinkedIn
             </Button>
             <Button 
               variant="outline" 
@@ -207,7 +203,7 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
               onClick={() => setActiveSection("job-tracker")}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Job Application
+              Agregar Aplicación Laboral
             </Button>
             <Button 
               variant="outline" 
@@ -215,7 +211,7 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
               onClick={() => setActiveSection("interviews")}
             >
               <Play className="w-4 h-4 mr-2" />
-              Start Mock Interview
+              Iniciar Entrevista Simulada
             </Button>
           </CardContent>
         </Card>
