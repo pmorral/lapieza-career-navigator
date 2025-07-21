@@ -1,14 +1,20 @@
 import { useState } from "react";
-import { Check, Star, Users, BookOpen, FileText, Target, MessageSquare, UserCheck } from "lucide-react";
+import { Check, Star, Users, BookOpen, FileText, Target, MessageSquare, UserCheck, User, Lock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LoginPage } from "./LoginPage";
 
 interface LandingPageProps {
   onAccessDashboard: () => void;
 }
 
 export function LandingPage({ onAccessDashboard }: LandingPageProps) {
+  const [showLogin, setShowLogin] = useState(false);
+
+  if (showLogin) {
+    return <LoginPage onLogin={onAccessDashboard} onBackToLanding={() => setShowLogin(false)} />;
+  }
   const [selectedPlan, setSelectedPlan] = useState("academy");
 
   const features = [
@@ -46,12 +52,12 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
 
   const benefits = [
     "Acceso completo a todas las herramientas de empleabilidad",
-    "Sesiones de comunidad quincenales en vivo",
+    "Sesiones grupales cada 2 semanas por 6 meses",
     "Grupo exclusivo de WhatsApp para networking",
     "Templates profesionales para comunicación laboral",
     "Seguimiento personalizado de tu progreso",
     "Certificados de finalización de cursos",
-    "Soporte directo con career coach",
+    "Soporte continuo por 6 meses",
     "Actualizaciones gratuitas de contenido"
   ];
 
@@ -83,29 +89,36 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <Badge variant="secondary" className="mb-4">
-              🚀 Programa #1 en empleabilidad
+              🚀 6 MESES DE ACCESO COMPLETO
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-6">
               LaPieza Academy
             </h1>
             <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">
-              Transforma tu carrera profesional
+              Impulsa tu carrera profesional con nuestro programa integral de 6 meses
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              El programa más completo para conseguir el trabajo de tus sueños. 
-              Herramientas profesionales, mentoría personalizada y comunidad exclusiva.
+              Acceso completo por 6 meses: herramientas de IA, coach personalizada, templates exclusivos y comunidad activa para acelerar tu crecimiento profesional
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Button 
                 size="lg" 
-                className="text-lg px-8 py-4"
-                onClick={onAccessDashboard}
+                className="text-lg px-8 py-4" 
+                variant="professional"
+                onClick={() => setShowLogin(true)}
               >
-                Acceder al Programa - $359 USD
+                Iniciar Sesión
+                <User className="w-5 h-5 ml-2" />
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-4">
-                Ver Demo Gratuito
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="text-lg px-8 py-4"
+                onClick={() => setShowLogin(true)}
+              >
+                Crear Cuenta
+                <Lock className="w-5 h-5 ml-2" />
               </Button>
             </div>
 
@@ -219,7 +232,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
               Inversión en tu futuro profesional
             </h3>
             <p className="text-lg text-muted-foreground">
-              Un solo pago para acceso de por vida
+              Acceso completo durante 6 meses
             </p>
           </div>
 
@@ -234,7 +247,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
                 $359 USD
               </div>
               <CardDescription className="text-lg">
-                Pago único • Acceso de por vida
+                Acceso completo durante 6 meses
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -250,9 +263,11 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
               <Button 
                 size="lg" 
                 className="w-full text-lg py-4"
-                onClick={onAccessDashboard}
+                variant="professional"
+                onClick={() => setShowLogin(true)}
               >
-                Comenzar Ahora
+                Comenzar Mi Transformación Profesional
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               
               <p className="text-center text-sm text-muted-foreground">

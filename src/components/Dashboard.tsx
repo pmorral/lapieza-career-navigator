@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings } from "lucide-react";
+import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,7 +25,6 @@ export function Dashboard() {
     { id: "job-tracker", label: "Seguimiento de Trabajos", icon: Target },
     { id: "interviews", label: "Entrevistas Simuladas", icon: MessageSquare },
     { id: "automated-messages", label: "Templates de Empleabilidad", icon: Users },
-    { id: "career-coach", label: "Career Coach", icon: UserCheck },
     { id: "services", label: "Servicios Adicionales", icon: DollarSign },
     { id: "referrals", label: "Refiere y Gana", icon: Gift },
     { id: "settings", label: "Configuración", icon: Settings },
@@ -45,8 +44,6 @@ export function Dashboard() {
         return <MockInterviews />;
       case "automated-messages":
         return <AutomatedMessages />;
-      case "career-coach":
-        return <CareerCoach />;
       case "services":
         return <AdditionalServices />;
       case "referrals":
@@ -244,10 +241,10 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
               variant="professional" 
               size="sm" 
               className="w-full"
-              onClick={() => setActiveSection("career-coach")}
+              onClick={() => window.open("https://wa.me/5215512345678", '_blank')}
             >
               <MessageSquare className="w-4 h-4 mr-2" />
-              Ver Perfil Completo
+              Chatear por WhatsApp
             </Button>
           </CardContent>
         </Card>
@@ -255,14 +252,55 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
+              <FileBarChart className="w-5 h-5 text-primary" />
+              Mi Membresía
+            </CardTitle>
+            <CardDescription>
+              Acceso por 6 meses - Gestiona tu cuenta
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Plan:</span>
+                <span className="font-medium">Academy Premium</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Válido hasta:</span>
+                <span className="font-medium text-warning">31 Jul 2024</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Precio pagado:</span>
+                <span className="font-medium">$359 USD</span>
+              </div>
+            </div>
+            
+            <div className="pt-2 border-t space-y-2">
+              <Button variant="outline" size="sm" className="w-full">
+                <CreditCard className="w-4 h-4 mr-2" />
+                Descargar Invoice
+              </Button>
+              <Button variant="outline" size="sm" className="w-full">
+                <Download className="w-4 h-4 mr-2" />
+                Historial de Pagos
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-primary" />
               Sesiones de Comunidad
             </CardTitle>
             <CardDescription>
-              Acceso a sesiones quincenales y grupo de WhatsApp
+              Acceso a sesiones quincenales y grupo de WhatsApp durante tu membresía de 6 meses
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h4 className="font-medium mb-2">Enlace a la próxima sesión:</h4>
               <div className="p-3 bg-accent rounded-lg">
@@ -277,10 +315,15 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
             
             <div>
               <h4 className="font-medium mb-2">Liga de Acceso al grupo de WhatsApp:</h4>
-              <Button variant="outline" size="sm" className="w-full">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Unirse al grupo de comunidad
-              </Button>
+              <div className="p-3 bg-accent rounded-lg">
+                <p className="text-xs text-muted-foreground mb-3">
+                  Conecta con otros profesionales en desarrollo
+                </p>
+                <Button variant="outline" size="sm" className="w-full">
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Unirse al grupo de comunidad
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
