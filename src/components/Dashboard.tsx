@@ -62,17 +62,14 @@ export function Dashboard() {
         <div className="fixed inset-y-0 left-0 w-64 bg-card border-r border-border shadow-card">
           <div className="flex flex-col h-full">
             <div className="p-6">
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex justify-center mb-2">
                 <img 
                   src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
                   alt="Academy by LaPieza" 
                   className="h-8"
                 />
-                <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  Academy by LaPieza
-                </h1>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground text-center">
                 Impulsa tu potencial profesional
               </p>
             </div>

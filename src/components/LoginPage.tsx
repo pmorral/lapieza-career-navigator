@@ -29,14 +29,13 @@ export function LoginPage({ onLogin, onBackToLanding }: LoginPageProps) {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <img 
-              src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
-              alt="Academy by LaPieza" 
-              className="h-16 mx-auto mb-4"
-            />
-            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-              Academy by LaPieza
-            </h1>
+            <div className="flex justify-center mb-4">
+              <img 
+                src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
+                alt="Academy by LaPieza" 
+                className="h-16"
+              />
+            </div>
             <p className="text-muted-foreground">
               {isLogin ? "Inicia sesión para acceder" : "Crea tu cuenta - Requiere membresía $359 USD"}
             </p>

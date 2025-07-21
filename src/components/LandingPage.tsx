@@ -91,16 +91,13 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
             <Badge variant="secondary" className="mb-4">
               🚀 6 MESES DE ACCESO COMPLETO
             </Badge>
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-6">
               <img 
                 src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
                 alt="Academy by LaPieza" 
                 className="h-20"
               />
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-6">
-              LaPieza Academy
-            </h1>
             <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">
               Impulsa tu carrera profesional con nuestro programa integral de 6 meses
             </h2>
