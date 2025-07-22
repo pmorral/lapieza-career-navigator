@@ -10,38 +10,28 @@ export function AdditionalServices() {
       title: "Entrevista con Career Coach",
       duration: "30 minutos",
       price: 35,
-      description: "Sesión personalizada para revisar tu CV, estrategia de búsqueda o preparación para entrevistas",
+      description: "Sesión personalizada para simulación de entrevista con un especialista",
       features: ["Análisis personalizado", "Feedback inmediato", "Plan de acción", "Grabación de la sesión"],
       icon: Users,
       popular: false
     },
     {
-      id: "interview-60", 
-      title: "Entrevista Extendida",
-      duration: "1 hora",
-      price: 50,
-      description: "Sesión completa para revisar múltiples aspectos de tu perfil profesional y estrategia",
-      features: ["Revisión completa", "Mock interview", "Estrategia LinkedIn", "Plan 30 días", "Seguimiento"],
-      icon: Users,
-      popular: true
-    },
-    {
       id: "consultation",
       title: "Asesoría General de Empleabilidad",
-      duration: "30 minutos",
-      price: 35,
+      duration: "60 minutos",
+      price: 50,
       description: "Orientación general sobre tu carrera profesional y estrategias de empleabilidad",
       features: ["Análisis de perfil", "Roadmap profesional", "Recomendaciones", "Recursos adicionales"],
       icon: Briefcase,
-      popular: false
+      popular: true
     },
     {
-      id: "job-recommendations",
-      title: "Recomendación de Vacantes",
-      duration: "Entrega en 48h",
+      id: "job-search",
+      title: "Búsqueda estratégica de empleo",
+      duration: "60 minutos",
       price: 50,
-      description: "Paquete de 20 vacantes personalizadas y seleccionadas específicamente para tu perfil",
-      features: ["20 vacantes afines", "Análisis de match", "Enlaces directos", "Tips por vacante"],
+      description: "Paquete de búsqueda de vacantes personalizadas y seleccionadas específicamente para tu perfil",
+      features: ["Análisis de match", "Enlaces directos", "Tips por vacante", "Estrategia de búsqueda"],
       icon: Briefcase,
       popular: false
     }

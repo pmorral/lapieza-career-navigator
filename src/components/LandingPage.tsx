@@ -94,7 +94,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
       <header className="absolute top-0 left-0 right-0 z-50 p-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <img 
-            src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
+            src="/lovable-uploads/e37ec050-5ccf-40bf-90d1-ec445f63dad3.png" 
             alt="Academy by LaPieza" 
             className="h-12"
           />
@@ -148,7 +148,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
             <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
               <Award className="w-6 h-6 text-accent" />
               <div className="text-left">
-                <div className="font-bold text-2xl">4.9/5</div>
+                <div className="font-bold text-2xl">4.7/5</div>
                 <div className="text-sm opacity-80">satisfacción</div>
               </div>
             </div>
@@ -190,31 +190,48 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
       {/* Features Section */}
       <section className="py-20 bg-card/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Herramientas que transforman tu búsqueda laboral
-            </h3>
-            <p className="text-lg text-muted-foreground">
-              Tecnología avanzada y metodología comprobada diseñada por expertos en reclutamiento y empleabilidad
-            </p>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Content */}
+            <div>
+              <div className="text-center lg:text-left mb-12">
+                <h3 className="text-3xl font-bold text-foreground mb-4">
+                  Herramientas que transforman tu búsqueda laboral
+                </h3>
+                <p className="text-lg text-muted-foreground">
+                  Tecnología avanzada y metodología comprobada diseñada por expertos en reclutamiento y empleabilidad
+                </p>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {features.map((feature, index) => (
+                  <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-4">
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <feature.icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <CardTitle className="text-lg">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <CardDescription className="text-sm">
+                        {feature.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Image */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                <img 
+                  src="/lovable-uploads/b28a2d67-4cd3-4df6-ab01-0a8742e948a1.png" 
+                  alt="Profesionales colaborando en el desarrollo de carrera"
+                  className="rounded-lg shadow-xl max-w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent rounded-lg"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -293,7 +310,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
               <Badge variant="secondary" className="w-fit mx-auto mb-4">
                 Más Popular
               </Badge>
-              <CardTitle className="text-2xl mb-2">LaPieza Academy</CardTitle>
+              <CardTitle className="text-2xl mb-2">Academy by LaPieza</CardTitle>
               <div className="text-4xl font-bold text-primary mb-2">
                 $359 USD
               </div>
@@ -334,13 +351,13 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h4 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
-              LaPieza Academy
+              Academy by LaPieza
             </h4>
             <p className="text-muted-foreground mb-6">
               Transformando carreras profesionales desde 2020
             </p>
             <div className="flex justify-center gap-6 text-sm text-muted-foreground">
-              <span>© 2024 LaPieza Academy</span>
+              <span>© 2024 Academy by LaPieza</span>
               <span>•</span>
               <span>Términos y Condiciones</span>
               <span>•</span>
