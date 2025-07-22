@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Star, Users, BookOpen, FileText, Target, MessageSquare, UserCheck, User, Lock, ArrowRight, TrendingUp, Award, Clock, Heart } from "lucide-react";
+import { Check, Star, Users, BookOpen, FileText, Target, MessageSquare, UserCheck, User, Lock, ArrowRight, TrendingUp, Award, Clock, Heart, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -114,54 +114,71 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-secondary to-accent">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-secondary/80"></div>
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30">
-            <Heart className="w-4 h-4 mr-2" />
-            Más de 320 casos de éxito
-          </Badge>
-          
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Impulsa tu carrera con nuestro 
-            <span className="block text-accent">programa 360° de empleabilidad</span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl mb-8 max-w-4xl mx-auto opacity-90">
-            Conviértete en el candidato ideal. Accede a herramientas de IA, mentoría personalizada y una comunidad activa que te acompañará en cada paso de tu búsqueda laboral.
-          </p>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Content */}
+            <div className="text-white">
+              <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30 w-fit">
+                <Heart className="w-4 h-4 mr-2" />
+                Más de 320 casos de éxito
+              </Badge>
+              
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                Impulsa tu carrera con nuestro 
+                <span className="block text-accent">programa 360° de empleabilidad</span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl mb-8 opacity-90">
+                Conviértete en el candidato ideal. Accede a herramientas de IA, mentoría personalizada y una comunidad activa que te acompañará en cada paso de tu búsqueda laboral.
+              </p>
 
-          {/* Key Results */}
-          <div className="flex flex-col md:flex-row justify-center gap-8 mb-10">
-            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
-              <Clock className="w-6 h-6 text-accent" />
-              <div className="text-left">
-                <div className="font-bold text-2xl">2.5 meses</div>
-                <div className="text-sm opacity-80">promedio de colocación</div>
+              {/* Key Results */}
+              <div className="flex flex-col md:flex-row gap-6 mb-8">
+                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
+                  <Clock className="w-6 h-6 text-accent" />
+                  <div className="text-left">
+                    <div className="font-bold text-xl">2.5 meses</div>
+                    <div className="text-sm opacity-80">promedio de colocación</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
+                  <TrendingUp className="w-6 h-6 text-accent" />
+                  <div className="text-left">
+                    <div className="font-bold text-xl">+320</div>
+                    <div className="text-sm opacity-80">casos de éxito</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
+                  <Award className="w-6 h-6 text-accent" />
+                  <div className="text-left">
+                    <div className="font-bold text-xl">4.7/5</div>
+                    <div className="text-sm opacity-80">satisfacción</div>
+                  </div>
+                </div>
               </div>
+              
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
+                onClick={() => setShowLogin(true)}
+              >
+                Comenzar Mi Transformación
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
             </div>
-            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
-              <TrendingUp className="w-6 h-6 text-accent" />
-              <div className="text-left">
-                <div className="font-bold text-2xl">+320</div>
-                <div className="text-sm opacity-80">casos de éxito</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
-              <Award className="w-6 h-6 text-accent" />
-              <div className="text-left">
-                <div className="font-bold text-2xl">4.7/5</div>
-                <div className="text-sm opacity-80">satisfacción</div>
+
+            {/* Image */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                <img 
+                  src="/lovable-uploads/team-collaboration.png" 
+                  alt="Profesionales colaborando en el desarrollo de carrera"
+                  className="rounded-lg shadow-xl max-w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent rounded-lg"></div>
               </div>
             </div>
           </div>
-          
-          <Button 
-            size="lg" 
-            className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
-            onClick={() => setShowLogin(true)}
-          >
-            Comenzar Mi Transformación
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
         </div>
       </section>
 
@@ -259,8 +276,122 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Resources Section */}
       <section className="py-20 bg-card/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Recursos disponibles
+            </h3>
+            <p className="text-lg text-muted-foreground">
+              Aprende estrategias clave para impulsar tu búsqueda laboral
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer">
+              <CardHeader className="pb-4">
+                <div className="relative mb-4">
+                  <div className="w-full h-48 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
+                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
+                      <Play className="w-8 h-8 text-primary ml-1" />
+                    </div>
+                  </div>
+                  <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">
+                    Video
+                  </Badge>
+                </div>
+                <CardTitle className="text-lg">Estructura del CV</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="mb-4">
+                  Aprende a estructurar tu CV de manera profesional y efectiva para destacar entre los reclutadores.
+                </CardDescription>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setShowLogin(true)}
+                >
+                  Ver Video Completo
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer">
+              <CardHeader className="pb-4">
+                <div className="relative mb-4">
+                  <div className="w-full h-48 bg-gradient-to-br from-secondary/10 to-accent/10 rounded-lg flex items-center justify-center">
+                    <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center">
+                      <Play className="w-8 h-8 text-secondary ml-1" />
+                    </div>
+                  </div>
+                  <Badge className="absolute top-2 right-2 bg-secondary text-secondary-foreground">
+                    Video
+                  </Badge>
+                </div>
+                <CardTitle className="text-lg">Metodología STAR</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="mb-4">
+                  Domina la técnica STAR para responder preguntas de entrevista de manera estructurada y convincente.
+                </CardDescription>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setShowLogin(true)}
+                >
+                  Ver Video Completo
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer">
+              <CardHeader className="pb-4">
+                <div className="relative mb-4">
+                  <div className="w-full h-48 bg-gradient-to-br from-accent/10 to-primary/10 rounded-lg flex items-center justify-center">
+                    <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center">
+                      <Play className="w-8 h-8 text-accent ml-1" />
+                    </div>
+                  </div>
+                  <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground">
+                    Video
+                  </Badge>
+                </div>
+                <CardTitle className="text-lg">Tips de Negociación</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="mb-4">
+                  Estrategias probadas para negociar tu salario y beneficios laborales de manera exitosa.
+                </CardDescription>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setShowLogin(true)}
+                >
+                  Ver Video Completo
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-6">
+              ¿Quieres acceso completo a todos nuestros recursos y herramientas?
+            </p>
+            <Button 
+              size="lg" 
+              className="text-lg px-8 py-4"
+              onClick={() => setShowLogin(true)}
+            >
+              Acceder al Programa Completo
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl font-bold text-foreground mb-4">
