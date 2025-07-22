@@ -6,12 +6,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LandingPage } from "./components/LandingPage";
 import { Dashboard } from "./components/Dashboard";
+import { PaymentPage } from "./components/PaymentPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [showDashboard, setShowDashboard] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -23,10 +25,20 @@ const App = () => {
             <Route 
               path="/" 
               element={
-                showDashboard ? (
+                showPayment ? (
+                  <PaymentPage 
+                    onPaymentComplete={() => {
+                      setShowPayment(false);
+                      setShowDashboard(true);
+                    }}
+                    onBackToSignup={() => setShowPayment(false)}
+                  />
+                ) : showDashboard ? (
                   <Dashboard />
                 ) : (
-                  <LandingPage onAccessDashboard={() => setShowDashboard(true)} />
+                  <LandingPage 
+                    onAccessDashboard={() => setShowPayment(true)} 
+                  />
                 )
               } 
             />

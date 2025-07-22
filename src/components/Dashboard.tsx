@@ -14,6 +14,7 @@ import { ReferAndEarn } from "./ReferAndEarn";
 import { GeneralSettings } from "./GeneralSettings";
 import { AutomatedMessages } from "./AutomatedMessages";
 import { CVBoost } from "./CVBoost";
+import { PaymentSettings } from "./PaymentSettings";
 
 export function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
@@ -52,6 +53,8 @@ export function Dashboard() {
         return <GeneralSettings />;
       case "membership":
         return <MembershipDetails />;
+      case "payment":
+        return <PaymentSettings />;
       default:
         return <DashboardOverview setActiveSection={setActiveSection} />;
     }
@@ -127,6 +130,10 @@ export function Dashboard() {
                   <DropdownMenuItem onClick={() => setActiveSection("membership")}>
                     <FileBarChart className="w-4 h-4 mr-2" />
                     Mi Membresía
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setActiveSection("payment")}>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Métodos de Pago
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
