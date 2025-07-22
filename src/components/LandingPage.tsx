@@ -56,10 +56,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
     "Sesiones grupales cada 2 semanas por 6 meses",
     "Grupo exclusivo de WhatsApp para networking",
     "Templates profesionales para comunicación laboral",
-    "Seguimiento personalizado de tu progreso",
-    "Certificados de finalización de cursos",
-    "Soporte continuo por 6 meses",
-    "Actualizaciones gratuitas de contenido"
+    "Actualizaciones gratuitas de contenido y herramientas"
   ];
 
   const testimonials = [
