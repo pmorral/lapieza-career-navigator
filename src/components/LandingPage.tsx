@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Check, Star, Users, BookOpen, FileText, Target, MessageSquare, UserCheck, User, Lock, ArrowRight } from "lucide-react";
+import { Check, Star, Users, BookOpen, FileText, Target, MessageSquare, UserCheck, User, Lock, ArrowRight, TrendingUp, Award, Clock, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { LoginPage } from "./LoginPage";
 
 interface LandingPageProps {
@@ -82,73 +83,122 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
     }
   ];
 
+  const companyLogos = [
+    { name: "Disney", src: "/lovable-uploads/cced4b4c-7deb-4dac-ad90-ecd3ad4a4637.png" },
+    { name: "HSBC", src: "/lovable-uploads/84d3be31-3485-4f6b-93bf-8a36379a4cb2.png" },
+    { name: "Nielsen", src: "/lovable-uploads/2e4864cb-2e37-49cc-88f8-cae9458d66f2.png" },
+    { name: "Deloitte", src: "/lovable-uploads/6fc386bb-8736-48a3-83e6-5b95cf54ed89.png" },
+    { name: "Warner Bros", src: "/lovable-uploads/7f911ddc-8bd9-4939-9458-0a2b9e698023.png" }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <Badge variant="secondary" className="mb-4">
-              🚀 6 MESES DE ACCESO COMPLETO
-            </Badge>
-            <div className="flex justify-center mb-6">
-              <img 
-                src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
-                alt="Academy by LaPieza" 
-                className="h-20"
-              />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">
-              Impulsa tu carrera profesional con nuestro programa integral de 6 meses
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Acceso completo por 6 meses: herramientas de IA, coach personalizada, templates exclusivos y comunidad activa para acelerar tu crecimiento profesional
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Button 
-                size="lg" 
-                className="text-lg px-8 py-4" 
-                variant="professional"
-                onClick={() => setShowLogin(true)}
-              >
-                Iniciar Sesión
-                <User className="w-5 h-5 ml-2" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="text-lg px-8 py-4"
-                onClick={() => setShowLogin(true)}
-              >
-                Crear Cuenta
-                <Lock className="w-5 h-5 ml-2" />
-              </Button>
-            </div>
+      {/* Header with Logo */}
+      <header className="absolute top-0 left-0 right-0 z-50 p-6">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <img 
+            src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
+            alt="Academy by LaPieza" 
+            className="h-12"
+          />
+          <div className="flex gap-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowLogin(true)}
+              className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+            >
+              <User className="w-4 h-4 mr-2" />
+              Iniciar Sesión
+            </Button>
+          </div>
+        </div>
+      </header>
 
-            <div className="flex justify-center items-center gap-8 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                <span>500+ profesionales exitosos</span>
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-secondary to-accent">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-secondary/80"></div>
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+          <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30">
+            <Heart className="w-4 h-4 mr-2" />
+            Más de 320 casos de éxito
+          </Badge>
+          
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            Impulsa tu carrera con nuestro 
+            <span className="block text-accent">programa 360° de empleabilidad</span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl mb-8 max-w-4xl mx-auto opacity-90">
+            Conviértete en el candidato ideal. Accede a herramientas de IA, mentoría personalizada y una comunidad activa que te acompañará en cada paso de tu búsqueda laboral.
+          </p>
+
+          {/* Key Results */}
+          <div className="flex flex-col md:flex-row justify-center gap-8 mb-10">
+            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
+              <Clock className="w-6 h-6 text-accent" />
+              <div className="text-left">
+                <div className="font-bold text-2xl">2.5 meses</div>
+                <div className="text-sm opacity-80">promedio de colocación</div>
               </div>
-              <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-warning" />
-                <span>4.9/5 rating</span>
+            </div>
+            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
+              <TrendingUp className="w-6 h-6 text-accent" />
+              <div className="text-left">
+                <div className="font-bold text-2xl">+320</div>
+                <div className="text-sm opacity-80">casos de éxito</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
+              <Award className="w-6 h-6 text-accent" />
+              <div className="text-left">
+                <div className="font-bold text-2xl">4.9/5</div>
+                <div className="text-sm opacity-80">satisfacción</div>
               </div>
             </div>
           </div>
+          
+          <Button 
+            size="lg" 
+            className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
+            onClick={() => setShowLogin(true)}
+          >
+            Comenzar Mi Transformación
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </div>
-      </div>
+      </section>
+
+      {/* Company Logos Carousel */}
+      <section className="py-12 bg-background border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-muted-foreground mb-8 font-medium">
+            Nuestros estudiantes han sido contratados por empresas líderes
+          </p>
+          <div className="relative overflow-hidden">
+            <div className="flex animate-scroll gap-16 items-center justify-center">
+              {[...companyLogos, ...companyLogos].map((logo, index) => (
+                <div key={index} className="flex-shrink-0">
+                  <img 
+                    src={logo.src} 
+                    alt={logo.name}
+                    className="h-12 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Features Section */}
       <section className="py-20 bg-card/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl font-bold text-foreground mb-4">
-              Todo lo que necesitas para conseguir trabajo
+              Herramientas que transforman tu búsqueda laboral
             </h3>
             <p className="text-lg text-muted-foreground">
-              Herramientas profesionales diseñadas por expertos en recruiting
+              Tecnología avanzada y metodología comprobada diseñada por expertos en reclutamiento y empleabilidad
             </p>
           </div>
 
