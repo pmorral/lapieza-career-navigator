@@ -87,11 +87,11 @@ export function JobTracker() {
   const [newNote, setNewNote] = useState({ text: '', type: 'general' as Note['type'] });
 
   const statusColumns = [
-    { key: 'applied', label: 'Applied', color: 'bg-blue-100 text-blue-800' },
-    { key: 'first-call', label: 'First Call', color: 'bg-yellow-100 text-yellow-800' },
-    { key: 'advancing', label: 'Advancing', color: 'bg-purple-100 text-purple-800' },
-    { key: 'rejected', label: 'Rejected', color: 'bg-red-100 text-red-800' },
-    { key: 'accepted', label: 'Accepted', color: 'bg-green-100 text-green-800' }
+    { key: 'applied', label: 'Aplicadas', color: 'bg-blue-100 text-blue-800' },
+    { key: 'first-call', label: 'Primera llamada', color: 'bg-yellow-100 text-yellow-800' },
+    { key: 'advancing', label: 'En Proceso', color: 'bg-purple-100 text-purple-800' },
+    { key: 'rejected', label: 'Rechazos', color: 'bg-red-100 text-red-800' },
+    { key: 'accepted', label: 'Aceptada', color: 'bg-green-100 text-green-800' }
   ];
 
   const addApplication = () => {
@@ -146,7 +146,7 @@ export function JobTracker() {
           <DialogTrigger asChild>
             <Button variant="professional">
               <Plus className="w-4 h-4 mr-2" />
-              Add Application
+              Agregar Vacante
             </Button>
           </DialogTrigger>
           <DialogContent>

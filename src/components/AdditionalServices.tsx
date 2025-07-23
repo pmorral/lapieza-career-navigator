@@ -3,8 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+interface Service {
+  id: string;
+  title: string;
+  duration: string;
+  price: string | number;
+  description: string;
+  features: string[];
+  investment?: string;
+  icon: any;
+  popular: boolean;
+  special?: boolean;
+}
+
 export function AdditionalServices() {
-  const services = [
+  const services: Service[] = [
     {
       id: "interview-30",
       title: "Entrevista con Career Coach",
@@ -42,14 +55,20 @@ export function AdditionalServices() {
       price: "Una quincena de tu próximo salario bruto",
       description: "Te acompañamos durante tu búsqueda de empleo con seguimiento personalizado",
       features: ["Tres asesorías personalizadas con tu Career Coach", "Seguimiento con un Career Coach a través de WhatsApp", "Acceso a una comunidad en WhatsApp", "Simulaciones de entrevista con diferentes expertos", "Benchmark de Job Boards de nicho"],
+      investment: "Solo el equivalente a una quincena de tu próximo salario bruto. Una vez que consigas trabajo, pagas. Así de simple.",
       icon: Users,
-      popular: true
+      popular: true,
+      special: true
     }
   ];
 
   const handleBookService = (serviceId: string) => {
-    // Aquí se implementaría la lógica de pago/booking
-    console.log(`Booking service: ${serviceId}`);
+    if (serviceId === "employment-program") {
+      window.open("https://form.typeform.com/to/FN4hudzl", "_blank");
+    } else {
+      // Aquí se implementaría la lógica de pago/booking para otros servicios
+      console.log(`Booking service: ${serviceId}`);
+    }
   };
 
   return (
@@ -80,8 +99,12 @@ export function AdditionalServices() {
                   </CardDescription>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">${service.price}</div>
-                  <div className="text-xs text-muted-foreground">USD</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {typeof service.price === 'number' ? `$${service.price}` : service.price}
+                  </div>
+                  {typeof service.price === 'number' && (
+                    <div className="text-xs text-muted-foreground">USD</div>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -98,6 +121,12 @@ export function AdditionalServices() {
                     </li>
                   ))}
                 </ul>
+                {service.investment && (
+                  <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <h4 className="text-sm font-medium text-primary mb-2">Inversión:</h4>
+                    <p className="text-sm text-muted-foreground">{service.investment}</p>
+                  </div>
+                )}
               </div>
               
               <Button 
@@ -106,7 +135,7 @@ export function AdditionalServices() {
                 onClick={() => handleBookService(service.id)}
               >
                 <Calendar className="w-4 h-4 mr-2" />
-                Agendar Ahora
+                {service.special ? "Aplica ahora" : "Agendar Ahora"}
               </Button>
             </CardContent>
           </Card>

@@ -27,17 +27,17 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
     },
     {
       icon: Users,
-      title: "LinkedIn Optimizer",
+      title: "LinkedIn Boost",
       description: "Optimización completa de tu perfil de LinkedIn"
     },
     {
       icon: Target,
-      title: "Job Tracker",
+      title: "Tablero de vacantes",
       description: "Seguimiento organizado de todas tus aplicaciones laborales"
     },
     {
       icon: MessageSquare,
-      title: "Mock Interviews",
+      title: "Simulación de Entrevistas con AI",
       description: "Entrevistas simuladas con feedback detallado"
     },
     {
@@ -47,8 +47,8 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
     },
     {
       icon: UserCheck,
-      title: "Career Coach",
-      description: "Mentoría personalizada con coach certificado"
+      title: "Comunidad en Vivo",
+      description: "Sesiones grupales y networking con profesionales"
     }
   ];
 
@@ -112,8 +112,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-secondary to-accent">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-secondary/80"></div>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-primary">
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="text-white">
             <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30 w-fit mx-auto">
@@ -122,13 +121,12 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
             </Badge>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              ¡Descubre nuestro 
-              <span className="block bg-gradient-to-r from-accent to-white bg-clip-text text-transparent">Programa de Empleabilidad</span>
-              para México!
+              Impulsa tu carrera con nuestro
+              <span className="block bg-gradient-to-r from-accent to-white bg-clip-text text-transparent">programa 360° de empleabilidad</span>
             </h1>
             
             <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
-              Creamos una ruta que te guiará a tu próximo empleo ideal. Lo mejor es que ¡solo pagas si consigues empleo!
+              Conviértete en el candidato ideal. Domina tu búsqueda laboral con IA, sesiones grupales, templates profesionales y recursos actualizados durante 6 meses.
             </p>
 
             {/* Key Results */}
@@ -159,9 +157,12 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
             <Button 
               size="lg" 
               className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
-              onClick={() => setShowLogin(true)}
+              onClick={() => {
+                const trialSection = document.getElementById('trial-section');
+                trialSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
-              Aplica al programa
+              Prueba una herramienta gratuita
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
@@ -191,7 +192,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
       </section>
 
       {/* Trial AI Interview Section */}
-      <section className="py-20">
+      <section id="trial-section" className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-foreground mb-4">
@@ -211,47 +212,32 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
       {/* Features Section */}
       <section className="py-20 bg-card/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Content */}
-            <div>
-              <div className="text-center lg:text-left mb-12">
-                <h3 className="text-3xl font-bold text-foreground mb-4">
-                  Herramientas que transforman tu búsqueda laboral
-                </h3>
-                <p className="text-lg text-muted-foreground">
-                  Tecnología avanzada y metodología comprobada diseñada por expertos en reclutamiento y empleabilidad
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {features.map((feature, index) => (
-                  <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-4">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        <feature.icon className="w-6 h-6 text-primary" />
-                      </div>
-                      <CardTitle className="text-lg">{feature.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <CardDescription className="text-sm">
-                        {feature.description}
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="mb-12">
+              <h3 className="text-3xl font-bold text-foreground mb-4">
+                Herramientas que transforman tu búsqueda laboral
+              </h3>
+              <p className="text-lg text-muted-foreground">
+                Tecnología avanzada y metodología comprobada diseñada por expertos en reclutamiento y empleabilidad
+              </p>
             </div>
 
-            {/* Image */}
-            <div className="flex justify-center lg:justify-end">
-              <div className="relative">
-                <img 
-                  src="/lovable-uploads/b28a2d67-4cd3-4df6-ab01-0a8742e948a1.png" 
-                  alt="Profesionales colaborando en el desarrollo de carrera"
-                  className="rounded-lg shadow-xl max-w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent rounded-lg"></div>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {features.map((feature, index) => (
+                <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                      <feature.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <CardDescription className="text-sm">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>

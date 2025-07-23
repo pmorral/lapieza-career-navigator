@@ -289,94 +289,153 @@ export function CVBoost() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">CV Boost - Correcciones Generadas</h2>
+        <h2 className="text-2xl font-bold mb-2">CV Boost - CV Optimizado</h2>
         <p className="text-muted-foreground">
-          Hemos extraído el texto de tu CV y generado correcciones para cada sección
+          Tu CV ha sido optimizado según las mejores prácticas de empleabilidad
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        {/* Correcciones por Sección */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {Object.entries(result?.sections || {}).map(([sectionKey, sectionData]: [string, any]) => (
-            <Card key={sectionKey} className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="capitalize">{sectionKey}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(sectionData.corrected, sectionKey)}
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copiar
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Texto Original:</Label>
-                  <div className="mt-1 p-3 bg-muted rounded-lg">
-                    <p className="text-sm">{sectionData.original}</p>
-                  </div>
+      <Card className="shadow-card max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Tu CV Optimizado</span>
+            <Button variant="professional">
+              <Download className="w-4 h-4 mr-2" />
+              Descargar PDF
+            </Button>
+          </CardTitle>
+          <CardDescription>
+            CV profesional optimizado con template profesional
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Vista previa del CV optimizado */}
+          <div className="border rounded-lg p-6 bg-card">
+            <div className="space-y-4">
+              <div className="text-center border-b pb-4">
+                <h3 className="text-xl font-bold">Juan Pérez García</h3>
+                <p className="text-primary font-medium">Desarrollador Frontend Especializado en React.js</p>
+                <div className="flex justify-center gap-4 text-sm text-muted-foreground mt-2">
+                  <span>juan.perez@email.com</span>
+                  <span>•</span>
+                  <span>+52 55 1234 5678</span>
+                  <span>•</span>
+                  <span>Ciudad de México</span>
+                  <span>•</span>
+                  <span>linkedin.com/in/juanperez</span>
+                  {relocation === "yes" && (
+                    <>
+                      <span>•</span>
+                      <span>Abierto a reubicación</span>
+                    </>
+                  )}
                 </div>
-                
-                <div>
-                  <Label className="text-sm font-medium text-success">Texto Corregido:</Label>
-                  <div className="mt-1 p-3 bg-success/10 border border-success/20 rounded-lg">
-                    <p className="text-sm whitespace-pre-line">{sectionData.corrected}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
 
-        {/* Templates Opcionales y Configuración */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Templates Disponibles */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Download className="w-5 h-5 text-primary" />
-                Templates Disponibles
-              </CardTitle>
-              <CardDescription>
-                Descarga templates profesionales para aplicar tus correcciones
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {templates.map((template) => (
-                <div key={template.name} className="border rounded-lg p-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-12 ${template.color} rounded flex items-center justify-center`}>
-                      <FileText className="w-5 h-5 text-muted-foreground" />
+              <div>
+                <h4 className="font-bold text-primary mb-2">PERFIL PROFESIONAL</h4>
+                <p className="text-sm">
+                  Desarrollador Frontend especializado en React.js con pasión por crear experiencias de usuario excepcionales. 
+                  Orientado a resultados con capacidad para trabajar en equipos multidisciplinarios y entregar soluciones de alta calidad.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-primary mb-2">EXPERIENCIA PROFESIONAL</h4>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h5 className="font-medium">Desarrollador Frontend Senior</h5>
+                        <p className="text-sm text-primary">Tech Solutions Inc.</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Ene 2022 - Presente</p>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-sm">{template.name}</h3>
-                      <p className="text-xs text-muted-foreground">{template.description}</p>
-                    </div>
-                    <Button
-                      onClick={() => downloadTemplate(template.name)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Descargar
-                    </Button>
+                    <ul className="text-sm mt-1 space-y-1">
+                      <li>• Lidero el desarrollo de aplicación web que mejoró la eficiencia operativa en 40%</li>
+                      <li>• Implemento sistema de gestión que redujo tiempos de respuesta en 60%</li>
+                      <li>• Colaboro en equipo ágil entregando 15+ features en 6 meses</li>
+                    </ul>
                   </div>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+              </div>
 
-          {/* Configuración Aplicada */}
-          <Card className="shadow-card">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-bold text-primary mb-2">HABILIDADES TÉCNICAS</h4>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>React.js</span>
+                      <span className="text-muted-foreground">Avanzado</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>JavaScript ES6+</span>
+                      <span className="text-muted-foreground">Avanzado</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>TypeScript</span>
+                      <span className="text-muted-foreground">Intermedio</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Git/GitHub</span>
+                      <span className="text-muted-foreground">Avanzado</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-primary mb-2">HABILIDADES BLANDAS</h4>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>Liderazgo de equipos</span>
+                      <span className="text-muted-foreground">Alto</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Comunicación efectiva</span>
+                      <span className="text-muted-foreground">Alto</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Resolución de problemas</span>
+                      <span className="text-muted-foreground">Alto</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-bold text-primary mb-2">EDUCACIÓN</h4>
+                  <div className="text-sm">
+                    <p className="font-medium">Ingeniería en Sistemas Computacionales</p>
+                    <p className="text-muted-foreground">Universidad Tecnológica Nacional</p>
+                    <p className="text-muted-foreground">2018 - 2022</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-primary mb-2">IDIOMAS</h4>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>Español</span>
+                      <span className="text-muted-foreground">Nativo</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Inglés</span>
+                      <span className="text-muted-foreground">Intermedio-Alto (B2)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Configuración aplicada */}
+          <Card className="bg-muted/50">
             <CardHeader>
-              <CardTitle>Configuración Aplicada</CardTitle>
+              <CardTitle className="text-lg">Configuración Aplicada</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4" />
                   <span>Idioma: {language === "spanish" ? "Español" : "Inglés"}</span>
@@ -392,8 +451,8 @@ export function CVBoost() {
               </div>
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <div className="flex justify-center">
         <Button 
@@ -401,7 +460,6 @@ export function CVBoost() {
             setCurrentStep(1);
             setResult(null);
             setUploadedFile(null);
-            
             setLanguage("");
             setRelocation("");
             setTargetPosition("");
