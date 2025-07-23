@@ -52,7 +52,7 @@ export function AdditionalServices() {
       id: "employment-program",
       title: "Programa Empleabilidad Personalizado",
       duration: "Seguimiento completo",
-      price: "Una quincena de tu próximo salario bruto",
+      price: "Solo si consigues trabajo",
       description: "Te acompañamos durante tu búsqueda de empleo con seguimiento personalizado",
       features: ["Tres asesorías personalizadas con tu Career Coach", "Seguimiento con un Career Coach a través de WhatsApp", "Acceso a una comunidad en WhatsApp", "Simulaciones de entrevista con diferentes expertos", "Benchmark de Job Boards de nicho"],
       investment: "Solo el equivalente a una quincena de tu próximo salario bruto. Una vez que consigas trabajo, pagas. Así de simple.",

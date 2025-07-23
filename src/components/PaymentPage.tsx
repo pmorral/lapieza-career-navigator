@@ -17,46 +17,19 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
 
   const plans = [
     {
-      id: "basic",
-      name: "Básico",
-      price: 29,
-      description: "Perfecto para comenzar tu búsqueda laboral",
-      features: [
-        "Acceso a herramientas básicas",
-        "1 sesión grupal al mes",
-        "Templates básicos",
-        "Soporte por email"
-      ],
-      popular: false
-    },
-    {
       id: "premium",
-      name: "Premium",
-      price: 49,
-      description: "El plan más popular para profesionales",
+      name: "Academy Premium",
+      price: 359,
+      description: "Programa completo de empleabilidad por 6 meses",
       features: [
-        "Acceso completo a todas las herramientas",
-        "Sesiones grupales cada 2 semanas por 6 meses",
-        "Grupo exclusivo de WhatsApp",
+        "Acceso completo a todas las herramientas por 6 meses",
+        "Sesiones grupales cada 2 semanas",
         "Templates profesionales",
         "Actualizaciones gratuitas",
-        "Soporte prioritario"
+        "Soporte prioritario",
+        "Comunidad exclusiva"
       ],
       popular: true
-    },
-    {
-      id: "enterprise",
-      name: "Enterprise",
-      price: 99,
-      description: "Para equipos y organizaciones",
-      features: [
-        "Todo lo del plan Premium",
-        "Sesiones 1:1 mensuales",
-        "Análisis personalizado",
-        "Soporte dedicado",
-        "Recursos exclusivos"
-      ],
-      popular: false
     }
   ];
 

@@ -193,6 +193,14 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
               <Play className="w-4 h-4 mr-2" />
               Iniciar Entrevista Simulada
             </Button>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start"
+              onClick={() => window.open("https://wa.me/+525555555555?text=Hola,%20necesito%20soporte%20con%20mi%20cuenta%20de%20Academy", "_blank")}
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Chatear con Soporte
+            </Button>
           </CardContent>
         </Card>
 
