@@ -22,28 +22,8 @@ export function CVBoost() {
   const templates = [
     { 
       name: "Profesional", 
-      description: "Para perfiles jr u operativos",
+      description: "Para todos los perfiles profesionales",
       color: "bg-blue-100"
-    },
-    { 
-      name: "Creativo", 
-      description: "Para perfiles de Marketing y Diseño",
-      color: "bg-purple-100"
-    },
-    { 
-      name: "Clásico", 
-      description: "Para perfiles Sr.",
-      color: "bg-gray-100"
-    },
-    { 
-      name: "Moderno", 
-      description: "Para perfiles tecnológicos",
-      color: "bg-green-100"
-    },
-    { 
-      name: "Ejecutivo", 
-      description: "Para perfiles directivos",
-      color: "bg-red-100"
     }
   ];
 

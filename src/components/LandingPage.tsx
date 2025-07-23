@@ -55,7 +55,6 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
   const benefits = [
     "Acceso completo a todas las herramientas de empleabilidad",
     "Sesiones grupales cada 2 semanas por 6 meses",
-    "Grupo exclusivo de WhatsApp para networking",
     "Templates profesionales para comunicación laboral",
     "Actualizaciones gratuitas de contenido y herramientas"
   ];
@@ -115,70 +114,56 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-secondary to-accent">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-secondary/80"></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Content */}
-            <div className="text-white">
-              <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30 w-fit">
-                <Heart className="w-4 h-4 mr-2" />
-                Más de 320 casos de éxito
-              </Badge>
-              
-              <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                Impulsa tu carrera con nuestro 
-                <span className="block text-accent">programa 360° de empleabilidad</span>
-              </h1>
-              
-              <p className="text-xl md:text-2xl mb-8 opacity-90">
-                Conviértete en el candidato ideal. Accede a herramientas de IA, mentoría personalizada y una comunidad activa que te acompañará en cada paso de tu búsqueda laboral.
-              </p>
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="text-white">
+            <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30 w-fit mx-auto">
+              <Heart className="w-4 h-4 mr-2" />
+              Más de 320 casos de éxito
+            </Badge>
+            
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              ¡Descubre nuestro 
+              <span className="block bg-gradient-to-r from-accent to-white bg-clip-text text-transparent">Programa de Empleabilidad</span>
+              para México!
+            </h1>
+            
+            <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
+              Creamos una ruta que te guiará a tu próximo empleo ideal. Lo mejor es que ¡solo pagas si consigues empleo!
+            </p>
 
-              {/* Key Results */}
-              <div className="flex flex-col md:flex-row gap-6 mb-8">
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
-                  <Clock className="w-6 h-6 text-accent" />
-                  <div className="text-left">
-                    <div className="font-bold text-xl">2.5 meses</div>
-                    <div className="text-sm opacity-80">promedio de colocación</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
-                  <TrendingUp className="w-6 h-6 text-accent" />
-                  <div className="text-left">
-                    <div className="font-bold text-xl">+320</div>
-                    <div className="text-sm opacity-80">casos de éxito</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
-                  <Award className="w-6 h-6 text-accent" />
-                  <div className="text-left">
-                    <div className="font-bold text-xl">4.7/5</div>
-                    <div className="text-sm opacity-80">satisfacción</div>
-                  </div>
+            {/* Key Results */}
+            <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center">
+              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
+                <Clock className="w-6 h-6 text-accent" />
+                <div className="text-left">
+                  <div className="font-bold text-xl">2.5 meses</div>
+                  <div className="text-sm opacity-80">promedio de colocación</div>
                 </div>
               </div>
-              
-              <Button 
-                size="lg" 
-                className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
-                onClick={() => setShowLogin(true)}
-              >
-                Comenzar Mi Transformación
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </div>
-
-            {/* Image */}
-            <div className="flex justify-center lg:justify-end">
-              <div className="relative">
-                <img 
-                  src="/lovable-uploads/team-collaboration.png" 
-                  alt="Profesionales colaborando en el desarrollo de carrera"
-                  className="rounded-lg shadow-xl max-w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent rounded-lg"></div>
+              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
+                <TrendingUp className="w-6 h-6 text-accent" />
+                <div className="text-left">
+                  <div className="font-bold text-xl">+320</div>
+                  <div className="text-sm opacity-80">casos de éxito</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
+                <Award className="w-6 h-6 text-accent" />
+                <div className="text-left">
+                  <div className="font-bold text-xl">4.7/5</div>
+                  <div className="text-sm opacity-80">satisfacción</div>
+                </div>
               </div>
             </div>
+            
+            <Button 
+              size="lg" 
+              className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
+              onClick={() => setShowLogin(true)}
+            >
+              Aplica al programa
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
           </div>
         </div>
       </section>
@@ -187,7 +172,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
       <section className="py-12 bg-background border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-center text-muted-foreground mb-8 font-medium">
-            Nuestros estudiantes han sido contratados por empresas líderes
+            Nuestros usuarios han sido contratados por empresas líderes
           </p>
           <div className="relative overflow-hidden">
             <div className="flex animate-scroll gap-16 items-center justify-center">
@@ -201,6 +186,24 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trial AI Interview Section */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Experimenta el poder de la IA
+            </h3>
+            <p className="text-lg text-muted-foreground">
+              Prueba nuestra tecnología antes de unirte al programa completo
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <TrialAIInterview />
           </div>
         </div>
       </section>
@@ -277,135 +280,46 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Resources Section */}
+      {/* Platform Video Section */}
       <section className="py-20 bg-card/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Recursos disponibles
-            </h3>
-            <p className="text-lg text-muted-foreground">
-              Aprende estrategias clave para impulsar tu búsqueda laboral
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer">
-              <CardHeader className="pb-4">
-                <div className="relative mb-4">
-                  <div className="w-full h-48 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
-                      <Play className="w-8 h-8 text-primary ml-1" />
-                    </div>
-                  </div>
-                  <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">
-                    Video
-                  </Badge>
-                </div>
-                <CardTitle className="text-lg">Estructura del CV</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="mb-4">
-                  Aprende a estructurar tu CV de manera profesional y efectiva para destacar entre los reclutadores.
-                </CardDescription>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setShowLogin(true)}
-                >
-                  Ver Video Completo
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer">
-              <CardHeader className="pb-4">
-                <div className="relative mb-4">
-                  <div className="w-full h-48 bg-gradient-to-br from-secondary/10 to-accent/10 rounded-lg flex items-center justify-center">
-                    <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center">
-                      <Play className="w-8 h-8 text-secondary ml-1" />
-                    </div>
-                  </div>
-                  <Badge className="absolute top-2 right-2 bg-secondary text-secondary-foreground">
-                    Video
-                  </Badge>
-                </div>
-                <CardTitle className="text-lg">Metodología STAR</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="mb-4">
-                  Domina la técnica STAR para responder preguntas de entrevista de manera estructurada y convincente.
-                </CardDescription>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setShowLogin(true)}
-                >
-                  Ver Video Completo
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer">
-              <CardHeader className="pb-4">
-                <div className="relative mb-4">
-                  <div className="w-full h-48 bg-gradient-to-br from-accent/10 to-primary/10 rounded-lg flex items-center justify-center">
-                    <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center">
-                      <Play className="w-8 h-8 text-accent ml-1" />
-                    </div>
-                  </div>
-                  <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground">
-                    Video
-                  </Badge>
-                </div>
-                <CardTitle className="text-lg">Tips de Negociación</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="mb-4">
-                  Estrategias probadas para negociar tu salario y beneficios laborales de manera exitosa.
-                </CardDescription>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setShowLogin(true)}
-                >
-                  Ver Video Completo
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="text-center mt-12">
-            <p className="text-muted-foreground mb-6">
-              ¿Quieres acceso completo a todos nuestros recursos y herramientas?
-            </p>
-            <Button 
-              size="lg" 
-              className="text-lg px-8 py-4"
-              onClick={() => setShowLogin(true)}
-            >
-              Acceder al Programa Completo
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Trial AI Interview Section */}
-      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-foreground mb-4">
-              Experimenta el poder de la IA
+              Conoce nuestra plataforma
             </h3>
             <p className="text-lg text-muted-foreground">
-              Prueba nuestra tecnología antes de unirte al programa completo
+              Descubre el valor agregado de nuestro programa a través de este video
             </p>
           </div>
-          
-          <div className="flex justify-center">
-            <TrialAIInterview />
-          </div>
+
+          <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer max-w-2xl mx-auto">
+            <CardHeader className="pb-4">
+              <div className="relative mb-4">
+                <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
+                    <Play className="w-10 h-10 text-primary ml-2" />
+                  </div>
+                </div>
+                <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">
+                  Video Demo
+                </Badge>
+              </div>
+              <CardTitle className="text-xl">Demo de la Plataforma</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="mb-6 text-base">
+                Conoce todas las herramientas y funcionalidades que tendrás disponibles en Academy by LaPieza para impulsar tu carrera profesional.
+              </CardDescription>
+              <Button 
+                size="lg"
+                className="text-lg px-8 py-4"
+                onClick={() => setShowLogin(true)}
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Ver Demo Completo
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
@@ -414,7 +328,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl font-bold text-foreground mb-4">
-              Lo que dicen nuestros estudiantes
+              Lo que dicen nuestros usuarios
             </h3>
             <p className="text-lg text-muted-foreground">
               Historias reales de profesionales que transformaron su carrera
@@ -444,22 +358,19 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
 
       {/* Pricing Section */}
       <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl font-bold text-foreground mb-4">
               Inversión en tu futuro profesional
             </h3>
             <p className="text-lg text-muted-foreground">
-              Acceso completo durante 6 meses
+              Un solo plan, acceso completo
             </p>
           </div>
 
           <Card className="relative overflow-hidden border-2 border-primary shadow-xl">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent"></div>
             <CardHeader className="text-center pb-8">
-              <Badge variant="secondary" className="w-fit mx-auto mb-4">
-                Más Popular
-              </Badge>
               <CardTitle className="text-2xl mb-2">Academy by LaPieza</CardTitle>
               <div className="text-4xl font-bold text-primary mb-2">
                 $359 USD
@@ -470,7 +381,7 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 gap-3">
-                {benefits.slice(0, 6).map((benefit, index) => (
+                {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-success mt-0.5 flex-shrink-0" />
                     <span className="text-sm">{benefit}</span>

@@ -135,10 +135,10 @@ export function LinkedInOptimizer() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-info" />
-              How to Export LinkedIn Profile
+              Consejos de Optimización
             </CardTitle>
             <CardDescription>
-              Step-by-step guide to get your profile PDF
+              Tips para maximizar tu perfil de LinkedIn
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -146,29 +146,22 @@ export function LinkedInOptimizer() {
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">1</div>
                 <div>
-                  <p className="text-sm font-medium">Go to your LinkedIn profile</p>
-                  <p className="text-xs text-muted-foreground">Visit your LinkedIn profile page</p>
+                  <p className="text-sm font-medium">Usa palabras clave relevantes</p>
+                  <p className="text-xs text-muted-foreground">Incluye términos de tu industria en tu perfil</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">2</div>
                 <div>
-                  <p className="text-sm font-medium">Click "More" button</p>
-                  <p className="text-xs text-muted-foreground">Find the "More" button in the top section</p>
+                  <p className="text-sm font-medium">Actualiza regularmente</p>
+                  <p className="text-xs text-muted-foreground">Mantén tu perfil con información actual</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">3</div>
                 <div>
-                  <p className="text-sm font-medium">Select "Save to PDF"</p>
-                  <p className="text-xs text-muted-foreground">Download your profile as PDF</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">4</div>
-                <div>
-                  <p className="text-sm font-medium">Upload here</p>
-                  <p className="text-xs text-muted-foreground">Upload the PDF for optimization</p>
+                  <p className="text-sm font-medium">Personaliza tu URL</p>
+                  <p className="text-xs text-muted-foreground">Crea una URL personalizada para tu perfil</p>
                 </div>
               </div>
             </div>

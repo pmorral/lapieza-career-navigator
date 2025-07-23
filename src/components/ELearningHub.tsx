@@ -152,9 +152,9 @@ export function ELearningHub() {
   };
 
   const getCourseStatus = (progress: number) => {
-    if (progress === 0) return 'Not Started';
-    if (progress < 100) return 'In Progress';
-    return 'Completed';
+    if (progress === 0) return 'No iniciado';
+    if (progress < 100) return 'En progreso';
+    return 'Completado';
   };
 
   const completedCourses = courses.filter(c => c.progress === 100).length;
@@ -186,18 +186,14 @@ export function ELearningHub() {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">E-Learning Hub</h2>
-          <p className="text-muted-foreground">Advance your career with our comprehensive courses</p>
+          <h2 className="text-2xl font-bold">Centro de Aprendizaje</h2>
+          <p className="text-muted-foreground">Acelera tu carrera con nuestros cursos especializados</p>
         </div>
         
         <div className="flex gap-2">
           <Button variant="outline">
             <BookOpen className="w-4 h-4 mr-2" />
-            My Courses
-          </Button>
-          <Button variant="professional">
-            <Star className="w-4 h-4 mr-2" />
-            Upgrade to Premium
+            Mis Cursos
           </Button>
         </div>
       </div>
@@ -228,7 +224,7 @@ export function ELearningHub() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Courses</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total de Cursos</p>
                     <p className="text-2xl font-bold">{filteredCourses.length}</p>
                   </div>
                   <BookOpen className="w-8 h-8 text-primary" />
@@ -240,7 +236,7 @@ export function ELearningHub() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Completed</p>
+                    <p className="text-sm font-medium text-muted-foreground">Completados</p>
                     <p className="text-2xl font-bold text-success">
                       {filteredCourses.filter(c => c.progress === 100).length}
                     </p>
@@ -254,7 +250,7 @@ export function ELearningHub() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">In Progress</p>
+                    <p className="text-sm font-medium text-muted-foreground">En Progreso</p>
                     <p className="text-2xl font-bold text-primary">
                       {filteredCourses.filter(c => c.progress > 0 && c.progress < 100).length}
                     </p>
@@ -313,12 +309,12 @@ export function ELearningHub() {
                   
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span>Progress</span>
+                      <span>Progreso</span>
                       <span className="font-medium">{course.progress}%</span>
                     </div>
                     <Progress value={course.progress} className="h-2" />
                     <p className="text-xs text-muted-foreground">
-                      {getCourseStatus(course.progress)} • {course.lessons} lessons
+                      {getCourseStatus(course.progress)} • {course.lessons} lecciones
                     </p>
                   </div>
                   
@@ -337,19 +333,19 @@ export function ELearningHub() {
                         ) : (
                           <>
                             <Play className="w-4 h-4 mr-2" />
-                            Start Course
+                            Iniciar Curso
                           </>
                         )}
                       </Button>
                     ) : course.progress < 100 ? (
                       <Button className="w-full" variant="professional">
                         <Play className="w-4 h-4 mr-2" />
-                        Continue Learning
+                        Continuar Aprendiendo
                       </Button>
                     ) : (
                       <Button className="w-full" variant="success">
                         <CheckCircle className="w-4 h-4 mr-2" />
-                        Completed
+                        Completado
                       </Button>
                     )}
                   </div>

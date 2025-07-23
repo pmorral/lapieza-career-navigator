@@ -138,8 +138,8 @@ export function JobTracker() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Job Application Tracker</h2>
-          <p className="text-muted-foreground">Track your job applications through different stages</p>
+          <h2 className="text-2xl font-bold">Tablero de Vacantes</h2>
+          <p className="text-muted-foreground">Organiza y da seguimiento a todas tus aplicaciones laborales</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

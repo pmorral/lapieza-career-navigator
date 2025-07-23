@@ -34,6 +34,16 @@ export function AdditionalServices() {
       features: ["Análisis de match", "Enlaces directos", "Tips por vacante", "Estrategia de búsqueda"],
       icon: Briefcase,
       popular: false
+    },
+    {
+      id: "employment-program",
+      title: "Programa Empleabilidad Personalizado",
+      duration: "Seguimiento completo",
+      price: "Una quincena de tu próximo salario bruto",
+      description: "Te acompañamos durante tu búsqueda de empleo con seguimiento personalizado",
+      features: ["Tres asesorías personalizadas con tu Career Coach", "Seguimiento con un Career Coach a través de WhatsApp", "Acceso a una comunidad en WhatsApp", "Simulaciones de entrevista con diferentes expertos", "Benchmark de Job Boards de nicho"],
+      icon: Users,
+      popular: true
     }
   ];
 

@@ -156,8 +156,8 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Mock Interviews</h2>
-          <p className="text-muted-foreground">Practice interviews with AI and get actionable feedback</p>
+          <h2 className="text-2xl font-bold">Simulación de Entrevistas con AI</h2>
+          <p className="text-muted-foreground">Practica entrevistas con IA y recibe retroalimentación detallada</p>
         </div>
         
         <Button variant="professional">

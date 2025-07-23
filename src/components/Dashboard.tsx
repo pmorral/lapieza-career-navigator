@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown } from "lucide-react";
+import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,12 +23,11 @@ export function Dashboard() {
     { id: "overview", label: "Panel Principal", icon: Home },
     { id: "learning", label: "E-learning", icon: BookOpen },
     { id: "cv-boost", label: "CV Boost", icon: FileText },
-    { id: "linkedin", label: "Optimizador LinkedIn", icon: Users },
-    { id: "job-tracker", label: "Seguimiento de Trabajos", icon: Target },
-    { id: "interviews", label: "Entrevistas Simuladas", icon: MessageSquare },
+    { id: "linkedin", label: "LinkedIn Boost", icon: Users },
+    { id: "job-tracker", label: "Tablero de Vacantes", icon: Target },
+    { id: "interviews", label: "Simulación de Entrevistas con AI", icon: MessageSquare },
     { id: "automated-messages", label: "Templates de Empleabilidad", icon: Users },
     { id: "services", label: "Servicios Adicionales", icon: DollarSign },
-    { id: "referrals", label: "Refiere y Gana", icon: Gift },
   ];
 
   const renderContent = () => {
@@ -47,8 +46,6 @@ export function Dashboard() {
         return <AutomatedMessages />;
       case "services":
         return <AdditionalServices />;
-      case "referrals":
-        return <ReferAndEarn />;
       case "settings":
         return <GeneralSettings />;
       case "membership":
@@ -202,36 +199,39 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-primary" />
-              Tu Career Coach Asignada
+              <Calendar className="w-5 h-5 text-primary" />
+              Eventos del Mes
             </CardTitle>
             <CardDescription>
-              Conecta con tu coach personalizada
+              Próximas sesiones y actividades programadas
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <UserCheck className="w-6 h-6 text-primary" />
+            <div className="space-y-3">
+              <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <h4 className="font-medium text-sm">Estrategias de Networking</h4>
+                </div>
+                <p className="text-xs text-muted-foreground">Jueves 25 de Julio, 2024 - 7:00 PM</p>
               </div>
-              <div>
-                <h4 className="font-medium">María González</h4>
-                <p className="text-sm text-muted-foreground">Career Coach Certificada</p>
+              
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-secondary rounded-full"></div>
+                  <h4 className="font-medium text-sm">Workshop CV Optimization</h4>
+                </div>
+                <p className="text-xs text-muted-foreground">Martes 30 de Julio, 2024 - 6:00 PM</p>
+              </div>
+
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-accent rounded-full"></div>
+                  <h4 className="font-medium text-sm">Simulacro de Entrevistas</h4>
+                </div>
+                <p className="text-xs text-muted-foreground">Viernes 2 de Agosto, 2024 - 7:30 PM</p>
               </div>
             </div>
-            <div className="p-3 bg-accent rounded-lg">
-              <p className="text-sm text-muted-foreground mb-2">Disponibilidad:</p>
-              <p className="text-xs">Lunes a Viernes 9:00 AM - 6:00 PM</p>
-            </div>
-            <Button 
-              variant="professional" 
-              size="sm" 
-              className="w-full"
-              onClick={() => window.open("https://wa.me/5215512345678", '_blank')}
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Chatear por WhatsApp
-            </Button>
           </CardContent>
         </Card>
 
@@ -248,28 +248,15 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
               Acceso a sesiones quincenales y grupo de WhatsApp durante tu membresía de 6 meses
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-medium mb-2">Enlace a la próxima sesión:</h4>
-              <div className="p-3 bg-accent rounded-lg">
-                <p className="text-sm font-medium">Sesión: Estrategias de Networking</p>
-                <p className="text-xs text-muted-foreground">Jueves 25 de Julio, 2024 - 7:00 PM (Hora México)</p>
-                <Button size="sm" className="mt-2">
+          <CardContent>
+            <div className="text-center">
+              <div className="p-4 bg-accent/10 border border-accent/20 rounded-lg">
+                <h4 className="font-medium mb-2">Próxima Sesión Grupal</h4>
+                <p className="text-sm font-medium text-primary">Estrategias de Networking</p>
+                <p className="text-xs text-muted-foreground mb-4">Jueves 25 de Julio, 2024 - 7:00 PM (Hora México)</p>
+                <Button size="sm" className="w-full">
                   <Play className="w-4 h-4 mr-2" />
                   Acceder a la sesión
-                </Button>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-medium mb-2">Liga de Acceso al grupo de WhatsApp:</h4>
-              <div className="p-3 bg-accent rounded-lg">
-                <p className="text-xs text-muted-foreground mb-3">
-                  Conecta con otros profesionales en desarrollo
-                </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Unirse al grupo de comunidad
                 </Button>
               </div>
             </div>
