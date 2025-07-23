@@ -201,6 +201,49 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
         </div>
       </section>
 
+      {/* Platform Video Section */}
+      <section className="py-20 bg-card/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Conoce nuestra plataforma
+            </h3>
+            <p className="text-lg text-muted-foreground">
+              Descubre el valor agregado de nuestro programa a través de este video
+            </p>
+          </div>
+
+          <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer max-w-2xl mx-auto">
+            <CardHeader className="pb-4">
+              <div className="relative mb-4">
+                <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
+                    <Play className="w-10 h-10 text-primary ml-2" />
+                  </div>
+                </div>
+                <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">
+                  Video Demo
+                </Badge>
+              </div>
+              <CardTitle className="text-xl">Demo de la Plataforma</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="mb-6 text-base">
+                Conoce todas las herramientas y funcionalidades que tendrás disponibles en Academy by LaPieza para impulsar tu carrera profesional.
+              </CardDescription>
+              <Button 
+                size="lg"
+                className="text-lg px-8 py-4"
+                onClick={() => setShowLogin(true)}
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Ver Demo Completo
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* Trial AI Interview Section */}
       <section id="trial-section" className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -273,49 +316,6 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Platform Video Section */}
-      <section className="py-20 bg-card/50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Conoce nuestra plataforma
-            </h3>
-            <p className="text-lg text-muted-foreground">
-              Descubre el valor agregado de nuestro programa a través de este video
-            </p>
-          </div>
-
-          <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer max-w-2xl mx-auto">
-            <CardHeader className="pb-4">
-              <div className="relative mb-4">
-                <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
-                  <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
-                    <Play className="w-10 h-10 text-primary ml-2" />
-                  </div>
-                </div>
-                <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">
-                  Video Demo
-                </Badge>
-              </div>
-              <CardTitle className="text-xl">Demo de la Plataforma</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="mb-6 text-base">
-                Conoce todas las herramientas y funcionalidades que tendrás disponibles en Academy by LaPieza para impulsar tu carrera profesional.
-              </CardDescription>
-              <Button 
-                size="lg"
-                className="text-lg px-8 py-4"
-                onClick={() => setShowLogin(true)}
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Ver Demo Completo
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
