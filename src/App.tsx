@@ -14,6 +14,7 @@ const queryClient = new QueryClient();
 const App = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -37,7 +38,11 @@ const App = () => {
                   <Dashboard />
                 ) : (
                   <LandingPage 
-                    onAccessDashboard={() => setShowPayment(true)} 
+                    onAccessDashboard={() => setShowPayment(true)}
+                    onLogin={() => {
+                      setIsLoggedIn(true);
+                      setShowDashboard(true);
+                    }}
                   />
                 )
               } 

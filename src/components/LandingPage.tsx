@@ -9,14 +9,15 @@ import { TrialAIInterview } from "./TrialAIInterview";
 
 interface LandingPageProps {
   onAccessDashboard: () => void;
+  onLogin?: () => void;
 }
 
-export function LandingPage({ onAccessDashboard }: LandingPageProps) {
+export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
   const [showLogin, setShowLogin] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("academy");
 
   if (showLogin) {
-    return <LoginPage onLogin={onAccessDashboard} onBackToLanding={() => setShowLogin(false)} />;
+    return <LoginPage onLogin={onLogin || onAccessDashboard} onBackToLanding={() => setShowLogin(false)} />;
   }
 
   const features = [
@@ -154,17 +155,23 @@ export function LandingPage({ onAccessDashboard }: LandingPageProps) {
               </div>
             </div>
             
-            <Button 
-              size="lg" 
-              className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
-              onClick={() => {
-                const trialSection = document.getElementById('trial-section');
-                trialSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              Prueba una herramienta gratuita
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
+                onClick={() => setShowLogin(true)}
+              >
+                Iniciar Sesión
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg font-semibold"
+                onClick={onAccessDashboard}
+              >
+                Registrarse
+              </Button>
+            </div>
           </div>
         </div>
       </section>
