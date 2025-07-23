@@ -103,7 +103,7 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
             <Button 
               variant="outline" 
               onClick={() => setShowLogin(true)}
-              className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
             >
               <User className="w-4 h-4 mr-2" />
               Iniciar Sesión
@@ -113,44 +113,43 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-primary">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">`
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-white">
-            <Badge variant="secondary" className="mb-6 bg-white/20 text-white border-white/30 w-fit mx-auto">
+          <div className="text-foreground">
+            <Badge variant="secondary" className="mb-6 bg-primary/10 text-primary border-primary/20 w-fit mx-auto">
               <Heart className="w-4 h-4 mr-2" />
               Más de 320 casos de éxito
             </Badge>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Impulsa tu carrera con nuestro
-              <span className="block bg-gradient-to-r from-accent to-white bg-clip-text text-transparent">programa 360° de empleabilidad</span>
+              <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">programa 360° de empleabilidad</span>
             </h1>
             
-            <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-8 text-muted-foreground max-w-3xl mx-auto">
               Conviértete en el candidato ideal. Domina tu búsqueda laboral con IA, sesiones grupales, templates profesionales y recursos actualizados durante 6 meses.
             </p>
 
-            {/* Key Results */}
             <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center">
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
-                <Clock className="w-6 h-6 text-accent" />
+              <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-4 py-3 border">
+                <Clock className="w-6 h-6 text-primary" />
                 <div className="text-left">
-                  <div className="font-bold text-xl">2.5 meses</div>
-                  <div className="text-sm opacity-80">promedio de colocación</div>
+                  <div className="font-bold text-xl text-foreground">2.5 meses</div>
+                  <div className="text-sm text-muted-foreground">promedio de colocación</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
-                <TrendingUp className="w-6 h-6 text-accent" />
+              <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-4 py-3 border">
+                <TrendingUp className="w-6 h-6 text-primary" />
                 <div className="text-left">
-                  <div className="font-bold text-xl">+320</div>
-                  <div className="text-sm opacity-80">casos de éxito</div>
+                  <div className="font-bold text-xl text-foreground">+320</div>
+                  <div className="text-sm text-muted-foreground">casos de éxito</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3">
-                <Award className="w-6 h-6 text-accent" />
+              <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-4 py-3 border">
+                <Award className="w-6 h-6 text-primary" />
                 <div className="text-left">
-                  <div className="font-bold text-xl">4.7/5</div>
-                  <div className="text-sm opacity-80">satisfacción</div>
+                  <div className="font-bold text-xl text-foreground">4.7/5</div>
+                  <div className="text-sm text-muted-foreground">satisfacción</div>
                 </div>
               </div>
             </div>
@@ -158,18 +157,22 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90"
-                onClick={() => setShowLogin(true)}
+                className="text-lg px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={() => {
+                  const trialSection = document.getElementById('trial-section');
+                  trialSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
-                Iniciar Sesión
+                Prueba gratis
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button 
                 size="lg" 
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg font-semibold"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-4 text-lg font-semibold"
                 onClick={onAccessDashboard}
               >
-                Registrarse
+                Regístrate
               </Button>
             </div>
           </div>
