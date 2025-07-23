@@ -244,26 +244,8 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Trial AI Interview Section */}
-      <section id="trial-section" className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Experimenta el poder de la IA
-            </h3>
-            <p className="text-lg text-muted-foreground">
-              Prueba nuestra tecnología antes de unirte al programa completo
-            </p>
-          </div>
-          
-          <div className="flex justify-center">
-            <TrialAIInterview />
-          </div>
-        </div>
-      </section>
-
       {/* Features Section */}
-      <section className="py-20 bg-card/50">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <div className="mb-12">
@@ -292,6 +274,23 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
                 </Card>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+      {/* Trial AI Interview Section */}
+      <section id="trial-section" className="py-20 bg-card/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Experimenta el poder de la IA
+            </h3>
+            <p className="text-lg text-muted-foreground">
+              Prueba nuestra tecnología antes de unirte al programa completo
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <TrialAIInterview />
           </div>
         </div>
       </section>
