@@ -184,7 +184,7 @@ export function LoginPage({ onLogin, onBackToLanding }: LoginPageProps) {
                 onClick={() => setIsLogin(!isLogin)}
                 className="text-primary hover:underline font-medium"
               >
-                {isLogin ? "Crear cuenta" : "Iniciar sesión"}
+                {isLogin ? "Crear cuenta" : "Accede aquí"}
               </button>
             </div>
 

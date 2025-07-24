@@ -388,7 +388,7 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
                 size="lg" 
                 className="w-full text-lg py-4"
                 variant="professional"
-                onClick={() => setShowLogin(true)}
+                onClick={onAccessDashboard}
               >
                 Comenzar Mi Transformación Profesional
                 <ArrowRight className="w-5 h-5 ml-2" />

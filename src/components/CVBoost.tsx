@@ -9,7 +9,8 @@ export function CVBoost() {
   const [currentStep, setCurrentStep] = useState(1);
   const [preferences, setPreferences] = useState({
     language: "",
-    targetPosition: ""
+    targetPosition: "",
+    relocation: ""
   });
   const [cvHistory, setCvHistory] = useState<Array<{
     id: string;
@@ -189,11 +190,25 @@ IDIOMAS
                     className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">¿Estás abierto/a a reubicación laboral?</label>
+                  <select
+                    value={preferences.relocation || ""}
+                    onChange={(e) => setPreferences(prev => ({ ...prev, relocation: e.target.value }))}
+                    className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  >
+                    <option value="">Selecciona una opción</option>
+                    <option value="si">Sí, estoy abierto/a</option>
+                    <option value="no">No, prefiero quedarme en mi ubicación actual</option>
+                    <option value="depende">Depende de la oportunidad</option>
+                  </select>
+                </div>
               </div>
 
               <Button
                 onClick={() => setCurrentStep(2)}
-                disabled={!preferences.language || !preferences.targetPosition}
+                disabled={!preferences.language || !preferences.targetPosition || !preferences.relocation}
                 className="w-full mt-6"
               >
                 Continuar
