@@ -1,4 +1,4 @@
-import { Calendar, DollarSign, Clock, Users, Briefcase } from "lucide-react";
+import { Calendar, DollarSign, Clock, Users, Briefcase, MessageSquare, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +29,16 @@ export function AdditionalServices() {
       popular: false
     },
     {
+      id: "interview-english",
+      title: "Entrevista en Inglés",
+      duration: "30 minutos",
+      price: 40,
+      description: "Sesión especializada para practicar entrevistas en inglés con un experto",
+      features: ["Práctica en inglés", "Corrección de pronunciación", "Feedback de vocabulario técnico", "Tips específicos para entrevistas en inglés"],
+      icon: MessageSquare,
+      popular: false
+    },
+    {
       id: "consultation",
       title: "Asesoría General de Empleabilidad",
       duration: "60 minutos",
@@ -39,36 +49,20 @@ export function AdditionalServices() {
       popular: true
     },
     {
-      id: "job-search",
-      title: "Búsqueda estratégica de empleo",
-      duration: "60 minutos",
+      id: "job-vacancies",
+      title: "20 Vacantes Personalizadas",
+      duration: "Entrega en 24h",
       price: 50,
-      description: "Paquete de búsqueda de vacantes personalizadas y seleccionadas específicamente para tu perfil",
-      features: ["Análisis de match", "Enlaces directos", "Tips por vacante", "Estrategia de búsqueda"],
-      icon: Briefcase,
+      description: "Recibe 20 vacantes seleccionadas específicamente para tu perfil que se agregarán a tu tablero",
+      features: ["20 vacantes curadas", "Match personalizado", "Agregadas a tu tablero", "Entrega en menos de 24h"],
+      icon: Target,
       popular: false
-    },
-    {
-      id: "employment-program",
-      title: "Programa Empleabilidad Personalizado",
-      duration: "Seguimiento completo",
-      price: "Solo si consigues trabajo",
-      description: "Te acompañamos durante tu búsqueda de empleo con seguimiento personalizado",
-      features: ["Tres asesorías personalizadas con tu Career Coach", "Seguimiento con un Career Coach a través de WhatsApp", "Acceso a una comunidad en WhatsApp", "Simulaciones de entrevista con diferentes expertos", "Benchmark de Job Boards de nicho"],
-      investment: "Solo el equivalente a una quincena de tu próximo salario bruto. Una vez que consigas trabajo, pagas. Así de simple.",
-      icon: Users,
-      popular: true,
-      special: true
     }
   ];
 
   const handleBookService = (serviceId: string) => {
-    if (serviceId === "employment-program") {
-      window.open("https://form.typeform.com/to/FN4hudzl", "_blank");
-    } else {
-      // Aquí se implementaría la lógica de pago/booking para otros servicios
-      console.log(`Booking service: ${serviceId}`);
-    }
+    // Aquí se implementaría la lógica de pago/booking para servicios
+    console.log(`Booking service: ${serviceId}`);
   };
 
   return (
