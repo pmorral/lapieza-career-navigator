@@ -224,23 +224,23 @@ export function ServicePayment({ service, isOpen, onClose }: ServicePaymentProps
 
                   <div>
                     <h4 className="font-medium mb-2">5. Uso de la información</h4>
-                    <p className="text-muted-foreground">
-                      Toda la información compartida durante la sesión es confidencial y será utilizada únicamente con fines de orientación profesional.
-                    </p>
+                    <ul className="space-y-1 text-muted-foreground ml-4">
+                      <li>• Toda la información compartida durante la sesión es confidencial y será utilizada únicamente con fines de orientación profesional.</li>
+                    </ul>
                   </div>
 
                   <div>
                     <h4 className="font-medium mb-2">6. Preparación previa del usuario</h4>
-                    <p className="text-muted-foreground">
-                      Es responsabilidad del usuario asistir a la sesión con dudas, preguntas o temas específicos que desee trabajar, a fin de aprovechar al máximo el tiempo disponible.
-                    </p>
+                    <ul className="space-y-1 text-muted-foreground ml-4">
+                      <li>• Es responsabilidad del usuario asistir a la sesión con dudas, preguntas o temas específicos que desee trabajar, a fin de aprovechar al máximo el tiempo disponible.</li>
+                    </ul>
                   </div>
 
                   <div>
                     <h4 className="font-medium mb-2">7. Limitación de responsabilidad</h4>
-                    <p className="text-muted-foreground">
-                      La asesoría tiene fines informativos y de acompañamiento. No garantiza ofertas laborales, entrevistas reales ni contrataciones. El resultado dependerá de tu proceso, contexto y acciones posteriores.
-                    </p>
+                    <ul className="space-y-1 text-muted-foreground ml-4">
+                      <li>• La asesoría tiene fines informativos y de acompañamiento. No garantiza ofertas laborales, entrevistas reales ni contrataciones. El resultado dependerá de tu proceso, contexto y acciones posteriores.</li>
+                    </ul>
                   </div>
                 </CardContent>
               </Card>

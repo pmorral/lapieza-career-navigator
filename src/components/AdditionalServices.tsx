@@ -39,7 +39,7 @@ export function AdditionalServices() {
       duration: "30 minutos",
       price: 40,
       description: "Sesión especializada para practicar entrevistas en inglés con un experto",
-      features: ["Práctica en inglés", "Corrección de pronunciación", "Feedback de vocabulario técnico", "Tips específicos para entrevistas en inglés"],
+      features: ["Práctica en inglés", "Corrección de pronunciación", "Feedback de vocabulario técnico", "Tips específicos para entrevistas en inglés", "Grabación de la sesión"],
       icon: MessageSquare,
       popular: false
     },

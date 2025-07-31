@@ -36,7 +36,7 @@ export function LoginPage({ onLogin, onBackToLanding, onSignupToPay }: LoginPage
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <img 
-                src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
+                src="/lovable-uploads/38bdff76-1a8c-4d71-a975-9058214f7ab1.png" 
                 alt="Academy by LaPieza" 
                 className="h-16"
               />
@@ -54,7 +54,7 @@ export function LoginPage({ onLogin, onBackToLanding, onSignupToPay }: LoginPage
             <CardDescription className="text-center">
               {isLogin 
                 ? "Ingresa tus credenciales para acceder a tu cuenta"
-                : "Completa tus datos para crear tu cuenta. Requiere membresía de $359 USD (6 meses)"
+                : "Completa tus datos para crear tu cuenta. Requiere membresía de $359 USD (5 meses)"
               }
             </CardDescription>
           </CardHeader>

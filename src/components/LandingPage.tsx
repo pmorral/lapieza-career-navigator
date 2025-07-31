@@ -398,9 +398,6 @@ export function LandingPage({ onAccessDashboard, onLogin }: LandingPageProps) {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               
-              <p className="text-center text-sm text-muted-foreground">
-                Garantía de satisfacción de 30 días
-              </p>
             </CardContent>
           </Card>
         </div>

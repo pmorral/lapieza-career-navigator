@@ -20,9 +20,9 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
       id: "premium",
       name: "Academy Premium",
       price: 359,
-      description: "Programa completo de empleabilidad por 6 meses",
+      description: "Programa completo de empleabilidad por 5 meses",
       features: [
-        "Acceso completo a todas las herramientas por 6 meses",
+        "Acceso completo a todas las herramientas por 5 meses",
         "Sesiones grupales cada 2 semanas",
         "Templates profesionales",
         "Actualizaciones gratuitas",

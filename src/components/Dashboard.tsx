@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown, Calendar } from "lucide-react";
+import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown, Calendar, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,9 +15,11 @@ import { GeneralSettings } from "./GeneralSettings";
 import { AutomatedMessages } from "./AutomatedMessages";
 import { CVBoost } from "./CVBoost";
 import { PaymentSettings } from "./PaymentSettings";
+import { JobSuccess } from "./JobSuccess";
 
 export function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
+  const [showJobSuccess, setShowJobSuccess] = useState(false);
 
   const menuItems = [
     { id: "overview", label: "Panel Principal", icon: Home },
@@ -132,6 +134,10 @@ export function Dashboard() {
                     <CreditCard className="w-4 h-4 mr-2" />
                     Métodos de Pago
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowJobSuccess(true)}>
+                    <Trophy className="w-4 h-4 mr-2" />
+                    ¡Conseguí Empleo!
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -142,6 +148,10 @@ export function Dashboard() {
           </main>
         </div>
       </div>
+      
+      {showJobSuccess && (
+        <JobSuccess onClose={() => setShowJobSuccess(false)} />
+      )}
     </div>
   );
 }
@@ -201,14 +211,6 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
             >
               <Play className="w-4 h-4 mr-2" />
               Iniciar Entrevista Simulada
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              onClick={() => window.open(coachInfo.whatsappLink, "_blank")}
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Escribe a tu Career Coach
             </Button>
           </CardContent>
         </Card>
