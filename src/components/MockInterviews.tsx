@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Play, MessageSquare, FileText, Star, Clock, Mic, MicOff, Upload, X } from "lucide-react";
+import { Play, MessageSquare, FileText, Star, Clock, Mic, MicOff, Upload, X, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { InterviewCredits } from "./InterviewCredits";
+import { useToast } from "@/hooks/use-toast";
 
 interface InterviewSession {
   id: string;
@@ -28,6 +30,10 @@ export function MockInterviews() {
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [uploadedCV, setUploadedCV] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [interviewCredits, setInterviewCredits] = useState(5);
+  const [usedInterviews, setUsedInterviews] = useState(0);
+  const [showCreditsDialog, setShowCreditsDialog] = useState(false);
+  const { toast } = useToast();
   const [interviews, setInterviews] = useState<InterviewSession[]>([
     {
       id: '1',
@@ -63,6 +69,12 @@ export function MockInterviews() {
 
   const startInterview = () => {
     if (!jobDescription.trim()) return;
+    
+    // Check if user has available interviews
+    if (usedInterviews >= interviewCredits) {
+      setShowCreditsDialog(true);
+      return;
+    }
     
     // Simulate AI generating interview questions
     const questions = [
@@ -120,6 +132,12 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
     setIsInterviewActive(false);
     setIsRecording(false);
     setCurrentQuestion('');
+    setUsedInterviews(prev => prev + 1);
+    
+    toast({
+      title: "Entrevista completada",
+      description: `Te quedan ${interviewCredits - usedInterviews - 1} entrevistas gratuitas.`,
+    });
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,12 +170,35 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
     return 'destructive';
   };
 
+  const handlePurchaseCredits = (credits: number) => {
+    setInterviewCredits(prev => prev + credits);
+    toast({
+      title: "Créditos agregados",
+      description: `Se han agregado ${credits} créditos a tu cuenta.`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">Simulación de Entrevistas con AI</h2>
           <p className="text-muted-foreground">Practica entrevistas con IA y recibe retroalimentación detallada</p>
+          <div className="flex items-center gap-2 mt-2">
+            <Badge variant="outline" className="text-sm">
+              {interviewCredits - usedInterviews} entrevistas disponibles
+            </Badge>
+            {usedInterviews >= interviewCredits && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowCreditsDialog(true)}
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Comprar créditos
+              </Button>
+            )}
+          </div>
         </div>
         
         <Button variant="professional">
@@ -257,7 +298,7 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
               className="flex-1"
             >
               <Play className="w-4 h-4 mr-2" />
-              Start AI Interview
+              {usedInterviews >= interviewCredits ? "Comprar créditos" : "Start AI Interview"}
             </Button>
             
             <Button 
@@ -389,6 +430,12 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
           </div>
         </CardContent>
       </Card>
+
+      <InterviewCredits
+        isOpen={showCreditsDialog}
+        onClose={() => setShowCreditsDialog(false)}
+        onPurchase={handlePurchaseCredits}
+      />
     </div>
   );
 }

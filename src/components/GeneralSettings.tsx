@@ -149,25 +149,6 @@ export function GeneralSettings() {
         </CardContent>
       </Card>
 
-      {/* Support */}
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle>Soporte y Ayuda</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="outline">
-              Centro de Ayuda
-            </Button>
-            <Button variant="outline">
-              Contactar Soporte
-            </Button>
-            <Button variant="outline">
-              Reportar Problema
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
