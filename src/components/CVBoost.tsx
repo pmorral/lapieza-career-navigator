@@ -192,16 +192,16 @@ IDIOMAS
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">¿Estás abierto/a a reubicación laboral?</label>
+                  <label className="block text-sm font-medium mb-2">¿Estás abiertx a reubicación?</label>
                   <select
-                    value={preferences.relocation || ""}
+                    value={preferences.relocation}
                     onChange={(e) => setPreferences(prev => ({ ...prev, relocation: e.target.value }))}
                     className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   >
                     <option value="">Selecciona una opción</option>
-                    <option value="si">Sí, estoy abierto/a</option>
-                    <option value="no">No, prefiero quedarme en mi ubicación actual</option>
-                    <option value="depende">Depende de la oportunidad</option>
+                    <option value="si">Sí, estoy abiertx a reubicación</option>
+                    <option value="no">No, prefiero trabajar en mi ciudad actual</option>
+                    <option value="remoto">Prefiero trabajo remoto</option>
                   </select>
                 </div>
               </div>

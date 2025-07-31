@@ -66,7 +66,7 @@ export function Dashboard() {
             <div className="p-6">
               <div className="flex justify-center mb-2">
                 <img 
-                  src="/lovable-uploads/db3312eb-7b7f-43e5-8ac7-8dc7be3850fb.png" 
+                  src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png" 
                   alt="Academy by LaPieza" 
                   className="h-8"
                 />
@@ -157,48 +157,6 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
 
   return (
     <div className="space-y-6">
-      {/* Career Coach Section */}
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-primary" />
-            Tu Career Coach Asignada
-          </CardTitle>
-          <CardDescription>
-            Tu mentora personalizada para el desarrollo profesional
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <img 
-                src={coachInfo.photo} 
-                alt={coachInfo.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-primary/20"
-              />
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-background rounded-full"></div>
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg">{coachInfo.name}</h3>
-              <p className="text-sm text-green-600 font-medium">{coachInfo.availability}</p>
-              <div className="flex flex-wrap gap-1 mt-2">
-                {coachInfo.specialties.map((specialty, index) => (
-                  <span key={index} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                    {specialty}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <Button 
-              onClick={() => window.open(coachInfo.whatsappLink, "_blank")}
-              className="flex-shrink-0"
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Chatear
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="shadow-card">
@@ -304,7 +262,7 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
               Sesiones de Comunidad
             </CardTitle>
             <CardDescription>
-              Acceso a sesiones quincenales y grupo de WhatsApp durante tu membresía de 6 meses
+              Acceso a sesiones quincenales y grupo de WhatsApp durante tu membresía de 5 meses
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -336,7 +294,7 @@ function MembershipDetails() {
             Mi Membresía
           </CardTitle>
           <CardDescription>
-            Acceso por 6 meses - Gestiona tu cuenta
+            Acceso por 5 meses - Gestiona tu cuenta
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

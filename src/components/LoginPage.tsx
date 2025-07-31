@@ -9,9 +9,10 @@ import { Separator } from "@/components/ui/separator";
 interface LoginPageProps {
   onLogin: () => void;
   onBackToLanding: () => void;
+  onSignupToPay?: () => void;
 }
 
-export function LoginPage({ onLogin, onBackToLanding }: LoginPageProps) {
+export function LoginPage({ onLogin, onBackToLanding, onSignupToPay }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
@@ -21,8 +22,12 @@ export function LoginPage({ onLogin, onBackToLanding }: LoginPageProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simular login exitoso
-    onLogin();
+    if (isLogin) {
+      onLogin();
+    } else {
+      // Si es signup, dirigir al pago
+      onSignupToPay ? onSignupToPay() : onLogin();
+    }
   };
 
   return (

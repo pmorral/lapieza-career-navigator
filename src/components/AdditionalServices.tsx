@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Calendar, DollarSign, Clock, Users, Briefcase, MessageSquare, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ServicePayment } from "./ServicePayment";
 
 interface Service {
   id: string;
@@ -17,6 +19,9 @@ interface Service {
 }
 
 export function AdditionalServices() {
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
+  
   const services: Service[] = [
     {
       id: "interview-30",
@@ -61,8 +66,11 @@ export function AdditionalServices() {
   ];
 
   const handleBookService = (serviceId: string) => {
-    // Aquí se implementaría la lógica de pago/booking para servicios
-    console.log(`Booking service: ${serviceId}`);
+    const service = services.find(s => s.id === serviceId);
+    if (service) {
+      setSelectedService(service);
+      setShowPayment(true);
+    }
   };
 
   return (
@@ -171,6 +179,18 @@ export function AdditionalServices() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Payment Modal */}
+      {selectedService && (
+        <ServicePayment
+          service={selectedService}
+          isOpen={showPayment}
+          onClose={() => {
+            setShowPayment(false);
+            setSelectedService(null);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -151,34 +151,34 @@ export function JobTracker() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add New Job Application</DialogTitle>
+              <DialogTitle>Agregar Nueva Vacante</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="title">Job Title</Label>
+                <Label htmlFor="title">Título del Puesto</Label>
                 <Input
                   id="title"
                   value={newApplication.title}
                   onChange={(e) => setNewApplication({...newApplication, title: e.target.value})}
-                  placeholder="e.g., Senior Frontend Developer"
+                  placeholder="ej., Desarrollador Frontend Senior"
                 />
               </div>
               
               <div>
-                <Label htmlFor="company">Company</Label>
+                <Label htmlFor="company">Empresa</Label>
                 <Input
                   id="company"
                   value={newApplication.company}
                   onChange={(e) => setNewApplication({...newApplication, company: e.target.value})}
-                  placeholder="e.g., Tech Corp"
+                  placeholder="ej., Tech Corp"
                 />
               </div>
               
               <div>
-                <Label htmlFor="platform">Platform</Label>
+                <Label htmlFor="platform">Plataforma</Label>
                 <Select value={newApplication.platform} onValueChange={(value) => setNewApplication({...newApplication, platform: value})}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select platform" />
+                    <SelectValue placeholder="Seleccionar plataforma" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="LinkedIn">LinkedIn</SelectItem>
@@ -186,13 +186,13 @@ export function JobTracker() {
                     <SelectItem value="OCC">OCC</SelectItem>
                     <SelectItem value="Computrabajo">Computrabajo</SelectItem>
                     <SelectItem value="AngelList">AngelList</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="Other">Otro</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               
               <div>
-                <Label htmlFor="url">Job URL</Label>
+                <Label htmlFor="url">URL de la Vacante</Label>
                 <Input
                   id="url"
                   value={newApplication.url}
@@ -202,19 +202,19 @@ export function JobTracker() {
               </div>
               
               <div>
-                <Label htmlFor="notes">Initial Notes</Label>
+                <Label htmlFor="notes">Descripción de la Vacante</Label>
                 <Textarea
                   id="notes"
                   value=""
                   onChange={() => {}}
-                  placeholder="Add notes after creating the application..."
+                  placeholder="Agregar notas después de crear la aplicación..."
                   rows={3}
                   disabled
                 />
               </div>
               
               <Button onClick={addApplication} className="w-full">
-                Add Application
+                Agregar Aplicación
               </Button>
             </div>
           </DialogContent>
@@ -297,9 +297,9 @@ export function JobTracker() {
                 </div>
               ))}
               
-              {getApplicationsByStatus(column.key as JobApplication['status']).length === 0 && (
+                {getApplicationsByStatus(column.key as JobApplication['status']).length === 0 && (
                 <div className="text-center py-8 text-muted-foreground text-sm">
-                  No applications
+                  Sin aplicaciones
                 </div>
               )}
             </CardContent>

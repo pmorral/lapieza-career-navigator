@@ -221,9 +221,9 @@ export function LinkedInOptimizer() {
                   <p className="text-xs text-muted-foreground">El archivo se descargará automáticamente</p>
                 </div>
               </div>
-              <div className="bg-info/10 border border-info/20 rounded-lg p-3 mt-4">
-                <p className="text-xs text-info-foreground">
-                  💡 <strong>Tip:</strong> Asegúrate de que tu perfil esté completo antes de descargarlo para obtener mejores resultados en la optimización.
+              <div className="border border-info/20 rounded-lg p-3 mt-4">
+                <p className="text-xs text-muted-foreground">
+                  💡 Tip: Asegúrate de que tu perfil esté completo antes de descargarlo para obtener mejores resultados en la optimización.
                 </p>
               </div>
             </div>
