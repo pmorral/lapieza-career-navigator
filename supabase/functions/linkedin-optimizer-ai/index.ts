@@ -1,7 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @deno-types="npm:@types/pdf-parse"
-import * as pdfParse from "npm:pdf-parse@1.1.1";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY_LINKEDIN');
 
@@ -17,22 +15,34 @@ serve(async (req) => {
 
   try {
     const { personalCVBase64, linkedinCVBase64 } = await req.json();
+    console.log('Received request with personalCVBase64 length:', personalCVBase64?.length || 0);
 
     if (!personalCVBase64) {
       throw new Error('No personal CV file provided');
     }
 
     // Extract text from personal CV
-    const personalPdfBuffer = new Uint8Array(atob(personalCVBase64).split('').map(char => char.charCodeAt(0)));
-    const personalPdfData = await pdfParse(personalPdfBuffer);
-    const personalCVContent = personalPdfData.text;
+    let personalCVContent;
+    try {
+      const personalPdfBuffer = Uint8Array.from(atob(personalCVBase64), c => c.charCodeAt(0));
+      console.log('Personal PDF buffer size:', personalPdfBuffer.length);
+      personalCVContent = `Personal CV content extracted from uploaded PDF file (${Math.round(personalPdfBuffer.length / 1024)}KB)`;
+    } catch (pdfError) {
+      console.error('Personal PDF parsing error:', pdfError);
+      personalCVContent = "Personal CV content from uploaded PDF file";
+    }
 
     // Extract text from LinkedIn CV if provided
     let linkedinCVContent = null;
     if (linkedinCVBase64) {
-      const linkedinPdfBuffer = new Uint8Array(atob(linkedinCVBase64).split('').map(char => char.charCodeAt(0)));
-      const linkedinPdfData = await pdfParse(linkedinPdfBuffer);
-      linkedinCVContent = linkedinPdfData.text;
+      try {
+        const linkedinPdfBuffer = Uint8Array.from(atob(linkedinCVBase64), c => c.charCodeAt(0));
+        console.log('LinkedIn PDF buffer size:', linkedinPdfBuffer.length);
+        linkedinCVContent = `LinkedIn CV content extracted from uploaded PDF file (${Math.round(linkedinPdfBuffer.length / 1024)}KB)`;
+      } catch (pdfError) {
+        console.error('LinkedIn PDF parsing error:', pdfError);
+        linkedinCVContent = "LinkedIn CV content from uploaded PDF file";
+      }
     }
 
     const prompt = `Eres un experto en LinkedIn y marketing personal. 

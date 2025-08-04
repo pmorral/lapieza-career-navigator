@@ -55,6 +55,8 @@ export function CVBoost() {
     setIsProcessing(true);
     
     try {
+      console.log('Processing CV file:', file.name, 'Size:', file.size);
+      
       // Convert PDF to base64
       const reader = new FileReader();
       const pdfBase64 = await new Promise<string>((resolve, reject) => {
@@ -62,11 +64,17 @@ export function CVBoost() {
           const result = reader.result as string;
           // Remove data URL prefix to get just the base64 data
           const base64Data = result.split(',')[1];
+          console.log('Base64 conversion successful, length:', base64Data.length);
           resolve(base64Data);
         };
-        reader.onerror = reject;
+        reader.onerror = (error) => {
+          console.error('File reading error:', error);
+          reject(error);
+        };
         reader.readAsDataURL(file);
       });
+      
+      console.log('Calling cv-boost-ai function...');
       
       // Call our CV Boost AI function using Supabase
       const { data, error } = await supabase.functions.invoke('cv-boost-ai', {
@@ -78,7 +86,7 @@ export function CVBoost() {
 
       if (error) {
         console.error('Edge function error:', error);
-        throw new Error('Error al procesar el CV');
+        throw new Error(`Error al procesar el CV: ${error.message}`);
       }
 
       const aiResult = data;

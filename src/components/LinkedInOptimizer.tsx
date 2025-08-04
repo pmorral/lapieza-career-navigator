@@ -75,15 +75,24 @@ export function LinkedInOptimizer() {
     setIsOptimizing(true);
     
     try {
+      console.log('Processing LinkedIn optimization with files:', {
+        personalCV: personalCV?.name,
+        linkedinCV: linkedinCV?.name
+      });
+      
       // Convert personal CV to base64
       const reader1 = new FileReader();
       const personalCVBase64 = await new Promise<string>((resolve, reject) => {
         reader1.onload = () => {
           const result = reader1.result as string;
           const base64Data = result.split(',')[1];
+          console.log('Personal CV base64 conversion successful, length:', base64Data.length);
           resolve(base64Data);
         };
-        reader1.onerror = reject;
+        reader1.onerror = (error) => {
+          console.error('Personal CV file reading error:', error);
+          reject(error);
+        };
         reader1.readAsDataURL(personalCV);
       });
 
@@ -95,12 +104,18 @@ export function LinkedInOptimizer() {
           reader2.onload = () => {
             const result = reader2.result as string;
             const base64Data = result.split(',')[1];
+            console.log('LinkedIn CV base64 conversion successful, length:', base64Data.length);
             resolve(base64Data);
           };
-          reader2.onerror = reject;
+          reader2.onerror = (error) => {
+            console.error('LinkedIn CV file reading error:', error);
+            reject(error);
+          };
           reader2.readAsDataURL(linkedinCV);
         });
       }
+      
+      console.log('Calling linkedin-optimizer-ai function...');
       
       // Call our LinkedIn Optimizer AI function using Supabase
       const { data, error } = await supabase.functions.invoke('linkedin-optimizer-ai', {
@@ -112,7 +127,7 @@ export function LinkedInOptimizer() {
 
       if (error) {
         console.error('Edge function error:', error);
-        throw new Error('Error al optimizar el perfil');
+        throw new Error(`Error al optimizar el perfil: ${error.message}`);
       }
 
       setOptimizedContent(data);
