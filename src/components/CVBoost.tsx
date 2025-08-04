@@ -805,6 +805,9 @@ export function CVBoost() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Templates Section */}
+      <TemplatesSection />
     </div>
   );
 }
