@@ -126,7 +126,29 @@ export function CVBoost() {
   };
 
   const downloadCV = () => {
-    // Simulate PDF download
+    if (!result?.improvedContent) {
+      toast({
+        title: "Error",
+        description: "No hay contenido de CV para descargar",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create a text file with the CV content
+    const cvText = `CV OPTIMIZADO\n\n${result.improvedContent}\n\n---\nGenerado por CV Boost AI`;
+    const blob = new Blob([cvText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `CV_Optimizado_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
     toast({
       title: "CV descargado",
       description: "Tu CV optimizado se ha descargado correctamente"
