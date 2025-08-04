@@ -48,7 +48,7 @@ serve(async (req) => {
       cvContent = "CV content from uploaded PDF file - Error in extraction, using fallback processing";
     }
 
-    const prompt = `Eres un experto en recursos humanos y optimización de CVs. 
+    const prompt = `Eres un experto senior en recursos humanos, ATS (Applicant Tracking Systems) y optimización de CVs. 
 
 Analiza el siguiente CV y optimízalo según estas preferencias:
 - Idioma: ${preferences.language}
@@ -58,25 +58,47 @@ Analiza el siguiente CV y optimízalo según estas preferencias:
 CV a analizar:
 ${cvContent}
 
+IMPORTANTE: Debes generar un CV completamente estructurado con TODAS las secciones, incluso si no están presentes en el CV original. Usa tu experiencia para inferir y crear contenido profesional relevante.
+
 Debes responder en el siguiente formato JSON:
 {
   "feedback": [
-    "lista de puntos de mejora detectados en el CV original"
+    "lista detallada de puntos de mejora detectados en el CV original"
   ],
-  "optimizedCV": "CV completo optimizado en formato texto",
+  "optimizedCV": "CV completo optimizado en formato texto profesional",
+  "sections": {
+    "personal": "Información de contacto profesional optimizada (nombre, teléfono, email, ubicación, LinkedIn)",
+    "summary": "Perfil profesional de 3-4 líneas que resuma experiencia clave y valor agregado para el puesto objetivo",
+    "experience": "Experiencia profesional con logros cuantificados, usando palabras clave del sector y métrica específicas",
+    "education": "Formación académica incluyendo títulos, instituciones, fechas y logros académicos relevantes",
+    "skills": "Habilidades técnicas y blandas categorizadas y relevantes para el puesto objetivo",
+    "certifications": "Certificaciones profesionales, cursos relevantes y formación continua",
+    "languages": "Idiomas con niveles de competencia claramente definidos",
+    "projects": "Proyectos destacados con resultados medibles y tecnologías utilizadas",
+    "achievements": "Logros profesionales, premios, reconocimientos y métricas de desempeño",
+    "volunteer": "Experiencia de voluntariado y actividades extracurriculares que agreguen valor",
+    "interests": "Intereses profesionales que complementen el perfil y muestren soft skills",
+    "additional": "Información adicional relevante como publicaciones, conferencias, membresías profesionales"
+  },
+  "keywords": [
+    "lista de palabras clave específicas del sector y puesto objetivo que se incluyeron en el CV"
+  ],
   "improvements": [
-    "lista de mejoras aplicadas"
+    "lista detallada de mejoras aplicadas"
   ]
 }
 
-El CV optimizado debe:
-1. Estar en el idioma solicitado
-2. Incluir información de contacto profesional
-3. Tener un perfil profesional alineado al puesto objetivo
-4. Cuantificar logros con números específicos
-5. Usar palabras clave relevantes para el puesto
-6. Tener estructura clara y profesional
-7. Incluir habilidades categorizadas`;
+REQUISITOS ESPECÍFICOS:
+1. **Análisis de palabras clave**: Identifica e incluye términos técnicos, habilidades y conceptos específicos del puesto objetivo que mejoren la visibilidad en ATS
+2. **Sinónimos estratégicos**: Usa variaciones de términos clave para maximizar coincidencias de búsqueda
+3. **Cuantificación obligatoria**: Todos los logros deben incluir números, porcentajes, fechas o métricas específicas
+4. **Optimización ATS**: Estructura y formato que sea fácil de leer por sistemas de seguimiento de candidatos
+5. **Adaptación al puesto**: Todo el contenido debe estar alineado con el puesto objetivo mencionado
+6. **Completitud**: Genera contenido para TODAS las secciones, incluso si no están en el CV original
+7. **Profesionalismo**: Lenguaje formal, claro y orientado a resultados
+8. **Relevancia sectorial**: Incluye terminología y conceptos específicos de la industria del puesto objetivo
+
+Cada sección debe ser sustancial y profesional, no genérica. Si falta información en el CV original, infiere y crea contenido profesional coherente basado en el puesto objetivo.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -90,8 +112,8 @@ El CV optimizado debe:
           { role: 'system', content: 'Eres un experto en optimización de CVs y recursos humanos. Respondes siempre en formato JSON válido.' },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
-        max_tokens: 2000,
+        temperature: 0.8,
+        max_tokens: 4000,
       }),
     });
 
@@ -109,8 +131,23 @@ El CV optimizado debe:
     } catch (e) {
       // Fallback if JSON parsing fails
       result = {
-        feedback: ["No se pudo analizar el CV anterior"],
+        feedback: ["No se pudo analizar el CV anterior completamente"],
         optimizedCV: aiResponse,
+        sections: {
+          personal: "Información de contacto profesional",
+          summary: "Perfil profesional optimizado",
+          experience: "Experiencia profesional destacada",
+          education: "Formación académica relevante",
+          skills: "Habilidades técnicas y blandas",
+          certifications: "Certificaciones profesionales",
+          languages: "Idiomas",
+          projects: "Proyectos destacados",
+          achievements: "Logros profesionales",
+          volunteer: "Experiencia de voluntariado",
+          interests: "Intereses profesionales",
+          additional: "Información adicional"
+        },
+        keywords: ["palabras", "clave", "relevantes"],
         improvements: ["CV optimizado con IA"]
       };
     }
