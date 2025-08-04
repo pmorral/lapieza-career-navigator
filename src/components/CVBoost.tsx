@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
-import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase, AlertCircle } from "lucide-react";
+import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase, AlertCircle, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 
 export function CVBoost() {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [activeView, setActiveView] = useState("config"); // "config" or "results"
   const [preferences, setPreferences] = useState({
     language: "",
     targetPosition: "",
@@ -24,7 +25,7 @@ export function CVBoost() {
   }>>([]);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [currentResult, setCurrentResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -184,8 +185,8 @@ export function CVBoost() {
         setCvHistory(prev => [historyEntry, ...prev]);
       }
       
-      setResult(result);
-      setCurrentStep(3);
+      setCurrentResult(result);
+      setActiveView("results");
     } catch (error) {
       console.error('Error processing CV:', error);
       toast({
@@ -198,324 +199,37 @@ export function CVBoost() {
     }
   };
 
-  const downloadCV = () => {
-    if (!result?.improvedContent) {
-      toast({
-        title: "Error",
-        description: "No hay contenido de CV para descargar",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      // Create PDF using jsPDF
-      const doc = new jsPDF();
-      
-      // Set font and title
-      doc.setFontSize(20);
-      doc.text("CV OPTIMIZADO", 20, 30);
-      
-      // Add metadata
-      doc.setFontSize(10);
-      doc.text(`Generado por CV Boost AI - ${new Date().toLocaleDateString()}`, 20, 45);
-      
-      // Add CV content
-      doc.setFontSize(12);
-      const lines = doc.splitTextToSize(result.improvedContent, 170);
-      doc.text(lines, 20, 60);
-      
-      // Save the PDF
-      const fileName = `CV_Optimizado_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
-
-      toast({
-        title: "CV descargado",
-        description: "Tu CV optimizado se ha descargado como PDF"
-      });
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo generar el PDF. Inténtalo de nuevo.",
-        variant: "destructive"
-      });
-    }
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copiado",
+      description: "Contenido copiado al portapapeles",
+    });
   };
 
-  // Download CV from history
-  const downloadCVFromHistory = (cvResult: any) => {
-    if (!cvResult?.improvedContent) {
-      toast({
-        title: "Error",
-        description: "No hay contenido de CV para descargar",
-        variant: "destructive"
-      });
-      return;
-    }
 
-    try {
-      const doc = new jsPDF();
-      doc.setFontSize(20);
-      doc.text("CV OPTIMIZADO", 20, 30);
-      doc.setFontSize(10);
-      doc.text(`Generado por CV Boost AI - ${new Date().toLocaleDateString()}`, 20, 45);
-      doc.setFontSize(12);
-      const lines = doc.splitTextToSize(cvResult.improvedContent, 170);
-      doc.text(lines, 20, 60);
-      
-      const fileName = `${cvResult.fileName.replace('.pdf', '')}_Optimizado_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
-
-      toast({
-        title: "CV descargado",
-        description: "Tu CV optimizado se ha descargado como PDF"
-      });
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo generar el PDF. Inténtalo de nuevo.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  if (currentStep === 1) {
+  if (activeView === "results" && currentResult) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">CV Boost</h1>
-            <p className="text-muted-foreground">Optimiza tu CV con inteligencia artificial</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">CV Optimizado</h1>
+            <p className="text-muted-foreground">Secciones optimizadas listas para usar</p>
           </div>
-
-          {/* CV History Section */}
-          {isLoading ? (
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 animate-spin" />
-                  <p className="text-muted-foreground">Cargando historial...</p>
-                </div>
-              </CardContent>
-            </Card>
-          ) : cvHistory.length > 0 && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg">📚 Historial de CVs Optimizados</CardTitle>
-                <CardDescription>
-                  Tus CVs anteriores están disponibles para descargar y revisar
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {cvHistory.slice(0, 5).map((entry) => (
-                    <div key={entry.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <FileText className="w-5 h-5 text-primary" />
-                          <div>
-                            <p className="font-medium">{entry.fileName}</p>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span>📅 {entry.date}</span>
-                              {entry.score && (
-                                <span className="flex items-center gap-1">
-                                  ⭐ Puntuación: {entry.score}/100
-                                </span>
-                              )}
-                              <span>💡 {entry.feedback?.length || 0} recomendaciones</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setResult(entry.result);
-                            setCurrentStep(3);
-                          }}
-                        >
-                          👁️ Ver Detalles
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => downloadCVFromHistory(entry.result)}
-                        >
-                          <Download className="w-4 h-4 mr-1" />
-                          PDF
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  {cvHistory.length > 5 && (
-                    <p className="text-sm text-muted-foreground text-center pt-2">
-                      Y {cvHistory.length - 5} CVs más en tu historial
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuración de tu CV</CardTitle>
-              <CardDescription>
-                Completa tu información para generar un CV optimizado
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">¿En qué idioma deseas el CV final?</label>
-                  <select
-                    value={preferences.language}
-                    onChange={(e) => setPreferences(prev => ({ ...prev, language: e.target.value }))}
-                    className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    <option value="">Selecciona idioma</option>
-                    <option value="español">Español</option>
-                    <option value="inglés">Inglés</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">¿A qué puesto estás aplicando?</label>
-                  <input
-                    type="text"
-                    value={preferences.targetPosition}
-                    onChange={(e) => setPreferences(prev => ({ ...prev, targetPosition: e.target.value }))}
-                    placeholder="Ej: Marketing Manager, Desarrollador Frontend..."
-                    className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">¿Estás abiertx a reubicación?</label>
-                  <select
-                    value={preferences.relocation}
-                    onChange={(e) => setPreferences(prev => ({ ...prev, relocation: e.target.value }))}
-                    className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    <option value="">Selecciona una opción</option>
-                    <option value="si">Sí, estoy abiertx a reubicación</option>
-                    <option value="no">No, prefiero trabajar en mi ciudad actual</option>
-                    <option value="remoto">Prefiero trabajo remoto</option>
-                  </select>
-                </div>
-              </div>
-
-              <Button
-                onClick={() => setCurrentStep(2)}
-                disabled={!preferences.language || !preferences.targetPosition || !preferences.relocation}
-                className="w-full mt-6"
-              >
-                Continuar
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  if (currentStep === 2) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">CV Boost</h1>
-            <p className="text-muted-foreground">Sube tu CV actual para comenzar la optimización</p>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Adjunta tu CV actual en formato PDF</CardTitle>
-              <CardDescription>
-                Sube tu CV para que la IA lo analice y genere una versión optimizada
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="cv-upload"
-                />
-                <label
-                  htmlFor="cv-upload"
-                  className="cursor-pointer flex flex-col items-center gap-2"
-                >
-                  <Upload className="w-12 h-12 text-muted-foreground" />
-                  <p className="text-lg font-medium">
-                    Arrastra tu CV aquí o haz click para seleccionar
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Solo archivos PDF (máx. 5MB)
-                  </p>
-                </label>
-              </div>
-
-              {uploadedFile && (
-                <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <div className="flex-1">
-                    <p className="font-medium">{uploadedFile.name}</p>
-                    <p className="text-sm text-muted-foreground">Archivo listo para procesar</p>
-                  </div>
-                  <CheckCircle className="w-5 h-5 text-success" />
-                </div>
-              )}
-
-              <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setCurrentStep(1)}
-                  className="flex-1"
-                >
-                  Regresar
-                </Button>
-                <Button
-                  onClick={() => uploadedFile && processCV(uploadedFile)}
-                  disabled={!uploadedFile || isProcessing}
-                  className="flex-1"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-                      Procesando tu CV...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Generar CV Optimizado
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">CV Boost</h1>
-          <p className="text-muted-foreground">Tu CV ha sido optimizado exitosamente</p>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setActiveView("config");
+              setCurrentResult(null);
+              setUploadedFile(null);
+            }}
+          >
+            Crear Nuevo CV
+          </Button>
         </div>
 
         {/* Feedback Section */}
-        <Card className="mb-6">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-orange-600">
               <AlertCircle className="w-5 h-5" />
@@ -524,7 +238,7 @@ export function CVBoost() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {result.feedback?.map((point: string, index: number) => (
+              {currentResult.feedback?.map((point: string, index: number) => (
                 <li key={index} className="flex items-start gap-2 text-sm">
                   <span className="text-orange-500 mt-1">•</span>
                   {point}
@@ -534,55 +248,329 @@ export function CVBoost() {
           </CardContent>
         </Card>
 
-        {/* Optimized CV */}
+        {/* CV Sections */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-success" />
-                Tu CV Optimizado - Template Profesional
-              </span>
-              <Button onClick={downloadCV} className="flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                Descargar PDF
-              </Button>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-success" />
+              Secciones del CV Optimizado
             </CardTitle>
             <CardDescription>
-              CV profesional generado con las mejores prácticas de empleabilidad
+              Copia cada sección a tu CV o generador de CVs preferido
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="bg-white p-8 rounded-lg border shadow-sm">
-              <pre className="whitespace-pre-wrap text-sm font-mono">
-                {result.improvedContent}
-              </pre>
+          <CardContent className="space-y-6">
+            {/* Personal Information Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">📝 Información Personal</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.personal || "Información personal optimizada")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.personal || "Información personal optimizada con mejores keywords y estructura profesional."}
+                readOnly
+                className="min-h-[80px]"
+              />
+            </div>
+
+            {/* Professional Summary */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">🎯 Perfil Profesional</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.summary || currentResult.improvedContent.split('\n').slice(0, 5).join('\n'))}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.summary || currentResult.improvedContent.split('\n').slice(0, 5).join('\n')}
+                readOnly
+                className="min-h-[120px]"
+              />
+            </div>
+
+            {/* Experience Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">💼 Experiencia Profesional</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.experience || "Experiencia profesional optimizada con logros cuantificables")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.experience || "Experiencia profesional optimizada con logros cuantificables y keywords relevantes para el puesto objetivo."}
+                readOnly
+                className="min-h-[150px]"
+              />
+            </div>
+
+            {/* Education Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">🎓 Educación</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.education || "Formación académica optimizada")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.education || "Formación académica optimizada con énfasis en habilidades relevantes para el puesto."}
+                readOnly
+                className="min-h-[100px]"
+              />
+            </div>
+
+            {/* Skills Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">🛠️ Habilidades</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.skills || "Habilidades técnicas y blandas optimizadas")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.skills || "Habilidades técnicas y blandas optimizadas, organizadas por relevancia para el puesto objetivo."}
+                readOnly
+                className="min-h-[100px]"
+              />
+            </div>
+
+            {/* Additional Sections */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">⭐ Secciones Adicionales</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.additional || "Certificaciones, proyectos y logros destacados")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.additional || "Certificaciones relevantes, proyectos destacados, idiomas y otros logros que fortalecen tu candidatura."}
+                readOnly
+                className="min-h-[120px]"
+              />
             </div>
             
             <div className="mt-6 p-4 bg-muted rounded-lg">
               <h4 className="font-medium mb-2">Configuración aplicada:</h4>
               <div className="text-sm text-muted-foreground space-y-1">
-                <p>• Idioma: {result.configApplied?.language}</p>
-                <p>• Puesto objetivo: {result.configApplied?.targetPosition}</p>
+                <p>• Idioma: {currentResult.configApplied?.language}</p>
+                <p>• Puesto objetivo: {currentResult.configApplied?.targetPosition}</p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-            <div className="flex gap-3 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setCurrentStep(1);
-                  setUploadedFile(null);
-                  setResult(null);
-                }}
-                className="flex-1"
-              >
-                Crear Nuevo CV
-              </Button>
-              <Button onClick={downloadCV} className="flex-1">
-                <Download className="w-4 h-4 mr-2" />
-                Descargar CV Final
-              </Button>
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-foreground mb-2">CV Boost</h1>
+        <p className="text-muted-foreground">Optimiza tu CV con inteligencia artificial</p>
+      </div>
+
+      {/* CV History Section */}
+      {isLoading ? (
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 animate-spin" />
+              <p className="text-muted-foreground">Cargando historial...</p>
             </div>
+          </CardContent>
+        </Card>
+      ) : cvHistory.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">📚 Historial de CVs Optimizados</CardTitle>
+            <CardDescription>
+              Tus CVs anteriores están disponibles para revisar
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {cvHistory.slice(0, 5).map((entry) => (
+                <div key={entry.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-primary" />
+                      <div>
+                        <p className="font-medium">{entry.fileName}</p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>📅 {entry.date}</span>
+                          {entry.score && (
+                            <span className="flex items-center gap-1">
+                              ⭐ Puntuación: {entry.score}/100
+                            </span>
+                          )}
+                          <span>💡 {entry.feedback?.length || 0} recomendaciones</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setCurrentResult(entry.result);
+                      setActiveView("results");
+                    }}
+                  >
+                    👁️ Ver Resultados
+                  </Button>
+                </div>
+              ))}
+              {cvHistory.length > 5 && (
+                <p className="text-sm text-muted-foreground text-center pt-2">
+                  Y {cvHistory.length - 5} CVs más en tu historial
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Configuration Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Configuración de tu CV</CardTitle>
+            <CardDescription>
+              Completa tu información para generar un CV optimizado
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">¿En qué idioma deseas el CV final?</label>
+                <select
+                  value={preferences.language}
+                  onChange={(e) => setPreferences(prev => ({ ...prev, language: e.target.value }))}
+                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="">Selecciona idioma</option>
+                  <option value="español">Español</option>
+                  <option value="inglés">Inglés</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">¿A qué puesto estás aplicando?</label>
+                <input
+                  type="text"
+                  value={preferences.targetPosition}
+                  onChange={(e) => setPreferences(prev => ({ ...prev, targetPosition: e.target.value }))}
+                  placeholder="Ej: Marketing Manager, Desarrollador Frontend..."
+                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">¿Estás abiertx a reubicación?</label>
+                <select
+                  value={preferences.relocation}
+                  onChange={(e) => setPreferences(prev => ({ ...prev, relocation: e.target.value }))}
+                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="">Selecciona una opción</option>
+                  <option value="si">Sí, estoy abiertx a reubicación</option>
+                  <option value="no">No, prefiero trabajar en mi ciudad actual</option>
+                  <option value="remoto">Prefiero trabajo remoto</option>
+                </select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Sube tu CV actual</CardTitle>
+            <CardDescription>
+              Sube tu CV para que la IA lo analice y genere una versión optimizada
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="cv-upload"
+              />
+              <label
+                htmlFor="cv-upload"
+                className="cursor-pointer flex flex-col items-center gap-2"
+              >
+                <Upload className="w-8 h-8 text-muted-foreground" />
+                <p className="text-sm font-medium">
+                  Arrastra tu CV aquí o haz click
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Solo archivos PDF (máx. 5MB)
+                </p>
+              </label>
+            </div>
+
+            {uploadedFile && (
+              <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                <FileText className="w-4 h-4 text-primary" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{uploadedFile.name}</p>
+                  <p className="text-xs text-muted-foreground">Listo para procesar</p>
+                </div>
+                <CheckCircle className="w-4 h-4 text-success" />
+              </div>
+            )}
+
+            <Button
+              onClick={() => uploadedFile && processCV(uploadedFile)}
+              disabled={!uploadedFile || isProcessing || !preferences.language || !preferences.targetPosition || !preferences.relocation}
+              className="w-full"
+            >
+              {isProcessing ? (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                  Procesando tu CV...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generar CV Optimizado
+                </>
+              )}
+            </Button>
           </CardContent>
         </Card>
       </div>

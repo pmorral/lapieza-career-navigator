@@ -48,11 +48,11 @@ export function Dashboard() {
 
   const menuItems = [
     { id: "overview", label: "Panel Principal", icon: Home },
-    { id: "learning", label: "E-learning", icon: BookOpen },
+    { id: "interviews", label: "Simulación de Entrevistas con AI", icon: MessageSquare },
     { id: "cv-boost", label: "CV Boost", icon: FileText },
     { id: "linkedin", label: "LinkedIn Boost", icon: Users },
     { id: "job-tracker", label: "Tablero de Vacantes", icon: Target },
-    { id: "interviews", label: "Simulación de Entrevistas con AI", icon: MessageSquare },
+    { id: "learning", label: "E-learning", icon: BookOpen },
     { id: "automated-messages", label: "Templates de Empleabilidad", icon: Users },
     { id: "services", label: "Servicios Adicionales", icon: DollarSign },
   ];
