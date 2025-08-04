@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export function CVBoost() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -38,23 +39,20 @@ export function CVBoost() {
       // Extract text from PDF (simulation)
       const cvContent = `CV content from ${file.name}`;
       
-      // Call our CV Boost AI function
-      const response = await fetch('/functions/v1/cv-boost-ai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Call our CV Boost AI function using Supabase
+      const { data, error } = await supabase.functions.invoke('cv-boost-ai', {
+        body: {
           cvContent,
           preferences
-        }),
+        }
       });
 
-      if (!response.ok) {
+      if (error) {
+        console.error('Edge function error:', error);
         throw new Error('Error al procesar el CV');
       }
 
-      const aiResult = await response.json();
+      const aiResult = data;
       
       const result = {
         originalContent: cvContent,

@@ -1,1 +1,7 @@
 project_id = "qgxpzuaeorjkcjwwphjt"
+
+[functions.cv-boost-ai]
+verify_jwt = false
+
+[functions.linkedin-optimizer-ai]
+verify_jwt = false

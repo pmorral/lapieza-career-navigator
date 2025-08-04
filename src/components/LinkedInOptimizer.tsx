@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
 
 export function LinkedInOptimizer() {
   const [personalCV, setPersonalCV] = useState<File | null>(null);
@@ -52,24 +53,20 @@ export function LinkedInOptimizer() {
       const personalCVContent = `Personal CV content from ${personalCV.name}`;
       const linkedinCVContent = linkedinCV ? `LinkedIn CV content from ${linkedinCV.name}` : null;
       
-      // Call our LinkedIn Optimizer AI function
-      const response = await fetch('/functions/v1/linkedin-optimizer-ai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Call our LinkedIn Optimizer AI function using Supabase
+      const { data, error } = await supabase.functions.invoke('linkedin-optimizer-ai', {
+        body: {
           personalCVContent,
           linkedinCVContent
-        }),
+        }
       });
 
-      if (!response.ok) {
+      if (error) {
+        console.error('Edge function error:', error);
         throw new Error('Error al optimizar el perfil');
       }
 
-      const optimizedContent = await response.json();
-      setOptimizedContent(optimizedContent);
+      setOptimizedContent(data);
       
     } catch (error) {
       console.error('Error optimizing profile:', error);
