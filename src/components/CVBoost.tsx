@@ -319,9 +319,6 @@ export function CVBoost() {
           </Button>
         </div>
 
-        {/* Templates Section */}
-        <TemplatesSection />
-
         {/* Feedback Section */}
         <Card>
           <CardHeader>
@@ -620,6 +617,9 @@ export function CVBoost() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Templates Section */}
+        <TemplatesSection />
       </div>
     );
   }
