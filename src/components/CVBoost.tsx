@@ -61,6 +61,7 @@ export function CVBoost() {
     feedback: string[];
     score?: number;
   }>>([]);
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentResult, setCurrentResult] = useState<any>(null);
@@ -128,6 +129,53 @@ export function CVBoost() {
   useEffect(() => {
     loadCVHistory();
   }, []);
+
+  // Load history on component mount
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  const loadHistory = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('cv_optimizations')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setHistoryItems(data || []);
+      }
+    } catch (error) {
+      console.error('Error loading history:', error);
+    }
+  };
+
+  const deleteHistoryItem = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('cv_optimizations')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      await loadHistory();
+      toast({
+        title: "Eliminado",
+        description: "El CV optimizado ha sido eliminado del historial",
+      });
+    } catch (error) {
+      console.error('Error deleting history item:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el elemento del historial",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

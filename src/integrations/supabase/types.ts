@@ -44,6 +44,33 @@ export type Database = {
         }
         Relationships: []
       }
+      cv_optimizations: {
+        Row: {
+          created_at: string
+          id: string
+          optimized_content: Json
+          original_filename: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          optimized_content: Json
+          original_filename: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          optimized_content?: Json
+          original_filename?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       interview_sessions: {
         Row: {
           completed_at: string | null
@@ -121,6 +148,36 @@ export type Database = {
           title?: string
           updated_at?: string
           url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      linkedin_optimizations: {
+        Row: {
+          created_at: string
+          id: string
+          linkedin_cv_filename: string | null
+          optimized_content: Json
+          personal_cv_filename: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          linkedin_cv_filename?: string | null
+          optimized_content: Json
+          personal_cv_filename: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          linkedin_cv_filename?: string | null
+          optimized_content?: Json
+          personal_cv_filename?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

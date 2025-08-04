@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Upload, Users, Copy, CheckCircle, AlertCircle, Linkedin } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Upload, Users, Copy, CheckCircle, AlertCircle, Linkedin, History, Calendar, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,56 @@ export function LinkedInOptimizer() {
   const [language, setLanguage] = useState('');
   const [optimizedContent, setOptimizedContent] = useState<any>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const { toast } = useToast();
+
+  // Load history on component mount
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  const loadHistory = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('linkedin_optimizations')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setHistoryItems(data || []);
+      }
+    } catch (error) {
+      console.error('Error loading history:', error);
+    }
+  };
+
+  const deleteHistoryItem = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('linkedin_optimizations')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      await loadHistory();
+      toast({
+        title: "Eliminado",
+        description: "La optimización de LinkedIn ha sido eliminada del historial",
+      });
+    } catch (error) {
+      console.error('Error deleting history item:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el elemento del historial",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handlePersonalCVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -131,6 +180,25 @@ export function LinkedInOptimizer() {
       }
 
       setOptimizedContent(data);
+
+      // Save to history
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && data) {
+        const { error: saveError } = await supabase
+          .from('linkedin_optimizations')
+          .insert({
+            user_id: user.id,
+            personal_cv_filename: personalCV.name,
+            linkedin_cv_filename: linkedinCV?.name || null,
+            optimized_content: data
+          });
+
+        if (saveError) {
+          console.error('Error saving to history:', saveError);
+        } else {
+          await loadHistory();
+        }
+      }
       
     } catch (error) {
       console.error('Error optimizing profile:', error);
@@ -154,6 +222,76 @@ export function LinkedInOptimizer() {
 
   return (
     <div className="space-y-6">
+      {/* Header with History Toggle */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Optimizador de LinkedIn</h1>
+        <Button
+          onClick={() => setShowHistory(!showHistory)}
+          variant="outline"
+          size="sm"
+        >
+          <History className="w-4 h-4 mr-2" />
+          {showHistory ? 'Ocultar Historial' : 'Ver Historial'}
+        </Button>
+      </div>
+
+      {/* History Section */}
+      {showHistory && (
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <History className="w-5 h-5 text-primary" />
+              Historial de Optimizaciones de LinkedIn
+            </CardTitle>
+            <CardDescription>
+              Tus optimizaciones de LinkedIn anteriores
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {historyItems.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">
+                No hay optimizaciones de LinkedIn en el historial
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {historyItems.map((item) => (
+                  <div key={item.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-medium">{item.personal_cv_filename}</h4>
+                        {item.linkedin_cv_filename && (
+                          <p className="text-sm text-muted-foreground">+ {item.linkedin_cv_filename}</p>
+                        )}
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(item.created_at).toLocaleDateString('es-ES')}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => setOptimizedContent(item.optimized_content)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Ver
+                        </Button>
+                        <Button
+                          onClick={() => deleteHistoryItem(item.id)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upload Section */}
         <Card className="shadow-card">
