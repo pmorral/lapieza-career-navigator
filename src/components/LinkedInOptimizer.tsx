@@ -359,31 +359,54 @@ export function LinkedInOptimizer() {
                 </div>
 
                 {/* Experience Español */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Experiencia</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.experience)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copiar
-                    </Button>
+                {optimizedContent.spanish.experiences && optimizedContent.spanish.experiences.length > 0 ? (
+                  optimizedContent.spanish.experiences.map((exp: any, index: number) => (
+                    <div key={index} className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">Experiencia {index + 1}: {exp.title} - {exp.company}</h3>
+                        <Button
+                          onClick={() => copyToClipboard(exp.description)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copiar
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={exp.description || "Descripción de experiencia profesional no disponible"}
+                        readOnly
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">Experiencia</h3>
+                      <Button
+                        onClick={() => copyToClipboard(optimizedContent.spanish.experience || "No disponible")}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copiar
+                      </Button>
+                    </div>
+                    <Textarea
+                      value={optimizedContent.spanish.experience || "Experiencia profesional no disponible"}
+                      readOnly
+                      className="min-h-[100px]"
+                    />
                   </div>
-                  <Textarea
-                    value={optimizedContent.spanish.experience}
-                    readOnly
-                    className="min-h-[100px]"
-                  />
-                </div>
+                )}
 
                 {/* Education Español */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Educación</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.education)}
+                      onClick={() => copyToClipboard(optimizedContent.spanish.education || "No disponible")}
                       variant="outline"
                       size="sm"
                     >
@@ -392,7 +415,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.spanish.education}
+                    value={optimizedContent.spanish.education || "Información de educación no disponible"}
                     readOnly
                     className="min-h-[80px]"
                   />
@@ -403,7 +426,7 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Licencias y Certificaciones</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.certifications)}
+                      onClick={() => copyToClipboard(optimizedContent.spanish.certifications || "No disponible")}
                       variant="outline"
                       size="sm"
                     >
@@ -412,7 +435,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.spanish.certifications}
+                    value={optimizedContent.spanish.certifications || "Certificaciones no disponibles"}
                     readOnly
                     className="min-h-[80px]"
                   />
@@ -423,7 +446,7 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Proyectos</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.projects)}
+                      onClick={() => copyToClipboard(optimizedContent.spanish.projects || "No disponible")}
                       variant="outline"
                       size="sm"
                     >
@@ -432,7 +455,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.spanish.projects}
+                    value={optimizedContent.spanish.projects || "Proyectos no disponibles"}
                     readOnly
                     className="min-h-[100px]"
                   />
@@ -443,7 +466,7 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Voluntariado</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.volunteer)}
+                      onClick={() => copyToClipboard(optimizedContent.spanish.volunteer || "No disponible")}
                       variant="outline"
                       size="sm"
                     >
@@ -452,7 +475,47 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.spanish.volunteer}
+                    value={optimizedContent.spanish.volunteer || "Experiencia de voluntariado no disponible"}
+                    readOnly
+                    className="min-h-[60px]"
+                  />
+                </div>
+
+                {/* Accomplishments Español */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">Logros y Reconocimientos</h3>
+                    <Button
+                      onClick={() => copyToClipboard(optimizedContent.spanish.accomplishments || "No disponible")}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copiar
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={optimizedContent.spanish.accomplishments || "Logros no disponibles"}
+                    readOnly
+                    className="min-h-[60px]"
+                  />
+                </div>
+
+                {/* Interests Español */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">Intereses</h3>
+                    <Button
+                      onClick={() => copyToClipboard(optimizedContent.spanish.interests || "No disponible")}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copiar
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={optimizedContent.spanish.interests || "Intereses no disponibles"}
                     readOnly
                     className="min-h-[60px]"
                   />
@@ -462,9 +525,13 @@ export function LinkedInOptimizer() {
                 <div>
                   <h3 className="font-medium mb-2">Aptitudes Recomendadas</h3>
                   <div className="flex flex-wrap gap-2">
-                    {optimizedContent.spanish.skills.map((skill: string, index: number) => (
-                      <Badge key={index} variant="secondary">{skill}</Badge>
-                    ))}
+                    {optimizedContent.spanish.skills && optimizedContent.spanish.skills.length > 0 ? (
+                      optimizedContent.spanish.skills.map((skill: string, index: number) => (
+                        <Badge key={index} variant="secondary">{skill}</Badge>
+                      ))
+                    ) : (
+                      <Badge variant="outline">Aptitudes no disponibles</Badge>
+                    )}
                   </div>
                 </div>
               </div>
@@ -514,31 +581,54 @@ export function LinkedInOptimizer() {
                 </div>
 
                 {/* Experience English */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Experience</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.experience)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy
-                    </Button>
+                {optimizedContent.english.experiences && optimizedContent.english.experiences.length > 0 ? (
+                  optimizedContent.english.experiences.map((exp: any, index: number) => (
+                    <div key={index} className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">Experience {index + 1}: {exp.title} - {exp.company}</h3>
+                        <Button
+                          onClick={() => copyToClipboard(exp.description)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={exp.description || "Professional experience description not available"}
+                        readOnly
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">Experience</h3>
+                      <Button
+                        onClick={() => copyToClipboard(optimizedContent.english.experience || "Not available")}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy
+                      </Button>
+                    </div>
+                    <Textarea
+                      value={optimizedContent.english.experience || "Professional experience not available"}
+                      readOnly
+                      className="min-h-[100px]"
+                    />
                   </div>
-                  <Textarea
-                    value={optimizedContent.english.experience}
-                    readOnly
-                    className="min-h-[100px]"
-                  />
-                </div>
+                )}
 
                 {/* Education English */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Education</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.education)}
+                      onClick={() => copyToClipboard(optimizedContent.english.education || "Not available")}
                       variant="outline"
                       size="sm"
                     >
@@ -547,7 +637,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.education}
+                    value={optimizedContent.english.education || "Education information not available"}
                     readOnly
                     className="min-h-[80px]"
                   />
@@ -558,7 +648,7 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Licenses & Certifications</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.certifications)}
+                      onClick={() => copyToClipboard(optimizedContent.english.certifications || "Not available")}
                       variant="outline"
                       size="sm"
                     >
@@ -567,7 +657,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.certifications}
+                    value={optimizedContent.english.certifications || "Certifications not available"}
                     readOnly
                     className="min-h-[80px]"
                   />
@@ -578,7 +668,7 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Projects</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.projects)}
+                      onClick={() => copyToClipboard(optimizedContent.english.projects || "Not available")}
                       variant="outline"
                       size="sm"
                     >
@@ -587,7 +677,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.projects}
+                    value={optimizedContent.english.projects || "Projects not available"}
                     readOnly
                     className="min-h-[100px]"
                   />
@@ -598,7 +688,7 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Volunteer Experience</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.volunteer)}
+                      onClick={() => copyToClipboard(optimizedContent.english.volunteer || "Not available")}
                       variant="outline"
                       size="sm"
                     >
@@ -607,7 +697,47 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.volunteer}
+                    value={optimizedContent.english.volunteer || "Volunteer experience not available"}
+                    readOnly
+                    className="min-h-[60px]"
+                  />
+                </div>
+
+                {/* Accomplishments English */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">Accomplishments</h3>
+                    <Button
+                      onClick={() => copyToClipboard(optimizedContent.english.accomplishments || "Not available")}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={optimizedContent.english.accomplishments || "Accomplishments not available"}
+                    readOnly
+                    className="min-h-[60px]"
+                  />
+                </div>
+
+                {/* Interests English */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">Interests</h3>
+                    <Button
+                      onClick={() => copyToClipboard(optimizedContent.english.interests || "Not available")}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy
+                    </Button>
+                  </div>
+                  <Textarea
+                    value={optimizedContent.english.interests || "Interests not available"}
                     readOnly
                     className="min-h-[60px]"
                   />
@@ -617,9 +747,13 @@ export function LinkedInOptimizer() {
                 <div>
                   <h3 className="font-medium mb-2">Recommended Skills</h3>
                   <div className="flex flex-wrap gap-2">
-                    {optimizedContent.english.skills.map((skill: string, index: number) => (
-                      <Badge key={index} variant="secondary">{skill}</Badge>
-                    ))}
+                    {optimizedContent.english.skills && optimizedContent.english.skills.length > 0 ? (
+                      optimizedContent.english.skills.map((skill: string, index: number) => (
+                        <Badge key={index} variant="secondary">{skill}</Badge>
+                      ))
+                    ) : (
+                      <Badge variant="outline">Skills not available</Badge>
+                    )}
                   </div>
                 </div>
               </div>
