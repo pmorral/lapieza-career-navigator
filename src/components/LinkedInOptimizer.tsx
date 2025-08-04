@@ -47,32 +47,40 @@ export function LinkedInOptimizer() {
     
     setIsOptimizing(true);
     
-    // Simulate AI optimization
-    setTimeout(() => {
-      setOptimizedContent({
-        spanish: {
-          headline: "Ingeniero de Software Senior | Desarrollador Full-Stack | Experto en React & Node.js | Construcción de Aplicaciones Web Escalables",
-          summary: "Ingeniero de software experimentado con más de 5 años de experiencia en desarrollo full-stack. Historial comprobado en la entrega de aplicaciones web de alta calidad usando React, Node.js y tecnologías modernas. 💻\n\nApasionado por crear soluciones eficientes y escalables que impulsen el crecimiento empresarial. Mi experiencia incluye liderazgo de equipos, arquitectura de sistemas y optimización de procesos. 🚀\n\n¿Interesado en conectar? Escríbeme a: ejemplo@email.com 📧",
-          skills: ["JavaScript", "React", "Node.js", "TypeScript", "Python", "AWS", "MongoDB", "PostgreSQL", "Git", "Docker"],
-          experience: "• Diseñé y desarrollé una plataforma de e-commerce que procesó más de $2M en ventas\n• Lideré un equipo de 5 desarrolladores en la migración exitosa de sistemas legacy\n• Implementé arquitecturas microservicios que mejoraron el rendimiento en un 40%",
-          education: "Ingeniería en Sistemas de Información | Universidad Tecnológica Nacional | 2015-2019\nCertificación AWS Solutions Architect | Amazon Web Services | 2021",
-          certifications: "AWS Solutions Architect Associate\nScrum Master Certified\nReact Developer Certification",
-          projects: "• E-commerce Platform - Plataforma completa con React, Node.js y MongoDB\n• Task Management App - Aplicación de gestión de tareas con integración de IA\n• API Gateway - Microservicio para manejo de autenticación y autorización",
-          volunteer: "Mentor de programación en Code Academy\nVoluntario en proyectos de código abierto"
+    try {
+      // Extract text from PDFs (simulation)
+      const personalCVContent = `Personal CV content from ${personalCV.name}`;
+      const linkedinCVContent = linkedinCV ? `LinkedIn CV content from ${linkedinCV.name}` : null;
+      
+      // Call our LinkedIn Optimizer AI function
+      const response = await fetch('/functions/v1/linkedin-optimizer-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        english: {
-          headline: "Senior Software Engineer | Full-Stack Developer | React & Node.js Expert | Building Scalable Web Applications",
-          summary: "Experienced software engineer with 5+ years of expertise in full-stack development. Proven track record of delivering high-quality web applications using React, Node.js, and modern technologies. 💻\n\nPassionate about creating efficient, scalable solutions that drive business growth. My experience includes team leadership, system architecture, and process optimization. 🚀\n\nInterested in connecting? Reach out to me at: ejemplo@email.com 📧",
-          skills: ["JavaScript", "React", "Node.js", "TypeScript", "Python", "AWS", "MongoDB", "PostgreSQL", "Git", "Docker"],
-          experience: "• Designed and developed an e-commerce platform that processed over $2M in sales\n• Led a team of 5 developers in successful legacy system migration\n• Implemented microservices architecture that improved performance by 40%",
-          education: "Bachelor's in Information Systems Engineering | National Technological University | 2015-2019\nAWS Solutions Architect Certification | Amazon Web Services | 2021",
-          certifications: "AWS Solutions Architect Associate\nScrum Master Certified\nReact Developer Certification",
-          projects: "• E-commerce Platform - Full-stack platform with React, Node.js, and MongoDB\n• Task Management App - AI-integrated task management application\n• API Gateway - Microservice for authentication and authorization handling",
-          volunteer: "Programming Mentor at Code Academy\nOpen Source Projects Contributor"
-        }
+        body: JSON.stringify({
+          personalCVContent,
+          linkedinCVContent
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Error al optimizar el perfil');
+      }
+
+      const optimizedContent = await response.json();
+      setOptimizedContent(optimizedContent);
+      
+    } catch (error) {
+      console.error('Error optimizing profile:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo optimizar el perfil. Inténtalo de nuevo.",
+        variant: "destructive"
+      });
+    } finally {
       setIsOptimizing(false);
-    }, 3000);
+    }
   };
 
   const copyToClipboard = (text: string) => {

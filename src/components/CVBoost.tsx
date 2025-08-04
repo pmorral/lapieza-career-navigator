@@ -34,80 +34,60 @@ export function CVBoost() {
   const processCV = async (file: File) => {
     setIsProcessing(true);
     
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    const feedback = [
-      "Tu CV anterior tenía información de contacto incompleta",
-      "Faltaba cuantificar logros específicos en la experiencia laboral", 
-      "Las habilidades no estaban categorizadas ni tenían niveles definidos",
-      "El perfil profesional era muy genérico y no mostraba tu valor único",
-      "No había keywords relevantes para el puesto objetivo"
-    ];
-    
-    const result = {
-      originalContent: "CV content extracted...",
-      improvedContent: `MARÍA JOSÉ GARCÍA LÓPEZ
-📧 maria.garcia@email.com | 📱 +52 55 1234 5678 | 🌍 Ciudad de México | 💼 LinkedIn: /in/maria-garcia
+    try {
+      // Extract text from PDF (simulation)
+      const cvContent = `CV content from ${file.name}`;
+      
+      // Call our CV Boost AI function
+      const response = await fetch('/functions/v1/cv-boost-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cvContent,
+          preferences
+        }),
+      });
 
-PERFIL PROFESIONAL
-Especialista en Marketing Digital con 5 años de experiencia desarrollando estrategias integrales para aumentar la visibilidad online y conversión de leads. Experta en SEO/SEM, redes sociales y análisis de datos. Busco aplicar mis conocimientos en ${preferences.targetPosition || 'marketing digital'} para impulsar el crecimiento de una empresa innovadora.
+      if (!response.ok) {
+        throw new Error('Error al procesar el CV');
+      }
 
-EXPERIENCIA PROFESIONAL
+      const aiResult = await response.json();
+      
+      const result = {
+        originalContent: cvContent,
+        improvedContent: aiResult.optimizedCV,
+        configApplied: {
+          language: preferences.language,
+          targetPosition: preferences.targetPosition
+        },
+        feedback: aiResult.feedback || ["CV procesado exitosamente"]
+      };
 
-Marketing Manager | Empresa XYZ | Enero 2021 - Presente
-• Diseñé e implementé estrategias de marketing digital que incrementaron el tráfico web en 150%
-• Gestioné presupuestos de publicidad digital de $50,000 USD anuales con ROI del 300%
-• Lideré un equipo de 3 especialistas en contenido y redes sociales
-• Desarrollé campañas multi-canal que aumentaron la generación de leads en 80%
-
-Especialista en Marketing Digital | StartUp ABC | Marzo 2019 - Diciembre 2020
-• Creé contenido para redes sociales que aumentó el engagement en 200%
-• Optimicé SEO del sitio web mejorando el ranking en Google en 50 posiciones
-• Implementé herramientas de automatización que redujeron el tiempo de gestión en 40%
-• Analicé métricas de rendimiento y presenté informes mensuales a dirección
-
-HABILIDADES
-Hard Skills
-• Google Ads - Avanzado
-• Facebook Business Manager - Avanzado  
-• Google Analytics - Intermedio
-• SEO/SEM - Avanzado
-• Email Marketing - Intermedio
-
-Soft Skills
-• Liderazgo - Alto
-• Comunicación - Alto
-• Pensamiento analítico - Alto
-• Trabajo en equipo - Alto
-
-EDUCACIÓN
-Licenciatura en Mercadotecnia | Universidad Nacional | 2015-2019
-
-IDIOMAS
-• Español - Nativo
-• Inglés - Avanzado
-• Francés - Básico`,
-      configApplied: {
-        language: preferences.language,
-        targetPosition: preferences.targetPosition
-      },
-      feedback
-    };
-
-    // Save to history
-    const historyEntry = {
-      id: Date.now().toString(),
-      fileName: file.name,
-      date: new Date().toLocaleDateString(),
-      result,
-      feedback
-    };
-    
-    setCvHistory(prev => [historyEntry, ...prev]);
-    setResult(result);
-    setIsProcessing(false);
-    setCurrentStep(3);
+      // Save to history
+      const historyEntry = {
+        id: Date.now().toString(),
+        fileName: file.name,
+        date: new Date().toLocaleDateString(),
+        result,
+        feedback: result.feedback
+      };
+      
+      setCvHistory(prev => [historyEntry, ...prev]);
+      setResult(result);
+      setCurrentStep(3);
+    } catch (error) {
+      console.error('Error processing CV:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo procesar el CV. Inténtalo de nuevo.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const downloadCV = () => {
