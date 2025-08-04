@@ -1,5 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// @deno-types="npm:@types/pdf-parse"
+import * as pdfParse from "npm:pdf-parse@1.1.1";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY_LINKEDIN');
 
@@ -14,7 +16,24 @@ serve(async (req) => {
   }
 
   try {
-    const { personalCVContent, linkedinCVContent } = await req.json();
+    const { personalCVBase64, linkedinCVBase64 } = await req.json();
+
+    if (!personalCVBase64) {
+      throw new Error('No personal CV file provided');
+    }
+
+    // Extract text from personal CV
+    const personalPdfBuffer = new Uint8Array(atob(personalCVBase64).split('').map(char => char.charCodeAt(0)));
+    const personalPdfData = await pdfParse(personalPdfBuffer);
+    const personalCVContent = personalPdfData.text;
+
+    // Extract text from LinkedIn CV if provided
+    let linkedinCVContent = null;
+    if (linkedinCVBase64) {
+      const linkedinPdfBuffer = new Uint8Array(atob(linkedinCVBase64).split('').map(char => char.charCodeAt(0)));
+      const linkedinPdfData = await pdfParse(linkedinPdfBuffer);
+      linkedinCVContent = linkedinPdfData.text;
+    }
 
     const prompt = `Eres un experto en LinkedIn y marketing personal. 
 

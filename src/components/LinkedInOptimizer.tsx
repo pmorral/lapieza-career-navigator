@@ -20,7 +20,20 @@ export function LinkedInOptimizer() {
   const handlePersonalCVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type === "application/pdf") {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "El archivo es demasiado grande. Máximo 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
       setPersonalCV(file);
+      toast({
+        title: "CV Personal cargado",
+        description: "Tu CV personal ha sido cargado correctamente",
+      });
     } else {
       toast({
         title: "Tipo de archivo inválido",
@@ -33,7 +46,20 @@ export function LinkedInOptimizer() {
   const handleLinkedInCVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type === "application/pdf") {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "El archivo es demasiado grande. Máximo 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
       setLinkedinCV(file);
+      toast({
+        title: "CV LinkedIn cargado",
+        description: "Tu CV de LinkedIn ha sido cargado correctamente",
+      });
     } else {
       toast({
         title: "Tipo de archivo inválido",
@@ -49,15 +75,38 @@ export function LinkedInOptimizer() {
     setIsOptimizing(true);
     
     try {
-      // Extract text from PDFs (simulation)
-      const personalCVContent = `Personal CV content from ${personalCV.name}`;
-      const linkedinCVContent = linkedinCV ? `LinkedIn CV content from ${linkedinCV.name}` : null;
+      // Convert personal CV to base64
+      const reader1 = new FileReader();
+      const personalCVBase64 = await new Promise<string>((resolve, reject) => {
+        reader1.onload = () => {
+          const result = reader1.result as string;
+          const base64Data = result.split(',')[1];
+          resolve(base64Data);
+        };
+        reader1.onerror = reject;
+        reader1.readAsDataURL(personalCV);
+      });
+
+      // Convert LinkedIn CV to base64 if provided
+      let linkedinCVBase64 = null;
+      if (linkedinCV) {
+        const reader2 = new FileReader();
+        linkedinCVBase64 = await new Promise<string>((resolve, reject) => {
+          reader2.onload = () => {
+            const result = reader2.result as string;
+            const base64Data = result.split(',')[1];
+            resolve(base64Data);
+          };
+          reader2.onerror = reject;
+          reader2.readAsDataURL(linkedinCV);
+        });
+      }
       
       // Call our LinkedIn Optimizer AI function using Supabase
       const { data, error } = await supabase.functions.invoke('linkedin-optimizer-ai', {
         body: {
-          personalCVContent,
-          linkedinCVContent
+          personalCVBase64,
+          linkedinCVBase64
         }
       });
 

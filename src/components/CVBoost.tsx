@@ -27,8 +27,27 @@ export function CVBoost() {
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (file && file.type === "application/pdf") {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "El archivo es demasiado grande. Máximo 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
       setUploadedFile(file);
+      toast({
+        title: "Archivo cargado",
+        description: "Tu CV ha sido cargado correctamente",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Por favor, selecciona un archivo PDF válido",
+        variant: "destructive",
+      });
     }
   };
 
@@ -36,13 +55,23 @@ export function CVBoost() {
     setIsProcessing(true);
     
     try {
-      // Extract text from PDF (simulation)
-      const cvContent = `CV content from ${file.name}`;
+      // Convert PDF to base64
+      const reader = new FileReader();
+      const pdfBase64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          // Remove data URL prefix to get just the base64 data
+          const base64Data = result.split(',')[1];
+          resolve(base64Data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
       
       // Call our CV Boost AI function using Supabase
       const { data, error } = await supabase.functions.invoke('cv-boost-ai', {
         body: {
-          cvContent,
+          pdfBase64,
           preferences
         }
       });
@@ -55,7 +84,7 @@ export function CVBoost() {
       const aiResult = data;
       
       const result = {
-        originalContent: cvContent,
+        originalContent: file.name,
         improvedContent: aiResult.optimizedCV,
         configApplied: {
           language: preferences.language,
@@ -231,9 +260,9 @@ export function CVBoost() {
                   <p className="text-lg font-medium">
                     Arrastra tu CV aquí o haz click para seleccionar
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    Solo archivos PDF (máx. 10MB)
-                  </p>
+                   <p className="text-sm text-muted-foreground">
+                     Solo archivos PDF (máx. 5MB)
+                   </p>
                 </label>
               </div>
 
