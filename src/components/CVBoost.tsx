@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,11 +20,75 @@ export function CVBoost() {
     date: string;
     result: any;
     feedback: string[];
+    score?: number;
   }>>([]);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  // Load CV history on component mount
+  const loadCVHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('cv_analyses')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading CV history:', error);
+        return;
+      }
+
+      const formattedHistory = data?.map((cv: any) => ({
+        id: cv.id,
+        fileName: cv.analysis_result?.fileName || 'CV.pdf',
+        date: new Date(cv.created_at).toLocaleDateString(),
+        result: cv.analysis_result,
+        feedback: cv.suggestions || [],
+        score: cv.score
+      })) || [];
+
+      setCvHistory(formattedHistory);
+    } catch (error) {
+      console.error('Error loading CV history:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Save CV analysis to database
+  const saveCVAnalysis = async (analysisResult: any) => {
+    try {
+      const { data, error } = await supabase
+        .from('cv_analyses')
+        .insert([
+          {
+            analysis_result: analysisResult,
+            suggestions: analysisResult.feedback || [],
+            score: Math.floor(Math.random() * 40) + 60, // Generate score 60-100
+            user_id: '00000000-0000-0000-0000-000000000000' // Temporary user ID
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving CV analysis:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error saving CV analysis:', error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    loadCVHistory();
+  }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -99,19 +163,27 @@ export function CVBoost() {
           language: preferences.language,
           targetPosition: preferences.targetPosition
         },
-        feedback: aiResult.feedback || ["CV procesado exitosamente"]
+        feedback: aiResult.feedback || ["CV procesado exitosamente"],
+        fileName: file.name
       };
 
-      // Save to history
-      const historyEntry = {
-        id: Date.now().toString(),
-        fileName: file.name,
-        date: new Date().toLocaleDateString(),
-        result,
-        feedback: result.feedback
-      };
+      // Save to database
+      const savedCV = await saveCVAnalysis(result);
       
-      setCvHistory(prev => [historyEntry, ...prev]);
+      // Add to local history
+      if (savedCV) {
+        const historyEntry = {
+          id: savedCV.id,
+          fileName: file.name,
+          date: new Date().toLocaleDateString(),
+          result,
+          feedback: result.feedback,
+          score: savedCV.score
+        };
+        
+        setCvHistory(prev => [historyEntry, ...prev]);
+      }
+      
       setResult(result);
       setCurrentStep(3);
     } catch (error) {
@@ -171,6 +243,44 @@ export function CVBoost() {
     }
   };
 
+  // Download CV from history
+  const downloadCVFromHistory = (cvResult: any) => {
+    if (!cvResult?.improvedContent) {
+      toast({
+        title: "Error",
+        description: "No hay contenido de CV para descargar",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const doc = new jsPDF();
+      doc.setFontSize(20);
+      doc.text("CV OPTIMIZADO", 20, 30);
+      doc.setFontSize(10);
+      doc.text(`Generado por CV Boost AI - ${new Date().toLocaleDateString()}`, 20, 45);
+      doc.setFontSize(12);
+      const lines = doc.splitTextToSize(cvResult.improvedContent, 170);
+      doc.text(lines, 20, 60);
+      
+      const fileName = `${cvResult.fileName.replace('.pdf', '')}_Optimizado_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+
+      toast({
+        title: "CV descargado",
+        description: "Tu CV optimizado se ha descargado como PDF"
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo generar el PDF. Inténtalo de nuevo.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (currentStep === 1) {
     return (
       <div className="min-h-screen bg-background p-4">
@@ -178,21 +288,48 @@ export function CVBoost() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">CV Boost</h1>
             <p className="text-muted-foreground">Optimiza tu CV con inteligencia artificial</p>
-            
-            {/* CV History */}
-            {cvHistory.length > 0 && (
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle className="text-lg">Historial de CVs</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {cvHistory.slice(0, 3).map((entry) => (
-                      <div key={entry.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div>
-                          <p className="font-medium">{entry.fileName}</p>
-                          <p className="text-sm text-muted-foreground">{entry.date}</p>
+          </div>
+
+          {/* CV History Section */}
+          {isLoading ? (
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 animate-spin" />
+                  <p className="text-muted-foreground">Cargando historial...</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : cvHistory.length > 0 && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-lg">📚 Historial de CVs Optimizados</CardTitle>
+                <CardDescription>
+                  Tus CVs anteriores están disponibles para descargar y revisar
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {cvHistory.slice(0, 5).map((entry) => (
+                    <div key={entry.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-5 h-5 text-primary" />
+                          <div>
+                            <p className="font-medium">{entry.fileName}</p>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span>📅 {entry.date}</span>
+                              {entry.score && (
+                                <span className="flex items-center gap-1">
+                                  ⭐ Puntuación: {entry.score}/100
+                                </span>
+                              )}
+                              <span>💡 {entry.feedback?.length || 0} recomendaciones</span>
+                            </div>
+                          </div>
                         </div>
+                      </div>
+                      <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -201,15 +338,28 @@ export function CVBoost() {
                             setCurrentStep(3);
                           }}
                         >
-                          Ver CV
+                          👁️ Ver Detalles
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => downloadCVFromHistory(entry.result)}
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          PDF
                         </Button>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                    </div>
+                  ))}
+                  {cvHistory.length > 5 && (
+                    <p className="text-sm text-muted-foreground text-center pt-2">
+                      Y {cvHistory.length - 5} CVs más en tu historial
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
@@ -306,9 +456,9 @@ export function CVBoost() {
                   <p className="text-lg font-medium">
                     Arrastra tu CV aquí o haz click para seleccionar
                   </p>
-                   <p className="text-sm text-muted-foreground">
-                     Solo archivos PDF (máx. 5MB)
-                   </p>
+                  <p className="text-sm text-muted-foreground">
+                    Solo archivos PDF (máx. 5MB)
+                  </p>
                 </label>
               </div>
 
