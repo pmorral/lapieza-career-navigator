@@ -8,6 +8,44 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 
+const cvTemplates = [
+  {
+    id: 1,
+    name: "Template Profesional Executive",
+    description: "Ideal para roles ejecutivos y gerenciales",
+    image: "/lovable-uploads/template-1.png",
+    downloadUrl: "/templates/template-executive.docx"
+  },
+  {
+    id: 2,
+    name: "Template Creativo Designer",
+    description: "Perfecto para diseñadores y creativos",
+    image: "/lovable-uploads/template-2.png",
+    downloadUrl: "/templates/template-creative.docx"
+  },
+  {
+    id: 3,
+    name: "Template Tech Developer",
+    description: "Optimizado para desarrolladores y IT",
+    image: "/lovable-uploads/template-3.png",
+    downloadUrl: "/templates/template-tech.docx"
+  },
+  {
+    id: 4,
+    name: "Template Minimalista Clean",
+    description: "Elegante y simple para cualquier sector",
+    image: "/lovable-uploads/template-4.png",
+    downloadUrl: "/templates/template-minimal.docx"
+  },
+  {
+    id: 5,
+    name: "Template ATS Optimized",
+    description: "Máxima compatibilidad con sistemas ATS",
+    image: "/lovable-uploads/template-5.png",
+    downloadUrl: "/templates/template-ats.docx"
+  }
+];
+
 export function CVBoost() {
   const [activeView, setActiveView] = useState("config"); // "config" or "results"
   const [preferences, setPreferences] = useState({
@@ -209,6 +247,57 @@ export function CVBoost() {
     });
   };
 
+  const downloadTemplate = (template: any) => {
+    // Create a temporary link to download the template
+    const link = document.createElement('a');
+    link.href = template.downloadUrl;
+    link.download = template.name + '.docx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Descarga iniciada",
+      description: `Template ${template.name} descargándose...`,
+    });
+  };
+
+  const TemplatesSection = () => (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="w-5 h-5 text-blue-600" />
+          Templates Recomendados por Academy By LaPieza
+        </CardTitle>
+        <CardDescription>
+          Descarga templates profesionales en Word listos para usar
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cvTemplates.map((template) => (
+            <div key={template.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
+                <FileText className="w-12 h-12 text-gray-400" />
+              </div>
+              <h3 className="font-semibold text-sm mb-1">{template.name}</h3>
+              <p className="text-xs text-muted-foreground mb-3">{template.description}</p>
+              <Button 
+                onClick={() => downloadTemplate(template)}
+                size="sm" 
+                className="w-full"
+                variant="outline"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Descargar Word
+              </Button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
 
   if (activeView === "results" && currentResult) {
     return (
@@ -229,6 +318,9 @@ export function CVBoost() {
             Crear Nuevo CV
           </Button>
         </div>
+
+        {/* Templates Section */}
+        <TemplatesSection />
 
         {/* Feedback Section */}
         <Card>
@@ -599,6 +691,9 @@ export function CVBoost() {
           </CardContent>
         </Card>
       )}
+
+      {/* Templates Section */}
+      <TemplatesSection />
 
       {/* Configuration Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
