@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import jsPDF from "jspdf";
 
 export function CVBoost() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -135,24 +136,39 @@ export function CVBoost() {
       return;
     }
 
-    // Create a text file with the CV content
-    const cvText = `CV OPTIMIZADO\n\n${result.improvedContent}\n\n---\nGenerado por CV Boost AI`;
-    const blob = new Blob([cvText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    
-    // Create download link
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `CV_Optimizado_${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    try {
+      // Create PDF using jsPDF
+      const doc = new jsPDF();
+      
+      // Set font and title
+      doc.setFontSize(20);
+      doc.text("CV OPTIMIZADO", 20, 30);
+      
+      // Add metadata
+      doc.setFontSize(10);
+      doc.text(`Generado por CV Boost AI - ${new Date().toLocaleDateString()}`, 20, 45);
+      
+      // Add CV content
+      doc.setFontSize(12);
+      const lines = doc.splitTextToSize(result.improvedContent, 170);
+      doc.text(lines, 20, 60);
+      
+      // Save the PDF
+      const fileName = `CV_Optimizado_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
 
-    toast({
-      title: "CV descargado",
-      description: "Tu CV optimizado se ha descargado correctamente"
-    });
+      toast({
+        title: "CV descargado",
+        description: "Tu CV optimizado se ha descargado como PDF"
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo generar el PDF. Inténtalo de nuevo.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (currentStep === 1) {
