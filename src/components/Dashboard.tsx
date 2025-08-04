@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown, Calendar, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { LinkedInOptimizer } from "./LinkedInOptimizer";
 import { JobTracker } from "./JobTracker";
 import { ELearningHub } from "./ELearningHub";
@@ -20,6 +22,29 @@ import { JobSuccess } from "./JobSuccess";
 export function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
   const [showJobSuccess, setShowJobSuccess] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Get current user and profile
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        setUserProfile(profile);
+      }
+    };
+
+    getCurrentUser();
+  }, []);
 
   const menuItems = [
     { id: "overview", label: "Panel Principal", icon: Home },
@@ -137,6 +162,18 @@ export function Dashboard() {
                   <DropdownMenuItem onClick={() => setShowJobSuccess(true)}>
                     <Trophy className="w-4 h-4 mr-2" />
                     ¡Conseguí Empleo!
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      toast({
+                        title: "Sesión cerrada",
+                        description: "Has cerrado sesión exitosamente",
+                      });
+                    }}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Cerrar Sesión
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

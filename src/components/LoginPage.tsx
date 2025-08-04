@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -19,14 +21,78 @@ export function LoginPage({ onLogin, onBackToLanding, onSignupToPay }: LoginPage
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin) {
-      onLogin();
-    } else {
-      // Si es signup, dirigir al pago
-      onSignupToPay ? onSignupToPay() : onLogin();
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          toast({
+            title: "Error al iniciar sesión",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "¡Bienvenido!",
+            description: "Has iniciado sesión correctamente",
+          });
+          onLogin();
+        }
+      } else {
+        if (password !== confirmPassword) {
+          toast({
+            title: "Error",
+            description: "Las contraseñas no coinciden",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const redirectUrl = `${window.location.origin}/`;
+        
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectUrl,
+            data: {
+              full_name: name,
+            }
+          }
+        });
+
+        if (error) {
+          toast({
+            title: "Error al crear cuenta",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "¡Cuenta creada!",
+            description: "Verifica tu correo electrónico para activar tu cuenta",
+          });
+          onSignupToPay ? onSignupToPay() : onLogin();
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Ocurrió un error inesperado",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,9 +213,10 @@ export function LoginPage({ onLogin, onBackToLanding, onSignupToPay }: LoginPage
                 className="w-full"
                 variant="professional"
                 size="lg"
+                disabled={loading}
               >
-                {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
-                <ArrowRight className="w-4 h-4 ml-2" />
+                {loading ? "Procesando..." : (isLogin ? "Iniciar Sesión" : "Crear Cuenta")}
+                {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
               </Button>
             </form>
 

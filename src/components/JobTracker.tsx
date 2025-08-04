@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, ExternalLink, MessageSquare, FileText, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Note {
   id: string;
@@ -29,48 +31,42 @@ interface JobApplication {
 }
 
 export function JobTracker() {
-  const [applications, setApplications] = useState<JobApplication[]>([
-    {
-      id: '1',
-      title: 'Senior Frontend Developer',
-      company: 'Tech Corp',
-      platform: 'LinkedIn',
-      url: 'https://linkedin.com/jobs/123456',
-      status: 'advancing',
-      dateApplied: '2024-01-15',
-      notes: [
-        {
-          id: '1',
-          text: 'Great interview with the team lead. Discussed React architecture and scalability challenges.',
-          date: '2024-01-16',
-          type: 'interview'
-        },
-        {
-          id: '2',
-          text: 'Follow-up email sent with portfolio examples.',
-          date: '2024-01-17',
-          type: 'general'
-        }
-      ]
-    },
-    {
-      id: '2',
-      title: 'Full Stack Engineer',
-      company: 'StartupXYZ',
-      platform: 'AngelList',
-      url: 'https://angel.co/jobs/789012',
-      status: 'first-call',
-      dateApplied: '2024-01-20',
-      notes: [
-        {
-          id: '3',
-          text: 'Initial screening call scheduled for next week.',
-          date: '2024-01-20',
-          type: 'general'
-        }
-      ]
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    loadApplications();
+  }, []);
+
+  const loadApplications = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('job_applications')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedApplications = data?.map(app => ({
+        id: app.id,
+        title: app.title,
+        company: app.company,
+        platform: app.platform || 'Other',
+        url: app.url || '',
+        status: app.status as JobApplication['status'],
+        dateApplied: app.applied_at || app.created_at.split('T')[0],
+        notes: app.notes ? JSON.parse(app.notes as string) : []
+      })) || [];
+
+      setApplications(formattedApplications);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar las aplicaciones",
+        variant: "destructive",
+      });
     }
-  ]);
+  };
 
   const [newApplication, setNewApplication] = useState<Partial<JobApplication>>({
     title: '',
@@ -94,40 +90,103 @@ export function JobTracker() {
     { key: 'accepted', label: 'Aceptada', color: 'bg-green-100 text-green-800' }
   ];
 
-  const addApplication = () => {
+  const addApplication = async () => {
     if (newApplication.title && newApplication.company) {
-      const application: JobApplication = {
-        id: Date.now().toString(),
-        title: newApplication.title!,
-        company: newApplication.company!,
-        platform: newApplication.platform || 'Other',
-        url: newApplication.url || '',
-        status: newApplication.status as JobApplication['status'] || 'applied',
-        dateApplied: new Date().toISOString().split('T')[0],
-        notes: []
-      };
-      
-      setApplications([...applications, application]);
-      setNewApplication({
-        title: '',
-        company: '',
-        platform: '',
-        url: '',
-        status: 'applied',
-        notes: []
-      });
-      setIsDialogOpen(false);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        const { data, error } = await supabase
+          .from('job_applications')
+          .insert([{
+            user_id: user.id,
+            title: newApplication.title!,
+            company: newApplication.company!,
+            platform: newApplication.platform || 'Other',
+            url: newApplication.url || '',
+            status: newApplication.status as string || 'applied',
+            applied_at: new Date().toISOString().split('T')[0],
+            notes: JSON.stringify([])
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        await loadApplications();
+        
+        setNewApplication({
+          title: '',
+          company: '',
+          platform: '',
+          url: '',
+          status: 'applied',
+          notes: []
+        });
+        setIsDialogOpen(false);
+
+        toast({
+          title: "¡Aplicación agregada!",
+          description: "Tu aplicación laboral ha sido guardada exitosamente",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "No se pudo agregar la aplicación",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const moveApplication = (id: string, newStatus: JobApplication['status']) => {
-    setApplications(applications.map(app => 
-      app.id === id ? { ...app, status: newStatus } : app
-    ));
+  const moveApplication = async (id: string, newStatus: JobApplication['status']) => {
+    try {
+      const { error } = await supabase
+        .from('job_applications')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setApplications(applications.map(app => 
+        app.id === id ? { ...app, status: newStatus } : app
+      ));
+
+      toast({
+        title: "Estado actualizado",
+        description: "El estado de la aplicación ha sido actualizado",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el estado",
+        variant: "destructive",
+      });
+    }
   };
 
-  const deleteApplication = (id: string) => {
-    setApplications(applications.filter(app => app.id !== id));
+  const deleteApplication = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('job_applications')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setApplications(applications.filter(app => app.id !== id));
+
+      toast({
+        title: "Aplicación eliminada",
+        description: "La aplicación ha sido eliminada exitosamente",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar la aplicación",
+        variant: "destructive",
+      });
+    }
   };
 
   const getApplicationsByStatus = (status: JobApplication['status']) => {
