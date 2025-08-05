@@ -50,7 +50,9 @@ serve(async (req) => {
     console.log('Sending request to LaPieza API:', {
       job_title: payload.job_title,
       fullname: payload.fullname,
-      has_cv_content: !!payload.cv_content
+      email: email,
+      has_cv_content: !!payload.cv_content,
+      cv_size_bytes: cvArrayBuffer.byteLength
     });
 
     // Send to LaPieza API
@@ -64,7 +66,12 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('LaPieza API error:', response.status, errorText);
+      console.error('LaPieza API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+        headers: Object.fromEntries(response.headers.entries())
+      });
       throw new Error(`LaPieza API error: ${response.status} - ${errorText}`);
     }
 

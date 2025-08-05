@@ -312,59 +312,7 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
         </CardContent>
       </Card>
 
-      {/* Active Interview */}
-      {isInterviewActive && (
-        <Card className="shadow-card border-primary">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              Interview in Progress
-            </CardTitle>
-            <CardDescription>
-              AI is conducting your interview session
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-accent rounded-lg">
-              <p className="font-medium mb-2">Current Question:</p>
-              <p className="text-sm">{currentQuestion}</p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={toggleRecording}
-                variant={isRecording ? "destructive" : "success"}
-                size="lg"
-              >
-                {isRecording ? (
-                  <>
-                    <MicOff className="w-4 h-4 mr-2" />
-                    Stop Recording
-                  </>
-                ) : (
-                  <>
-                    <Mic className="w-4 h-4 mr-2" />
-                    Start Recording
-                  </>
-                )}
-              </Button>
-              
-              <div className="flex-1 text-center">
-                <p className="text-sm text-muted-foreground">
-                  {isRecording ? 'Recording your response...' : 'Click to start recording your answer'}
-                </p>
-              </div>
-              
-              <Button
-                onClick={endInterview}
-                variant="outline"
-              >
-                End Interview
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Removed Interview in Progress - now handled by LaPieza URL */}
 
       {/* Interview History */}
       <Card className="shadow-card">
