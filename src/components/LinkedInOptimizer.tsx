@@ -382,7 +382,7 @@ export function LinkedInOptimizer() {
               {isOptimizing ? (
                 <>
                   <Users className="w-4 h-4 mr-2 animate-spin" />
-                  Generando contenido para LinkedIn...
+                  Generando contenido para LinkedIn... (puede tardar más de 1 minuto)
                 </>
               ) : (
                 <>

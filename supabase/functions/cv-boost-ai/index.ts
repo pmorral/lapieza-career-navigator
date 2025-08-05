@@ -60,10 +60,12 @@ ${cvContent}
 
 IMPORTANTE: Debes generar un CV completamente estructurado con TODAS las secciones, incluso si no están presentes en el CV original. Usa tu experiencia para inferir y crear contenido profesional relevante.
 
+FEEDBACK SIEMPRE EN ESPAÑOL: La sección "feedback" SIEMPRE debe estar en español, independientemente del idioma solicitado para el CV. Solo el contenido del CV optimizado debe estar en el idioma solicitado.
+
 Debes responder en el siguiente formato JSON:
 {
   "feedback": [
-    "lista detallada de puntos de mejora detectados en el CV original"
+    "lista detallada de puntos de mejora detectados en el CV original - SIEMPRE EN ESPAÑOL"
   ],
   "optimizedCV": "CV completo optimizado en formato texto profesional",
   "sections": {

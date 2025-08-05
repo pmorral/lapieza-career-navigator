@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase, AlertCircle, Copy } from "lucide-react";
+import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase, AlertCircle, Copy, History, Calendar, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +62,7 @@ export function CVBoost() {
     score?: number;
   }>>([]);
   const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentResult, setCurrentResult] = useState<any>(null);
@@ -259,6 +260,24 @@ export function CVBoost() {
       // Save to database
       const savedCV = await saveCVAnalysis(result);
       
+      // Save to new cv_optimizations table
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && result) {
+        const { error: saveError } = await supabase
+          .from('cv_optimizations')
+          .insert({
+            user_id: user.id,
+            original_filename: file.name,
+            optimized_content: result
+          });
+
+        if (saveError) {
+          console.error('Error saving to history:', saveError);
+        } else {
+          await loadHistory();
+        }
+      }
+      
       // Add to local history
       if (savedCV) {
         const historyEntry = {
@@ -367,7 +386,7 @@ export function CVBoost() {
           </Button>
         </div>
 
-        {/* Feedback Section */}
+        {/* Feedback Section - Always in Spanish */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-orange-600">
@@ -674,10 +693,75 @@ export function CVBoost() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">CV Boost</h1>
-        <p className="text-muted-foreground">Optimiza tu CV con inteligencia artificial</p>
+      {/* Header with History Toggle */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">CV Boost</h1>
+          <p className="text-muted-foreground">Optimiza tu CV con inteligencia artificial</p>
+        </div>
+        <Button
+          onClick={() => setShowHistory(!showHistory)}
+          variant="outline"
+          size="sm"
+        >
+          <History className="w-4 h-4 mr-2" />
+          {showHistory ? 'Ocultar Historial' : 'Ver Historial'}
+        </Button>
       </div>
+
+      {/* History Section */}
+      {showHistory && (
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <History className="w-5 h-5 text-primary" />
+              Historial de CVs Optimizados
+            </CardTitle>
+            <CardDescription>
+              Tus CVs optimizados anteriores
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {historyItems.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">
+                No hay CVs optimizados en el historial
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {historyItems.map((item) => (
+                  <div key={item.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-medium">{item.original_filename}</h4>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(item.created_at).toLocaleDateString('es-ES')}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => setCurrentResult(item.optimized_content)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Ver
+                        </Button>
+                        <Button
+                          onClick={() => deleteHistoryItem(item.id)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* CV History Section */}
       {isLoading ? (
@@ -841,7 +925,7 @@ export function CVBoost() {
               {isProcessing ? (
                 <>
                   <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-                  Procesando tu CV...
+                  Procesando tu CV... (puede tardar más de 1 minuto)
                 </>
               ) : (
                 <>
