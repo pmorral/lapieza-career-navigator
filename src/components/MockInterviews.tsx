@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Play, MessageSquare, FileText, Star, Clock, Mic, MicOff, Upload, X, CreditCard } from "lucide-react";
+import { Play, MessageSquare, FileText, Star, Clock, Mic, MicOff, Upload, X, CreditCard, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,8 @@ interface InterviewSession {
   feedback: string;
   improvements: string[];
   status: 'completed' | 'in-progress' | 'scheduled';
+  recordingUrl?: string;
+  betterAnswers?: string[];
 }
 
 export function MockInterviews() {
@@ -34,6 +36,7 @@ export function MockInterviews() {
   const [interviewCredits, setInterviewCredits] = useState(5);
   const [usedInterviews, setUsedInterviews] = useState(0);
   const [showCreditsDialog, setShowCreditsDialog] = useState(false);
+  const [showEmailNotification, setShowEmailNotification] = useState(false);
   const { toast } = useToast();
   const [interviews, setInterviews] = useState<InterviewSession[]>([
     {
@@ -49,7 +52,12 @@ export function MockInterviews() {
         'Prepare specific examples for leadership scenarios',
         'Work on concise answers'
       ],
-      status: 'completed'
+      status: 'completed',
+      recordingUrl: "https://example-interview-recording.com/session1.mp3",
+      betterAnswers: [
+        "Para la pregunta 'Háblame de ti', podrías estructurar mejor tu respuesta siguiendo esta guía: 'Soy un desarrollador frontend con 5 años de experiencia especializado en React y TypeScript. En mi trabajo actual en Tech Corp, lidero un equipo de 3 desarrolladores y hemos mejorado el rendimiento de la aplicación en un 40%. Busco nuevos desafíos donde pueda aplicar mi experiencia en arquitectura frontend y mentoría.'",
+        "Cuando te pregunten sobre debugging, proporciona un ejemplo específico: 'Recientemente enfrenté un bug de memoria en nuestra SPA. Utilicé Chrome DevTools para identificar memory leaks, implementé lazy loading para componentes pesados y reduje el uso de memoria en un 60%. Documenté el proceso para el equipo.'"
+      ]
     },
     {
       id: '2',
@@ -64,7 +72,12 @@ export function MockInterviews() {
         'Practice coding questions out loud',
         'Research company culture better'
       ],
-      status: 'completed'
+      status: 'completed',
+      recordingUrl: "https://example-interview-recording.com/session2.mp3",
+      betterAnswers: [
+        "Para proyectos desafiantes, usa STAR: 'Situación: Nuestro e-commerce tenía problemas de rendimiento. Tarea: Optimizar la velocidad de carga. Acción: Implementé code splitting, optimicé imágenes y usé service workers. Resultado: Redujimos el tiempo de carga en 50% y aumentamos la conversión en 15%.'",
+        "Al hablar de tecnologías, sé específico: 'Sigo blogs como CSS-Tricks, participo en comunidades de React, y dedico 2 horas semanales a experimentar con nuevas herramientas. Recientemente exploré Vite para builds más rápidos en nuestros proyectos.'"
+      ]
     }
   ]);
 
@@ -77,17 +90,8 @@ export function MockInterviews() {
       return;
     }
     
-    // Simulate AI generating interview questions
-    const questions = [
-      "Tell me about yourself and your experience with frontend development.",
-      "How do you approach debugging a complex issue in a React application?",
-      "Describe a challenging project you've worked on and how you overcame obstacles.",
-      "How do you stay updated with the latest technologies and trends?",
-      "Where do you see yourself in 5 years?"
-    ];
-    
-    setCurrentQuestion(questions[0]);
-    setIsInterviewActive(true);
+    // Show email notification popup
+    setShowEmailNotification(true);
   };
 
   const endInterview = () => {
@@ -126,19 +130,20 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
         "Preparar ejemplos específicos para escenarios de liderazgo", 
         "Investigar a fondo la cultura de la empresa"
       ],
-      status: "completed" as const
-    };
+        status: "completed" as const,
+        recordingUrl: "https://example-interview-recording.com/audio.mp3"
+      };
 
-    setInterviews(prev => [newInterview, ...prev]);
-    setIsInterviewActive(false);
-    setIsRecording(false);
-    setCurrentQuestion('');
-    setUsedInterviews(prev => prev + 1);
-    
-    toast({
-      title: "Entrevista completada",
-      description: `Te quedan ${interviewCredits - usedInterviews - 1} entrevistas gratuitas.`,
-    });
+      setInterviews(prev => [newInterview, ...prev]);
+      setIsInterviewActive(false);
+      setIsRecording(false);
+      setCurrentQuestion('');
+      setUsedInterviews(prev => prev + 1);
+      
+      toast({
+        title: "Entrevista completada",
+        description: `Te quedan ${interviewCredits - usedInterviews - 1} entrevistas gratuitas.`,
+      });
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -384,9 +389,29 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
                   </div>
                 </div>
                 
-                <div className="mt-4 pt-3 border-t">
+                {interview.betterAnswers && (
+                  <div className="mt-4">
+                    <h4 className="font-medium text-primary mb-2">Ejemplos de mejores respuestas</h4>
+                    <div className="space-y-2">
+                      {interview.betterAnswers.map((answer, index) => (
+                        <div key={index} className="text-sm p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
+                          {answer}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <div className="mt-4 pt-3 border-t flex gap-2">
+                  {interview.recordingUrl && (
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={interview.recordingUrl} target="_blank" rel="noopener noreferrer">
+                        🎧 Escuchar grabación
+                      </a>
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm">
-                    View Full Report
+                    Ver reporte completo
                   </Button>
                 </div>
               </div>
@@ -400,6 +425,44 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
         onClose={() => setShowCreditsDialog(false)}
         onPurchase={handlePurchaseCredits}
       />
+
+      {/* Email Notification Dialog */}
+      <Dialog open={showEmailNotification} onOpenChange={setShowEmailNotification}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-primary" />
+              Entrevista AI en camino
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center py-6">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-primary animate-pulse" />
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                <strong>¡Perfecto!</strong> En los próximos minutos recibirás un link por correo electrónico con tu entrevista AI personalizada.
+              </p>
+              <div className="bg-accent/50 p-4 rounded-lg">
+                <p className="text-xs text-muted-foreground">
+                  📧 Revisa tu bandeja de entrada y carpeta de spam<br />
+                  ⏰ La entrevista estará lista en 2-5 minutos<br />
+                  📊 El feedback aparecerá aquí después de completarla
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setShowEmailNotification(false)}
+                className="flex-1"
+              >
+                Entendido
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
