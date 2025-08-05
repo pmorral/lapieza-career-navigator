@@ -23,6 +23,7 @@ interface InterviewSession {
 }
 
 export function MockInterviews() {
+  const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [language, setLanguage] = useState('');
   const [isInterviewActive, setIsInterviewActive] = useState(false);
@@ -68,7 +69,7 @@ export function MockInterviews() {
   ]);
 
   const startInterview = () => {
-    if (!jobDescription.trim()) return;
+    if (!jobTitle.trim() || !jobDescription.trim()) return;
     
     // Check if user has available interviews
     if (usedInterviews >= interviewCredits) {
@@ -279,7 +280,19 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
           </div>
 
           <div>
-            <Label htmlFor="job-description">Job Description</Label>
+            <Label htmlFor="job-title">Título del puesto *</Label>
+            <Textarea
+              id="job-title"
+              placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
+              rows={1}
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="job-description">Job Description *</Label>
             <Textarea
               id="job-description"
               placeholder="Paste the job description here..."
@@ -293,7 +306,7 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
           <div className="flex gap-2">
             <Button 
               onClick={startInterview}
-              disabled={!jobDescription.trim() || !language || isInterviewActive}
+              disabled={!jobTitle.trim() || !jobDescription.trim() || !language || isInterviewActive}
               variant="professional"
               className="flex-1"
             >
@@ -303,7 +316,10 @@ Aplicar esta metodología te ayudará a dar respuestas más estructuradas y conv
             
             <Button 
               variant="outline"
-              onClick={() => setJobDescription('')}
+              onClick={() => {
+                setJobTitle('');
+                setJobDescription('');
+              }}
               disabled={isInterviewActive}
             >
               Clear
