@@ -18,11 +18,12 @@ serve(async (req) => {
     const lastName = formData.get('lastName') as string;
     const email = formData.get('email') as string;
     const company = formData.get('company') as string;
+    const jobTitle = formData.get('jobTitle') as string;
     const jobDescription = formData.get('jobDescription') as string;
     const experience = formData.get('experience') as string;
     const cvFile = formData.get('cv') as File;
 
-    if (!firstName || !lastName || !email || !jobDescription || !cvFile) {
+    if (!firstName || !lastName || !email || !jobTitle || !jobDescription || !cvFile) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         {
@@ -35,9 +36,6 @@ serve(async (req) => {
     // Read CV content
     const cvArrayBuffer = await cvFile.arrayBuffer();
     const cvBase64 = btoa(String.fromCharCode(...new Uint8Array(cvArrayBuffer)));
-
-    // Extract job title from job description (first line or assume from description)
-    const jobTitle = jobDescription.split('\n')[0].substring(0, 100) || 'Posición no especificada';
 
     // Prepare payload for LaPieza API
     const payload = {

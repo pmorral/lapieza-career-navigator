@@ -190,11 +190,21 @@ export const TrialAIInterview = () => {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="jobTitle">Título del puesto *</Label>
+            <Input 
+              id="jobTitle" 
+              name="jobTitle"
+              placeholder="Ej: Frontend Developer, Data Scientist, Product Manager" 
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="jobDescription">Descripción de la vacante *</Label>
             <Textarea 
               id="jobDescription"
               name="jobDescription"
-              placeholder="Describe la posición que te interesa: título del puesto, responsabilidades principales, tecnologías requeridas, etc."
+              placeholder="Describe la posición: responsabilidades principales, tecnologías requeridas, requisitos, etc."
               className="min-h-[120px]"
               required
             />
