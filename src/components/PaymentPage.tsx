@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Check, CreditCard, Lock, Star } from "lucide-react";
+import { CouponInput } from "./CouponInput";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface PaymentPageProps {
   onPaymentComplete: () => void;
@@ -14,6 +17,8 @@ interface PaymentPageProps {
 export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPageProps) => {
   const [selectedPlan, setSelectedPlan] = useState("premium");
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const plans = [
     {
@@ -33,12 +38,52 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate payment processing
-    setTimeout(() => {
+    setIsProcessing(true);
+
+    try {
+      // Check if free coupon is applied
+      if (appliedCoupon && appliedCoupon.discount_type === 'free') {
+        // Record coupon usage
+        const { data: user } = await supabase.auth.getUser();
+        if (user.user) {
+          await supabase.from('coupon_uses').insert({
+            coupon_id: appliedCoupon.id,
+            user_id: user.user.id
+          });
+
+          // Update coupon usage count
+          await supabase
+            .from('coupons')
+            .update({ current_uses: appliedCoupon.current_uses + 1 })
+            .eq('id', appliedCoupon.id);
+
+          // Update user profile to premium
+          await supabase
+            .from('profiles')
+            .update({ 
+              subscription_status: 'active',
+              subscription_plan: 'premium'
+            })
+            .eq('user_id', user.user.id);
+        }
+        
+        toast.success("¡Acceso gratuito activado!");
+        onPaymentComplete();
+        return;
+      }
+
+      // Simulate regular payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      toast.success("¡Pago completado exitosamente!");
       onPaymentComplete();
-    }, 2000);
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Error al procesar el pago");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -81,8 +126,14 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
                       <CardDescription className="text-sm">{plan.description}</CardDescription>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">${plan.price}</div>
-                      <div className="text-sm text-muted-foreground">USD/mes</div>
+                      {appliedCoupon && appliedCoupon.discount_type === 'free' ? (
+                        <div className="text-2xl font-bold text-green-600">GRATIS</div>
+                      ) : (
+                        <>
+                          <div className="text-2xl font-bold text-primary">${plan.price}</div>
+                          <div className="text-sm text-muted-foreground">USD/mes</div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
@@ -98,22 +149,28 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
                 </CardContent>
               </Card>
             ))}
+            
+            <CouponInput 
+              onCouponApplied={setAppliedCoupon}
+              appliedCoupon={appliedCoupon}
+            />
           </div>
 
           {/* Payment Form */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Información de pago
-                </CardTitle>
-                <CardDescription>
-                  Ingresa los datos de tu tarjeta de forma segura
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
+            {(!appliedCoupon || appliedCoupon.discount_type !== 'free') && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5" />
+                    Información de pago
+                  </CardTitle>
+                  <CardDescription>
+                    Ingresa los datos de tu tarjeta de forma segura
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" placeholder="tu@email.com" required />
@@ -156,8 +213,8 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
                       Tus datos están protegidos con encriptación SSL
                     </div>
 
-                    <Button type="submit" className="w-full" size="lg">
-                      Completar pago - ${plans.find(p => p.id === selectedPlan)?.price} USD
+                    <Button type="submit" className="w-full" size="lg" disabled={isProcessing}>
+                      {isProcessing ? "Procesando..." : `Completar pago - $${plans.find(p => p.id === selectedPlan)?.price} USD`}
                     </Button>
 
                     <Button 
@@ -172,6 +229,36 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
                 </form>
               </CardContent>
             </Card>
+            )}
+
+            {/* Free Access Button for Coupon Users */}
+            {appliedCoupon && appliedCoupon.discount_type === 'free' && (
+              <Card>
+                <CardContent className="p-6">
+                  <div className="text-center space-y-4">
+                    <div className="text-lg font-semibold text-green-700">
+                      ¡Cupón aplicado! Tienes acceso gratuito
+                    </div>
+                    <Button 
+                      onClick={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)} 
+                      className="w-full" 
+                      size="lg"
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? "Activando..." : "Activar acceso gratuito"}
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={onBackToSignup}
+                    >
+                      Volver al registro
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Summary */}
             <Card>
@@ -182,16 +269,31 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Plan {plans.find(p => p.id === selectedPlan)?.name}</span>
-                    <span>${plans.find(p => p.id === selectedPlan)?.price} USD</span>
+                    <span>
+                      {appliedCoupon && appliedCoupon.discount_type === 'free' ? 
+                        "$0 USD" : 
+                        `$${plans.find(p => p.id === selectedPlan)?.price} USD`
+                      }
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Facturación mensual</span>
+                    <span>
+                      {appliedCoupon && appliedCoupon.discount_type === 'free' ? 
+                        "Acceso gratuito con cupón" : 
+                        "Facturación mensual"
+                      }
+                    </span>
                     <span>Cancela cuando quieras</span>
                   </div>
                   <hr className="my-2" />
                   <div className="flex justify-between font-semibold">
                     <span>Total</span>
-                    <span>${plans.find(p => p.id === selectedPlan)?.price} USD/mes</span>
+                    <span>
+                      {appliedCoupon && appliedCoupon.discount_type === 'free' ? 
+                        "$0 USD/mes" : 
+                        `$${plans.find(p => p.id === selectedPlan)?.price} USD/mes`
+                      }
+                    </span>
                   </div>
                 </div>
               </CardContent>
