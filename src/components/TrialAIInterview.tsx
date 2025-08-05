@@ -31,24 +31,42 @@ export const TrialAIInterview = () => {
     setIsSubmitting(true);
     
     try {
+      console.log('🔄 Starting form submission...');
       const formData = new FormData(e.target as HTMLFormElement);
+      
+      // Log form data
+      console.log('📋 Form data:', {
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        email: formData.get('email'),
+        company: formData.get('company'),
+        jobTitle: formData.get('jobTitle'),
+        jobDescription: formData.get('jobDescription'),
+        experience: formData.get('experience'),
+        cvFile: uploadedCV?.name
+      });
+      
       formData.append('cv', uploadedCV!);
 
+      console.log('📡 Calling Supabase function...');
       const { data, error } = await supabase.functions.invoke('ai-interview-request', {
         body: formData,
       });
 
+      console.log('📦 Response received:', { data, error });
+
       if (error) {
-        console.error('Error:', error);
-        toast.error('Error al enviar la solicitud. Inténtalo de nuevo.');
+        console.error('❌ Supabase error:', error);
+        toast.error(`Error: ${error.message || 'Error al enviar la solicitud'}`);
         return;
       }
 
+      console.log('✅ Request successful');
       setIsSubmitted(true);
       toast.success("¡Solicitud enviada! La entrevista AI llegará a tu email.");
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error('Error al enviar la solicitud. Inténtalo de nuevo.');
+      console.error('💥 Catch error:', error);
+      toast.error(`Error al enviar la solicitud: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     } finally {
       setIsSubmitting(false);
     }

@@ -6,12 +6,16 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log('🚀 AI Interview Request function called with method:', req.method);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('📋 Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('📝 Starting form data processing...');
     const formData = await req.formData();
     
     const firstName = formData.get('firstName') as string;
