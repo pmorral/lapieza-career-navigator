@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Upload, Mail, CheckCircle, Clock, FileText, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const TrialAIInterview = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,12 +30,28 @@ export const TrialAIInterview = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const formData = new FormData(e.target as HTMLFormElement);
+      formData.append('cv', uploadedCV!);
+
+      const { data, error } = await supabase.functions.invoke('ai-interview-request', {
+        body: formData,
+      });
+
+      if (error) {
+        console.error('Error:', error);
+        toast.error('Error al enviar la solicitud. Inténtalo de nuevo.');
+        return;
+      }
+
       setIsSubmitted(true);
       toast.success("¡Solicitud enviada! Revisa tu email en los próximos minutos.");
-    }, 2000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('Error al enviar la solicitud. Inténtalo de nuevo.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -133,6 +150,7 @@ export const TrialAIInterview = () => {
               <Label htmlFor="firstName">Nombre *</Label>
               <Input 
                 id="firstName" 
+                name="firstName"
                 placeholder="Tu nombre" 
                 required 
               />
@@ -141,6 +159,7 @@ export const TrialAIInterview = () => {
               <Label htmlFor="lastName">Apellido *</Label>
               <Input 
                 id="lastName" 
+                name="lastName"
                 placeholder="Tu apellido" 
                 required 
               />
@@ -151,6 +170,7 @@ export const TrialAIInterview = () => {
             <Label htmlFor="email">Email *</Label>
             <Input 
               id="email" 
+              name="email"
               type="email" 
               placeholder="tu@email.com" 
               required 
@@ -164,6 +184,7 @@ export const TrialAIInterview = () => {
             <Label htmlFor="company">Empresa objetivo (opcional)</Label>
             <Input 
               id="company" 
+              name="company"
               placeholder="Ej: Google, Microsoft, Startup Tech" 
             />
           </div>
@@ -172,6 +193,7 @@ export const TrialAIInterview = () => {
             <Label htmlFor="jobDescription">Descripción de la vacante *</Label>
             <Textarea 
               id="jobDescription"
+              name="jobDescription"
               placeholder="Describe la posición que te interesa: título del puesto, responsabilidades principales, tecnologías requeridas, etc."
               className="min-h-[120px]"
               required
@@ -185,6 +207,7 @@ export const TrialAIInterview = () => {
             <Label htmlFor="experience">Años de experiencia *</Label>
             <Input 
               id="experience" 
+              name="experience"
               placeholder="Ej: 3 años" 
               required 
             />
