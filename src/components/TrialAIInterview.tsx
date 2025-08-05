@@ -45,7 +45,7 @@ export const TrialAIInterview = () => {
       }
 
       setIsSubmitted(true);
-      toast.success("¡Solicitud enviada! Revisa tu email en los próximos minutos.");
+      toast.success("¡Solicitud enviada! La entrevista AI llegará a tu email.");
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error('Error al enviar la solicitud. Inténtalo de nuevo.');
@@ -83,7 +83,7 @@ export const TrialAIInterview = () => {
                 Solicitud enviada
               </Badge>
               <p className="text-sm text-muted-foreground mb-4">
-                Hemos enviado los detalles a tu email. La entrevista AI estará lista en 24-48 horas.
+                Tu entrevista AI será enviada directamente a tu email. Revisa tu bandeja de entrada y spam.
               </p>
               <Button variant="outline" onClick={resetForm} className="w-full">
                 Hacer otra solicitud
@@ -271,7 +271,7 @@ export const TrialAIInterview = () => {
               <li>• Análisis de tus respuestas con IA</li>
               <li>• Feedback específico para mejorar</li>
               <li>• Sugerencias de preparación para la entrevista real</li>
-              <li>• Tiempo estimado de entrega: 24-48 horas</li>
+              <li>• La entrevista AI será enviada directamente a tu email</li>
             </ul>
           </div>
 

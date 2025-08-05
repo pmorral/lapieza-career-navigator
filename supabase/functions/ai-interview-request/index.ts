@@ -54,7 +54,7 @@ serve(async (req) => {
     });
 
     // Send to LaPieza API
-    const response = await fetch('https://interview-api.lapieza.io/api/interview/request', {
+    const response = await fetch('https://interview-api.lapieza.io/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
