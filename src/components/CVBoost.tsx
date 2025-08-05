@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase, AlertCircle, Copy, History, Calendar, Trash2 } from "lucide-react";
+import { Upload, Download, FileText, Sparkles, CheckCircle, Globe, MapPin, Briefcase, AlertCircle, Copy, History, Calendar, Trash2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,40 +8,47 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 
+// Import template preview images
+import templateExecutivePreview from "@/assets/template-executive-preview.jpg";
+import templateCreativePreview from "@/assets/template-creative-preview.jpg";
+import templateTechPreview from "@/assets/template-tech-preview.jpg";
+import templateMinimalPreview from "@/assets/template-minimal-preview.jpg";
+import templateAtsPreview from "@/assets/template-ats-preview.jpg";
+
 const cvTemplates = [
   {
     id: 1,
     name: "Template Profesional Executive",
     description: "Ideal para roles ejecutivos y gerenciales",
-    image: "/lovable-uploads/template-1.png",
+    image: templateExecutivePreview,
     downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-executive.docx"
   },
   {
     id: 2,
     name: "Template Creativo Designer",
     description: "Perfecto para diseñadores y creativos",
-    image: "/lovable-uploads/template-2.png",
+    image: templateCreativePreview,
     downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-creative.docx"
   },
   {
     id: 3,
     name: "Template Tech Developer",
     description: "Optimizado para desarrolladores y IT",
-    image: "/lovable-uploads/template-3.png",
+    image: templateTechPreview,
     downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-tech.docx"
   },
   {
     id: 4,
     name: "Template Minimalista Clean",
     description: "Elegante y simple para cualquier sector",
-    image: "/lovable-uploads/template-4.png",
+    image: templateMinimalPreview,
     downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-minimal.docx"
   },
   {
     id: 5,
     name: "Template ATS Optimized",
     description: "Máxima compatibilidad con sistemas ATS",
-    image: "/lovable-uploads/template-5.png",
+    image: templateAtsPreview,
     downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-ats.docx"
   }
 ];
@@ -314,19 +321,49 @@ export function CVBoost() {
     });
   };
 
-  const downloadTemplate = (template: any) => {
-    // Create a temporary link to download the template
-    const link = document.createElement('a');
-    link.href = template.downloadUrl;
-    link.download = template.name + '.docx';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({
-      title: "Descarga iniciada",
-      description: `Template ${template.name} descargándose...`,
-    });
+  const downloadTemplate = async (template: any) => {
+    try {
+      toast({
+        title: "Descargando template...",
+        description: "Por favor espera mientras se descarga el archivo",
+      });
+
+      // Fetch the file from Supabase Storage
+      const response = await fetch(template.downloadUrl);
+      
+      if (!response.ok) {
+        throw new Error('Error al descargar el template');
+      }
+
+      // Create blob from response
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${template.name.replace(/\s+/g, '-')}.docx`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "¡Template descargado!",
+        description: `${template.name} se ha descargado exitosamente`,
+      });
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      toast({
+        title: "Error al descargar",
+        description: "No se pudo descargar el template. Por favor intenta de nuevo.",
+        variant: "destructive",
+      });
+    }
   };
 
   const TemplatesSection = () => (
@@ -344,20 +381,40 @@ export function CVBoost() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cvTemplates.map((template) => (
             <div key={template.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                <FileText className="w-12 h-12 text-gray-400" />
+              <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-3 overflow-hidden">
+                <img 
+                  src={template.image} 
+                  alt={template.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/placeholder.svg';
+                  }}
+                />
               </div>
               <h3 className="font-semibold text-sm mb-1">{template.name}</h3>
               <p className="text-xs text-muted-foreground mb-3">{template.description}</p>
-              <Button 
-                onClick={() => downloadTemplate(template)}
-                size="sm" 
-                className="w-full"
-                variant="outline"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Descargar Word
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => downloadTemplate(template)}
+                  size="sm" 
+                  className="flex-1"
+                  variant="outline"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Descargar
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  onClick={() => {
+                    // Preview functionality - open image in new tab
+                    window.open(template.image, '_blank');
+                  }}
+                >
+                  <Eye className="w-3 h-3" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>

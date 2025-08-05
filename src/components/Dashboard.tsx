@@ -386,52 +386,97 @@ function MembershipDetails() {
   );
 }
 
+// Import template preview images
+import templateExecutivePreview from "@/assets/template-executive-preview.jpg";
+import templateCreativePreview from "@/assets/template-creative-preview.jpg";
+import templateTechPreview from "@/assets/template-tech-preview.jpg";
+import templateMinimalPreview from "@/assets/template-minimal-preview.jpg";
+import templateAtsPreview from "@/assets/template-ats-preview.jpg";
+
 function CVTemplatesPreview({ setActiveSection }: { setActiveSection: (section: string) => void }) {
+  const { toast } = useToast();
+  
   const cvTemplates = [
     {
       id: 1,
       name: "Template Profesional Executive",
       description: "Ideal para roles ejecutivos y gerenciales",
-      image: "/lovable-uploads/template-1.png",
+      image: templateExecutivePreview,
       downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-executive.docx"
     },
     {
       id: 2,
       name: "Template Creativo Designer", 
       description: "Perfecto para diseñadores y creativos",
-      image: "/lovable-uploads/template-2.png",
+      image: templateCreativePreview,
       downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-creative.docx"
     },
     {
       id: 3,
       name: "Template Tech Developer",
       description: "Optimizado para desarrolladores y IT",
-      image: "/lovable-uploads/template-3.png",
+      image: templateTechPreview,
       downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-tech.docx"
     },
     {
       id: 4,
       name: "Template Minimalista Clean",
       description: "Elegante y simple para cualquier sector",
-      image: "/lovable-uploads/template-4.png",
+      image: templateMinimalPreview,
       downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-minimal.docx"
     },
     {
       id: 5,
       name: "Template ATS Optimized",
       description: "Máxima compatibilidad con sistemas ATS",
-      image: "/lovable-uploads/template-5.png",
+      image: templateAtsPreview,
       downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-ats.docx"
     }
   ];
 
-  const downloadTemplate = (template: any) => {
-    const link = document.createElement('a');
-    link.href = template.downloadUrl;
-    link.download = `${template.name}.docx`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const downloadTemplate = async (template: any) => {
+    try {
+      toast({
+        title: "Descargando template...",
+        description: "Por favor espera mientras se descarga el archivo",
+      });
+
+      // Fetch the file from Supabase Storage
+      const response = await fetch(template.downloadUrl);
+      
+      if (!response.ok) {
+        throw new Error('Error al descargar el template');
+      }
+
+      // Create blob from response
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${template.name.replace(/\s+/g, '-')}.docx`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "¡Template descargado!",
+        description: `${template.name} se ha descargado exitosamente`,
+      });
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      toast({
+        title: "Error al descargar",
+        description: "No se pudo descargar el template. Por favor intenta de nuevo.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -466,7 +511,8 @@ function CVTemplatesPreview({ setActiveSection }: { setActiveSection: (section: 
                 size="sm" 
                 variant="ghost"
                 onClick={() => {
-                  // Preview functionality can be added here
+                  // Preview functionality - open image in new tab
+                  window.open(template.image, '_blank');
                 }}
               >
                 <Eye className="w-3 h-3" />
