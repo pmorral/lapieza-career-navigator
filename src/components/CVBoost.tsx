@@ -21,35 +21,35 @@ const cvTemplates = [
     name: "Template Profesional Executive",
     description: "Ideal para roles ejecutivos y gerenciales",
     image: templateExecutivePreview,
-    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-executive.docx"
+    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/Executive%20Resume%20Template.docx"
   },
   {
     id: 2,
     name: "Template Creativo Designer",
     description: "Perfecto para diseñadores y creativos",
     image: templateCreativePreview,
-    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-creative.docx"
+    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/Graduate%20Resume%20Template.docx"
   },
   {
     id: 3,
     name: "Template Tech Developer",
     description: "Optimizado para desarrolladores y IT",
     image: templateTechPreview,
-    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-tech.docx"
+    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/Professional%20Resume%20Template.docx"
   },
   {
     id: 4,
     name: "Template Minimalista Clean",
     description: "Elegante y simple para cualquier sector",
     image: templateMinimalPreview,
-    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-minimal.docx"
+    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/Classic%20Resume%20Template.docx"
   },
   {
     id: 5,
     name: "Template ATS Optimized",
     description: "Máxima compatibilidad con sistemas ATS",
     image: templateAtsPreview,
-    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-ats.docx"
+    downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/Business%20Resume%20Template.docx"
   }
 ];
 
