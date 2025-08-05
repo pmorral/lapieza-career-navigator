@@ -323,26 +323,52 @@ export function CVBoost() {
 
   const downloadTemplate = async (template: any) => {
     try {
+      console.log('CVBoost - Download attempt starting for template:', template);
+      console.log('CVBoost - Download URL:', template.downloadUrl);
+      
       toast({
         title: "Descargando template...",
         description: "Por favor espera mientras se descarga el archivo",
       });
 
-      // Fetch the file from Supabase Storage
-      const response = await fetch(template.downloadUrl);
+      // Test if URL is accessible first
+      console.log('CVBoost - Testing URL accessibility...');
+      const response = await fetch(template.downloadUrl, {
+        method: 'HEAD'
+      });
+      
+      console.log('CVBoost - HEAD response status:', response.status);
+      console.log('CVBoost - HEAD response headers:', Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
-        throw new Error('Error al descargar el template');
+        console.error('CVBoost - HEAD request failed with status:', response.status);
+        throw new Error(`HTTP ${response.status}: Error al acceder al template`);
+      }
+
+      // Now fetch the actual file
+      console.log('CVBoost - Fetching file content...');
+      const fileResponse = await fetch(template.downloadUrl);
+      
+      console.log('CVBoost - File response status:', fileResponse.status);
+      console.log('CVBoost - File response headers:', Object.fromEntries(fileResponse.headers.entries()));
+      
+      if (!fileResponse.ok) {
+        console.error('CVBoost - File fetch failed with status:', fileResponse.status);
+        throw new Error(`HTTP ${fileResponse.status}: Error al descargar el template`);
       }
 
       // Create blob from response
-      const blob = await response.blob();
+      const blob = await fileResponse.blob();
+      console.log('CVBoost - Blob created, size:', blob.size, 'type:', blob.type);
       
       // Create download link
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `${template.name.replace(/\s+/g, '-')}.docx`;
+      
+      console.log('CVBoost - Download link created:', link.href);
+      console.log('CVBoost - Download filename:', link.download);
       
       // Trigger download
       document.body.appendChild(link);
@@ -352,15 +378,19 @@ export function CVBoost() {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
+      console.log('CVBoost - Download completed successfully');
       toast({
         title: "¡Template descargado!",
         description: `${template.name} se ha descargado exitosamente`,
       });
     } catch (error) {
-      console.error('Error downloading template:', error);
+      console.error('CVBoost - Download error details:', error);
+      console.error('CVBoost - Error message:', error.message);
+      console.error('CVBoost - Error stack:', error.stack);
+      
       toast({
         title: "Error al descargar",
-        description: "No se pudo descargar el template. Por favor intenta de nuevo.",
+        description: `Error: ${error.message}. Verifica la consola para más detalles.`,
         variant: "destructive",
       });
     }
@@ -408,8 +438,33 @@ export function CVBoost() {
                   size="sm" 
                   variant="ghost"
                   onClick={() => {
-                    // Preview functionality - open image in new tab
-                    window.open(template.image, '_blank');
+                    console.log('CVBoost - Preview attempt for template:', template);
+                    console.log('CVBoost - Image URL:', template.image);
+                    console.log('CVBoost - Attempting to open in new tab...');
+                    
+                    try {
+                      // Preview functionality - open image in new tab
+                      const opened = window.open(template.image, '_blank');
+                      console.log('CVBoost - Window.open result:', opened);
+                      
+                      if (!opened) {
+                        console.error('CVBoost - Failed to open new tab - popup blocked?');
+                        toast({
+                          title: "Error al abrir preview",
+                          description: "No se pudo abrir la vista previa. Verifica que no estén bloqueados los popups.",
+                          variant: "destructive",
+                        });
+                      } else {
+                        console.log('CVBoost - Preview opened successfully');
+                      }
+                    } catch (error) {
+                      console.error('CVBoost - Preview error:', error);
+                      toast({
+                        title: "Error al abrir preview",
+                        description: `Error: ${error.message}`,
+                        variant: "destructive",
+                      });
+                    }
                   }}
                 >
                   <Eye className="w-3 h-3" />

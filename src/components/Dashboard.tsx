@@ -436,26 +436,52 @@ function CVTemplatesPreview({ setActiveSection }: { setActiveSection: (section: 
 
   const downloadTemplate = async (template: any) => {
     try {
+      console.log('Download attempt starting for template:', template);
+      console.log('Download URL:', template.downloadUrl);
+      
       toast({
         title: "Descargando template...",
         description: "Por favor espera mientras se descarga el archivo",
       });
 
-      // Fetch the file from Supabase Storage
-      const response = await fetch(template.downloadUrl);
+      // Test if URL is accessible first
+      console.log('Testing URL accessibility...');
+      const response = await fetch(template.downloadUrl, {
+        method: 'HEAD'
+      });
+      
+      console.log('HEAD response status:', response.status);
+      console.log('HEAD response headers:', Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
-        throw new Error('Error al descargar el template');
+        console.error('HEAD request failed with status:', response.status);
+        throw new Error(`HTTP ${response.status}: Error al acceder al template`);
+      }
+
+      // Now fetch the actual file
+      console.log('Fetching file content...');
+      const fileResponse = await fetch(template.downloadUrl);
+      
+      console.log('File response status:', fileResponse.status);
+      console.log('File response headers:', Object.fromEntries(fileResponse.headers.entries()));
+      
+      if (!fileResponse.ok) {
+        console.error('File fetch failed with status:', fileResponse.status);
+        throw new Error(`HTTP ${fileResponse.status}: Error al descargar el template`);
       }
 
       // Create blob from response
-      const blob = await response.blob();
+      const blob = await fileResponse.blob();
+      console.log('Blob created, size:', blob.size, 'type:', blob.type);
       
       // Create download link
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `${template.name.replace(/\s+/g, '-')}.docx`;
+      
+      console.log('Download link created:', link.href);
+      console.log('Download filename:', link.download);
       
       // Trigger download
       document.body.appendChild(link);
@@ -465,15 +491,19 @@ function CVTemplatesPreview({ setActiveSection }: { setActiveSection: (section: 
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
+      console.log('Download completed successfully');
       toast({
         title: "¡Template descargado!",
         description: `${template.name} se ha descargado exitosamente`,
       });
     } catch (error) {
-      console.error('Error downloading template:', error);
+      console.error('Download error details:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
       toast({
         title: "Error al descargar",
-        description: "No se pudo descargar el template. Por favor intenta de nuevo.",
+        description: `Error: ${error.message}. Verifica la consola para más detalles.`,
         variant: "destructive",
       });
     }
@@ -511,8 +541,33 @@ function CVTemplatesPreview({ setActiveSection }: { setActiveSection: (section: 
                 size="sm" 
                 variant="ghost"
                 onClick={() => {
-                  // Preview functionality - open image in new tab
-                  window.open(template.image, '_blank');
+                  console.log('Preview attempt for template:', template);
+                  console.log('Image URL:', template.image);
+                  console.log('Attempting to open in new tab...');
+                  
+                  try {
+                    // Preview functionality - open image in new tab
+                    const opened = window.open(template.image, '_blank');
+                    console.log('Window.open result:', opened);
+                    
+                    if (!opened) {
+                      console.error('Failed to open new tab - popup blocked?');
+                      toast({
+                        title: "Error al abrir preview",
+                        description: "No se pudo abrir la vista previa. Verifica que no estén bloqueados los popups.",
+                        variant: "destructive",
+                      });
+                    } else {
+                      console.log('Preview opened successfully');
+                    }
+                  } catch (error) {
+                    console.error('Preview error:', error);
+                    toast({
+                      title: "Error al abrir preview",
+                      description: `Error: ${error.message}`,
+                      variant: "destructive",
+                    });
+                  }
                 }}
               >
                 <Eye className="w-3 h-3" />
