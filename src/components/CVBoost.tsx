@@ -14,35 +14,35 @@ const cvTemplates = [
     name: "Template Profesional Executive",
     description: "Ideal para roles ejecutivos y gerenciales",
     image: "/lovable-uploads/template-1.png",
-    downloadUrl: "/templates/template-executive.docx"
+    downloadUrl: "/lovable-uploads/template-executive.docx"
   },
   {
     id: 2,
     name: "Template Creativo Designer",
     description: "Perfecto para diseñadores y creativos",
     image: "/lovable-uploads/template-2.png",
-    downloadUrl: "/templates/template-creative.docx"
+    downloadUrl: "/lovable-uploads/template-creative.docx"
   },
   {
     id: 3,
     name: "Template Tech Developer",
     description: "Optimizado para desarrolladores y IT",
     image: "/lovable-uploads/template-3.png",
-    downloadUrl: "/templates/template-tech.docx"
+    downloadUrl: "/lovable-uploads/template-tech.docx"
   },
   {
     id: 4,
     name: "Template Minimalista Clean",
     description: "Elegante y simple para cualquier sector",
     image: "/lovable-uploads/template-4.png",
-    downloadUrl: "/templates/template-minimal.docx"
+    downloadUrl: "/lovable-uploads/template-minimal.docx"
   },
   {
     id: 5,
     name: "Template ATS Optimized",
     description: "Máxima compatibilidad con sistemas ATS",
     image: "/lovable-uploads/template-5.png",
-    downloadUrl: "/templates/template-ats.docx"
+    downloadUrl: "/lovable-uploads/template-ats.docx"
   }
 ];
 
