@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown, Calendar, Trophy } from "lucide-react";
+import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown, Calendar, Trophy, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -293,6 +293,24 @@ function DashboardOverview({ setActiveSection }: { setActiveSection: (section: s
 
       </div>
 
+      {/* CV Templates Section */}
+      <div className="grid grid-cols-1 gap-6 mt-6">
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
+              Templates de CV Profesionales
+            </CardTitle>
+            <CardDescription>
+              Descarga templates optimizados para ATS y diferentes industrias
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CVTemplatesPreview setActiveSection={setActiveSection} />
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
         <Card className="shadow-card">
           <CardHeader>
@@ -364,6 +382,108 @@ function MembershipDetails() {
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function CVTemplatesPreview({ setActiveSection }: { setActiveSection: (section: string) => void }) {
+  const cvTemplates = [
+    {
+      id: 1,
+      name: "Template Profesional Executive",
+      description: "Ideal para roles ejecutivos y gerenciales",
+      image: "/lovable-uploads/template-1.png",
+      downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-executive.docx"
+    },
+    {
+      id: 2,
+      name: "Template Creativo Designer", 
+      description: "Perfecto para diseñadores y creativos",
+      image: "/lovable-uploads/template-2.png",
+      downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-creative.docx"
+    },
+    {
+      id: 3,
+      name: "Template Tech Developer",
+      description: "Optimizado para desarrolladores y IT",
+      image: "/lovable-uploads/template-3.png",
+      downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-tech.docx"
+    },
+    {
+      id: 4,
+      name: "Template Minimalista Clean",
+      description: "Elegante y simple para cualquier sector",
+      image: "/lovable-uploads/template-4.png",
+      downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-minimal.docx"
+    },
+    {
+      id: 5,
+      name: "Template ATS Optimized",
+      description: "Máxima compatibilidad con sistemas ATS",
+      image: "/lovable-uploads/template-5.png",
+      downloadUrl: "https://qgxpzuaeorjkcjwwphjt.supabase.co/storage/v1/object/public/cv-templates/template-ats.docx"
+    }
+  ];
+
+  const downloadTemplate = (template: any) => {
+    const link = document.createElement('a');
+    link.href = template.downloadUrl;
+    link.download = `${template.name}.docx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {cvTemplates.slice(0, 3).map((template) => (
+          <div key={template.id} className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div className="aspect-[3/4] bg-muted rounded-lg mb-3 overflow-hidden">
+              <img 
+                src={template.image} 
+                alt={template.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/placeholder.svg';
+                }}
+              />
+            </div>
+            <h4 className="font-medium text-sm mb-1">{template.name}</h4>
+            <p className="text-xs text-muted-foreground mb-3">{template.description}</p>
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => downloadTemplate(template)}
+              >
+                <Download className="w-3 h-3 mr-1" />
+                Descargar
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost"
+                onClick={() => {
+                  // Preview functionality can be added here
+                }}
+              >
+                <Eye className="w-3 h-3" />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="text-center pt-4 border-t border-border">
+        <Button 
+          variant="outline" 
+          onClick={() => setActiveSection("cv-boost")}
+        >
+          <FileText className="w-4 h-4 mr-2" />
+          Ver todos los templates
+        </Button>
+      </div>
     </div>
   );
 }
