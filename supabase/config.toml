@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.linkedin-optimizer-ai]
 verify_jwt = false
+
+[functions.ai-interview-request]
+verify_jwt = false
+
+[functions.interview-webhook]
+verify_jwt = false
+
+[functions.interview-response]
+verify_jwt = false

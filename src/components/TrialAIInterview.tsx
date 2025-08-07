@@ -1,12 +1,39 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Upload, Mail, CheckCircle, Clock, FileText, Sparkles } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Upload,
+  Mail,
+  CheckCircle,
+  Clock,
+  FileText,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,6 +42,7 @@ export const TrialAIInterview = () => {
   const [uploadedCV, setUploadedCV] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [language, setLanguage] = useState("es");
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,44 +57,53 @@ export const TrialAIInterview = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      console.log('🔄 Starting form submission...');
+      console.log("🔄 Starting form submission...");
       const formData = new FormData(e.target as HTMLFormElement);
-      
+
       // Log form data
-      console.log('📋 Form data:', {
-        firstName: formData.get('firstName'),
-        lastName: formData.get('lastName'),
-        email: formData.get('email'),
-        company: formData.get('company'),
-        jobTitle: formData.get('jobTitle'),
-        jobDescription: formData.get('jobDescription'),
-        experience: formData.get('experience'),
-        cvFile: uploadedCV?.name
-      });
-      
-      formData.append('cv', uploadedCV!);
-
-      console.log('📡 Calling Supabase function...');
-      const { data, error } = await supabase.functions.invoke('ai-interview-request', {
-        body: formData,
+      console.log("📋 Form data:", {
+        firstName: formData.get("firstName"),
+        lastName: formData.get("lastName"),
+        email: formData.get("email"),
+        company: formData.get("company"),
+        jobTitle: formData.get("jobTitle"),
+        jobDescription: formData.get("jobDescription"),
+        cvFile: uploadedCV?.name,
       });
 
-      console.log('📦 Response received:', { data, error });
+      formData.append("cv", uploadedCV!);
+      formData.append("language", language);
+
+      console.log("📡 Calling Supabase function...");
+      const { data, error } = await supabase.functions.invoke(
+        "ai-interview-request",
+        {
+          body: formData,
+        }
+      );
+
+      console.log("📦 Response received:", { data, error });
 
       if (error) {
-        console.error('❌ Supabase error:', error);
-        toast.error(`Error: ${error.message || 'Error al enviar la solicitud'}`);
+        console.error("❌ Supabase error:", error);
+        toast.error(
+          `Error: ${error.message || "Error al enviar la solicitud"}`
+        );
         return;
       }
 
-      console.log('✅ Request successful');
+      console.log("✅ Request successful");
       setIsSubmitted(true);
       toast.success("¡Solicitud enviada! La entrevista AI llegará a tu email.");
     } catch (error) {
-      console.error('💥 Catch error:', error);
-      toast.error(`Error al enviar la solicitud: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      console.error("💥 Catch error:", error);
+      toast.error(
+        `Error al enviar la solicitud: ${
+          error instanceof Error ? error.message : "Error desconocido"
+        }`
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -75,9 +112,10 @@ export const TrialAIInterview = () => {
   const resetForm = () => {
     setIsSubmitted(false);
     setUploadedCV(null);
+    setLanguage("es");
     setIsOpen(false);
     // Reset form fields
-    const form = document.getElementById('trial-form') as HTMLFormElement;
+    const form = document.getElementById("trial-form") as HTMLFormElement;
     if (form) form.reset();
   };
 
@@ -90,9 +128,12 @@ export const TrialAIInterview = () => {
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="w-8 h-8 text-primary" />
               </div>
-              <CardTitle className="text-xl">Prueba gratuita de entrevista AI</CardTitle>
+              <CardTitle className="text-xl">
+                Prueba gratuita de entrevista AI
+              </CardTitle>
               <CardDescription>
-                Experimenta nuestro simulador de entrevistas con inteligencia artificial
+                Experimenta nuestro simulador de entrevistas con inteligencia
+                artificial
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
@@ -101,7 +142,8 @@ export const TrialAIInterview = () => {
                 Solicitud enviada
               </Badge>
               <p className="text-sm text-muted-foreground mb-4">
-                Tu entrevista AI será enviada directamente a tu email. Revisa tu bandeja de entrada y spam.
+                Tu entrevista AI será enviada directamente a tu email. Revisa tu
+                bandeja de entrada y spam.
               </p>
               <Button variant="outline" onClick={resetForm} className="w-full">
                 Hacer otra solicitud
@@ -121,9 +163,12 @@ export const TrialAIInterview = () => {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Sparkles className="w-8 h-8 text-primary" />
             </div>
-            <CardTitle className="text-xl">Prueba gratuita de entrevista AI</CardTitle>
+            <CardTitle className="text-xl">
+              Prueba gratuita de entrevista AI
+            </CardTitle>
             <CardDescription>
-              Experimenta nuestro simulador de entrevistas con inteligencia artificial
+              Experimenta nuestro simulador de entrevistas con inteligencia
+              artificial
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
@@ -144,9 +189,7 @@ export const TrialAIInterview = () => {
             <Badge className="bg-primary/10 text-primary mb-4">
               100% Gratuito
             </Badge>
-            <Button className="w-full">
-              Solicitar entrevista gratuita
-            </Button>
+            <Button className="w-full">Solicitar entrevista gratuita</Button>
           </CardContent>
         </Card>
       </DialogTrigger>
@@ -158,7 +201,8 @@ export const TrialAIInterview = () => {
             Solicitud de entrevista AI gratuita
           </DialogTitle>
           <DialogDescription>
-            Completa la información para recibir tu entrevista personalizada por email
+            Completa la información para recibir tu entrevista personalizada por
+            email
           </DialogDescription>
         </DialogHeader>
 
@@ -166,32 +210,32 @@ export const TrialAIInterview = () => {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">Nombre *</Label>
-              <Input 
-                id="firstName" 
+              <Input
+                id="firstName"
                 name="firstName"
-                placeholder="Tu nombre" 
-                required 
+                placeholder="Tu nombre"
+                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName">Apellido *</Label>
-              <Input 
-                id="lastName" 
+              <Input
+                id="lastName"
                 name="lastName"
-                placeholder="Tu apellido" 
-                required 
+                placeholder="Tu apellido"
+                required
               />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email *</Label>
-            <Input 
-              id="email" 
+            <Input
+              id="email"
               name="email"
-              type="email" 
-              placeholder="tu@email.com" 
-              required 
+              type="email"
+              placeholder="tu@email.com"
+              required
             />
             <p className="text-xs text-muted-foreground">
               Recibirás la entrevista AI y los resultados en este email
@@ -200,26 +244,26 @@ export const TrialAIInterview = () => {
 
           <div className="space-y-2">
             <Label htmlFor="company">Empresa objetivo (opcional)</Label>
-            <Input 
-              id="company" 
+            <Input
+              id="company"
               name="company"
-              placeholder="Ej: Google, Microsoft, Startup Tech" 
+              placeholder="Ej: Google, Microsoft, Startup Tech"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="jobTitle">Título del puesto *</Label>
-            <Input 
-              id="jobTitle" 
+            <Input
+              id="jobTitle"
               name="jobTitle"
-              placeholder="Ej: Frontend Developer, Data Scientist, Product Manager" 
+              placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
               required
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="jobDescription">Descripción de la vacante *</Label>
-            <Textarea 
+            <Textarea
               id="jobDescription"
               name="jobDescription"
               placeholder="Describe la posición: responsabilidades principales, tecnologías requeridas, requisitos, etc."
@@ -227,18 +271,35 @@ export const TrialAIInterview = () => {
               required
             />
             <p className="text-xs text-muted-foreground">
-              Mientras más específico seas, más personalizada será tu entrevista AI
+              Mientras más específico seas, más personalizada será tu entrevista
+              AI
             </p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="experience">Años de experiencia *</Label>
-            <Input 
-              id="experience" 
+            <Input
+              id="experience"
               name="experience"
-              placeholder="Ej: 3 años" 
-              required 
+              placeholder="Ej: 3 años"
+              required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="language">Idioma de la entrevista *</Label>
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona el idioma" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="es">Español</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Selecciona en qué idioma quieres recibir tu entrevista AI
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -268,7 +329,7 @@ export const TrialAIInterview = () => {
                     Seleccionar archivo
                   </Button>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Solo archivos PDF, máximo 5MB
+                    Solo archivos PDF, máximo 2MB
                   </p>
                 </div>
               )}
@@ -283,7 +344,9 @@ export const TrialAIInterview = () => {
           </div>
 
           <div className="bg-primary/5 p-4 rounded-lg">
-            <h4 className="font-medium text-primary mb-2">¿Qué incluye tu entrevista AI gratuita?</h4>
+            <h4 className="font-medium text-primary mb-2">
+              ¿Qué incluye tu entrevista AI gratuita?
+            </h4>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• Preguntas personalizadas basadas en tu CV y la vacante</li>
               <li>• Análisis de tus respuestas con IA</li>
@@ -294,8 +357,8 @@ export const TrialAIInterview = () => {
           </div>
 
           <div className="flex gap-3">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="flex-1"
               disabled={isSubmitting || !uploadedCV}
             >
@@ -311,9 +374,9 @@ export const TrialAIInterview = () => {
                 </>
               )}
             </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => setIsOpen(false)}
               disabled={isSubmitting}
             >
