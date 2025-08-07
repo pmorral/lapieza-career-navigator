@@ -55,10 +55,17 @@ serve(async (req) => {
       interviewID
     );
 
-    // Search for the interview by candidateID or interviewID
+    // Search for the interview by candidateID or interviewID with profile data
     const { data: interviews, error: searchError } = await supabase
       .from("interviews" as any)
-      .select("*")
+      .select(
+        `
+        *,
+        profiles!inner (
+          email
+        )
+      `
+      )
       .or(`candidate_id.eq.${candidateID},interview_id.eq.${interviewID}`)
       .limit(1);
 
@@ -97,12 +104,30 @@ serve(async (req) => {
     }
 
     const interview = interviews[0];
+    const candidateEmail = interview.profiles?.email;
+
     console.log("✅ Found interview:", {
       id: interview.id,
       candidate_id: interview.candidate_id,
       interview_id: interview.interview_id,
       current_status: interview.status,
+      candidate_email: candidateEmail,
     });
+
+    // Validate that we have the candidate's email
+    if (!candidateEmail) {
+      console.error("❌ No email found for candidate:", interview.candidate_id);
+      return new Response(
+        JSON.stringify({
+          error: "Candidate email not found",
+          candidate_id: interview.candidate_id,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     // Update the interview with new status and URL
     const { data: updatedInterview, error: updateError } = await supabase
@@ -136,6 +161,54 @@ serve(async (req) => {
       interview_url: updatedInterview.interview_url,
     });
 
+    // Send email notification to candidate
+    try {
+      console.log("📧 Sending email notification to candidate...");
+
+      const sendable = {
+        email: candidateEmail, // Email from the profiles table
+        templateID: "d-598226c9e4d645ceb04979cfaeda952e",
+        bcc: [],
+        replyTo: [],
+        isHTML: false,
+        attachments: [],
+        variables: {
+          url,
+        },
+      };
+
+      console.log("📤 Email payload:", {
+        email: sendable.email,
+        templateID: sendable.templateID,
+        url: sendable.variables.url,
+      });
+
+      const emailResponse = await fetch(
+        "https://us-central1-pieza-development.cloudfunctions.net/onlySendEmailSendgrid",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(sendable),
+        }
+      );
+
+      if (!emailResponse.ok) {
+        const errorText = await emailResponse.text();
+        console.error("❌ Email sending failed:", {
+          status: emailResponse.status,
+          statusText: emailResponse.statusText,
+          error: errorText,
+        });
+      } else {
+        console.log("✅ Email sent successfully to:", sendable.email);
+      }
+    } catch (emailError) {
+      console.error("❌ Error sending email:", emailError);
+      // Don't fail the webhook if email fails
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -146,6 +219,7 @@ serve(async (req) => {
           interview_id_external: updatedInterview.interview_id,
           status: updatedInterview.status,
           interview_url: updatedInterview.interview_url,
+          email_sent: true,
         },
       }),
       {
