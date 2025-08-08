@@ -24,8 +24,58 @@ serve(async (req) => {
   try {
     console.log("📝 Processing webhook data...");
 
+    // Check if request has content
+    const contentType = req.headers.get("content-type");
+    console.log("📋 Content-Type:", contentType);
+
+    if (!contentType || !contentType.includes("application/json")) {
+      console.error("❌ Invalid content type:", contentType);
+      return new Response(
+        JSON.stringify({
+          error: "Content-Type must be application/json",
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Get request body as text first
+    const bodyText = await req.text();
+    console.log("📄 Raw body text:", bodyText);
+
+    if (!bodyText || bodyText.trim() === "") {
+      console.error("❌ Empty request body");
+      return new Response(
+        JSON.stringify({
+          error: "Request body is empty",
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Parse JSON body
-    const body = await req.json();
+    let body;
+    try {
+      body = JSON.parse(bodyText);
+    } catch (parseError) {
+      console.error("❌ JSON parse error:", parseError);
+      return new Response(
+        JSON.stringify({
+          error: "Invalid JSON format",
+          details: parseError.message,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     console.log("📦 Webhook payload:", body);
 
     const { candidateID, url, interviewID } = body;
@@ -48,25 +98,13 @@ serve(async (req) => {
       );
     }
 
-    console.log(
-      "🔍 Searching for interview with candidateID:",
-      candidateID,
-      "or interviewID:",
-      interviewID
-    );
+    console.log("🔍 Searching for interview with interviewID:", interviewID);
 
-    // Search for the interview by candidateID or interviewID with profile data
+    // Search for the interview by interviewID only
     const { data: interviews, error: searchError } = await supabase
       .from("interviews" as any)
-      .select(
-        `
-        *,
-        profiles!inner (
-          email
-        )
-      `
-      )
-      .or(`candidate_id.eq.${candidateID},interview_id.eq.${interviewID}`)
+      .select("*")
+      .eq("interview_id", interviewID)
       .limit(1);
 
     if (searchError) {
@@ -104,23 +142,45 @@ serve(async (req) => {
     }
 
     const interview = interviews[0];
-    const candidateEmail = interview.profiles?.email;
 
     console.log("✅ Found interview:", {
       id: interview.id,
       candidate_id: interview.candidate_id,
       interview_id: interview.interview_id,
       current_status: interview.status,
-      candidate_email: candidateEmail,
+      user_id: interview.user_id,
     });
+
+    // Get candidate email from profiles table using user_id
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles" as any)
+      .select("email")
+      .eq("user_id", interview.user_id)
+      .single();
+
+    if (profileError) {
+      console.error("❌ Error fetching profile:", profileError);
+      return new Response(
+        JSON.stringify({
+          error: "Error fetching candidate profile",
+          details: profileError.message,
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const candidateEmail = profile?.email;
 
     // Validate that we have the candidate's email
     if (!candidateEmail) {
-      console.error("❌ No email found for candidate:", interview.candidate_id);
+      console.error("❌ No email found for user:", interview.user_id);
       return new Response(
         JSON.stringify({
           error: "Candidate email not found",
-          candidate_id: interview.candidate_id,
+          user_id: interview.user_id,
         }),
         {
           status: 400,
@@ -128,6 +188,8 @@ serve(async (req) => {
         }
       );
     }
+
+    console.log("✅ Found candidate email:", candidateEmail);
 
     // Update the interview with new status and URL
     const { data: updatedInterview, error: updateError } = await supabase
@@ -169,21 +231,21 @@ serve(async (req) => {
         email: candidateEmail, // Email from the profiles table
         templateID: "d-598226c9e4d645ceb04979cfaeda952e",
         bcc: [],
-        replyTo: [],
+        replyTo: ["tulia.valdez@lapieza.io"],
         isHTML: false,
         attachments: [],
         variables: {
-          url,
+          link: url,
         },
       };
 
       console.log("📤 Email payload:", {
         email: sendable.email,
         templateID: sendable.templateID,
-        url: sendable.variables.url,
+        url: sendable.variables.link,
       });
 
-      const emailResponse = await fetch(
+      await fetch(
         "https://us-central1-pieza-development.cloudfunctions.net/onlySendEmailSendgrid",
         {
           method: "POST",
@@ -193,17 +255,6 @@ serve(async (req) => {
           body: JSON.stringify(sendable),
         }
       );
-
-      if (!emailResponse.ok) {
-        const errorText = await emailResponse.text();
-        console.error("❌ Email sending failed:", {
-          status: emailResponse.status,
-          statusText: emailResponse.statusText,
-          error: errorText,
-        });
-      } else {
-        console.log("✅ Email sent successfully to:", sendable.email);
-      }
     } catch (emailError) {
       console.error("❌ Error sending email:", emailError);
       // Don't fail the webhook if email fails

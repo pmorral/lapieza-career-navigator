@@ -156,7 +156,7 @@ serve(async (req) => {
       cv_url: urlData.signedUrl, // Sending the signed URL instead
       fullname,
       language: language,
-      enabled_webhook: false,
+      enabled_webhook: true,
       source: "academy",
     };
 
@@ -171,7 +171,7 @@ serve(async (req) => {
 
     // Send to LaPieza API
     const response = await fetch(
-      "https://interview-api.lapieza.io/api/v1/interview",
+      "https://interview-api-dev.lapieza.io/api/v1/interview",
       {
         method: "POST",
         headers: {

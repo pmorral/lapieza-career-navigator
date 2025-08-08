@@ -29,7 +29,6 @@ serve(async (req) => {
     console.log("📦 Interview response payload received");
 
     const {
-      id,
       candidateId,
       interviewId,
       assistantId,
@@ -74,18 +73,13 @@ serve(async (req) => {
       );
     }
 
-    console.log(
-      "🔍 Searching for interview with candidateId:",
-      candidateId,
-      "or interviewId:",
-      interviewId
-    );
+    console.log("🔍 Searching for interview with interviewId:", interviewId);
 
-    // Search for the interview by candidateId or interviewId
+    // Search for the interview by interviewId only
     const { data: interviews, error: searchError } = await supabase
       .from("interviews" as any)
       .select("*")
-      .or(`candidate_id.eq.${candidateId},interview_id.eq.${interviewId}`)
+      .eq("interview_id", interviewId)
       .limit(1);
 
     if (searchError) {
@@ -103,16 +97,10 @@ serve(async (req) => {
     }
 
     if (!interviews || interviews.length === 0) {
-      console.error(
-        "❌ Interview not found for candidateId:",
-        candidateId,
-        "or interviewId:",
-        interviewId
-      );
+      console.error("❌ Interview not found for interviewId:", interviewId);
       return new Response(
         JSON.stringify({
           error: "Interview not found",
-          candidateId,
           interviewId,
         }),
         {
