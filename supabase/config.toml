@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.interview-response]
 verify_jwt = false
+
+[functions.trial-interview-request]
+verify_jwt = false

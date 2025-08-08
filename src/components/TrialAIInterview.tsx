@@ -59,7 +59,7 @@ export const TrialAIInterview = () => {
     setIsSubmitting(true);
 
     try {
-      console.log("🔄 Starting form submission...");
+      console.log("🔄 Starting trial interview submission...");
       const formData = new FormData(e.target as HTMLFormElement);
 
       // Log form data
@@ -67,7 +67,7 @@ export const TrialAIInterview = () => {
         firstName: formData.get("firstName"),
         lastName: formData.get("lastName"),
         email: formData.get("email"),
-        company: formData.get("company"),
+        whatsapp: formData.get("whatsapp"),
         jobTitle: formData.get("jobTitle"),
         jobDescription: formData.get("jobDescription"),
         cvFile: uploadedCV?.name,
@@ -76,9 +76,9 @@ export const TrialAIInterview = () => {
       formData.append("cv", uploadedCV!);
       formData.append("language", language);
 
-      console.log("📡 Calling Supabase function...");
+      console.log("📡 Calling trial interview function...");
       const { data, error } = await supabase.functions.invoke(
-        "ai-interview-request",
+        "trial-interview-request",
         {
           body: formData,
         }
@@ -243,12 +243,18 @@ export const TrialAIInterview = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="company">Empresa objetivo (opcional)</Label>
+            <Label htmlFor="whatsapp">WhatsApp *</Label>
             <Input
-              id="company"
-              name="company"
-              placeholder="Ej: Google, Microsoft, Startup Tech"
+              id="whatsapp"
+              name="whatsapp"
+              type="tel"
+              placeholder="+52 1 234 567 8900"
+              required
             />
+            <p className="text-xs text-muted-foreground">
+              Solo se permite una entrevista de prueba gratuita por número de
+              WhatsApp
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -274,16 +280,6 @@ export const TrialAIInterview = () => {
               Mientras más específico seas, más personalizada será tu entrevista
               AI
             </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="experience">Años de experiencia *</Label>
-            <Input
-              id="experience"
-              name="experience"
-              placeholder="Ej: 3 años"
-              required
-            />
           </div>
 
           <div className="space-y-2">
