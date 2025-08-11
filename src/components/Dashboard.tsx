@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown, Calendar, Trophy, Eye } from "lucide-react";
+import { FileText, Users, BookOpen, MessageSquare, Target, Home, Upload, Download, Play, Plus, UserCheck, DollarSign, Gift, Settings, FileBarChart, CreditCard, User, ChevronDown, Calendar, Trophy, Eye, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { LinkedInOptimizer } from "./LinkedInOptimizer";
 import { JobTracker } from "./JobTracker";
 import { ELearningHub } from "./ELearningHub";
@@ -23,15 +25,13 @@ export function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
   const [showJobSuccess, setShowJobSuccess] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Get current user and profile
-    const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      
+    // Get user profile
+    const getUserProfile = async () => {
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -43,8 +43,25 @@ export function Dashboard() {
       }
     };
 
-    getCurrentUser();
-  }, []);
+    getUserProfile();
+  }, [user]);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente",
+      });
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Error al cerrar sesión",
+        variant: "destructive",
+      });
+    }
+  };
 
   const menuItems = [
     { id: "overview", label: "Panel Principal", icon: Home },
@@ -164,15 +181,9 @@ export function Dashboard() {
                     ¡Conseguí Empleo!
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={async () => {
-                      await supabase.auth.signOut();
-                      toast({
-                        title: "Sesión cerrada",
-                        description: "Has cerrado sesión exitosamente",
-                      });
-                    }}
+                    onClick={handleSignOut}
                   >
-                    <User className="w-4 h-4 mr-2" />
+                    <LogOut className="w-4 h-4 mr-2" />
                     Cerrar Sesión
                   </DropdownMenuItem>
                 </DropdownMenuContent>

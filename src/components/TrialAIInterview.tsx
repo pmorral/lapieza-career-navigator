@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { EmailVerification } from "./EmailVerification";
 
 export const TrialAIInterview = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,6 +44,9 @@ export const TrialAIInterview = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [language, setLanguage] = useState("es");
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [emailForVerification, setEmailForVerification] = useState("");
+  const [formData, setFormData] = useState<FormData | null>(null);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -56,11 +60,35 @@ export const TrialAIInterview = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Get email from form
+    const formDataObj = new FormData(e.target as HTMLFormElement);
+    const email = formDataObj.get("email") as string;
+
+    if (!email) {
+      toast.error("Por favor ingresa tu email");
+      return;
+    }
+
+    // Store form data for later use
+    setFormData(formDataObj);
+
+    // Show email verification first
+    setEmailForVerification(email);
+    setShowEmailVerification(true);
+  };
+
+  const handleVerificationSuccess = async () => {
+    setShowEmailVerification(false);
     setIsSubmitting(true);
 
     try {
       console.log("🔄 Starting trial interview submission...");
-      const formData = new FormData(e.target as HTMLFormElement);
+
+      if (!formData) {
+        toast.error("Error: Datos del formulario no encontrados");
+        return;
+      }
 
       // Log form data
       console.log("📋 Form data:", {
@@ -114,6 +142,8 @@ export const TrialAIInterview = () => {
     setUploadedCV(null);
     setLanguage("es");
     setIsOpen(false);
+    setShowEmailVerification(false);
+    setFormData(null);
     // Reset form fields
     const form = document.getElementById("trial-form") as HTMLFormElement;
     if (form) form.reset();
@@ -195,191 +225,206 @@ export const TrialAIInterview = () => {
       </DialogTrigger>
 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
-            Solicitud de entrevista AI gratuita
-          </DialogTitle>
-          <DialogDescription>
-            Completa la información para recibir tu entrevista personalizada por
-            email
-          </DialogDescription>
-        </DialogHeader>
+        {showEmailVerification ? (
+          <EmailVerification
+            email={emailForVerification}
+            onVerificationSuccess={handleVerificationSuccess}
+            onBack={() => setShowEmailVerification(false)}
+          />
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                Solicitud de entrevista AI gratuita
+              </DialogTitle>
+              <DialogDescription>
+                Completa la información para recibir tu entrevista personalizada
+                por email
+              </DialogDescription>
+            </DialogHeader>
 
-        <form id="trial-form" onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">Nombre *</Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                placeholder="Tu nombre"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Apellido *</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                placeholder="Tu apellido"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="tu@email.com"
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              Recibirás la entrevista AI y los resultados en este email
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="whatsapp">WhatsApp *</Label>
-            <Input
-              id="whatsapp"
-              name="whatsapp"
-              type="tel"
-              placeholder="+52 1 234 567 8900"
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              Solo se permite una entrevista de prueba gratuita por número de
-              WhatsApp
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="jobTitle">Título del puesto *</Label>
-            <Input
-              id="jobTitle"
-              name="jobTitle"
-              placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="jobDescription">Descripción de la vacante *</Label>
-            <Textarea
-              id="jobDescription"
-              name="jobDescription"
-              placeholder="Describe la posición: responsabilidades principales, tecnologías requeridas, requisitos, etc."
-              className="min-h-[120px]"
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              Mientras más específico seas, más personalizada será tu entrevista
-              AI
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="language">Idioma de la entrevista *</Label>
-            <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona el idioma" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="es">Español</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">
-              Selecciona en qué idioma quieres recibir tu entrevista AI
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cv">Sube tu CV *</Label>
-            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-              {uploadedCV ? (
-                <div className="flex items-center justify-center gap-2 text-primary">
-                  <FileText className="w-5 h-5" />
-                  <span className="font-medium">{uploadedCV.name}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setUploadedCV(null)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    Cambiar
-                  </Button>
+            <form id="trial-form" onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Nombre *</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Tu nombre"
+                    required
+                  />
                 </div>
-              ) : (
-                <div>
-                  <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Arrastra tu CV aquí o haz clic para seleccionar
-                  </p>
-                  <Button type="button" variant="outline" size="sm">
-                    Seleccionar archivo
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Solo archivos PDF, máximo 2MB
-                  </p>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Apellido *</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Tu apellido"
+                    required
+                  />
                 </div>
-              )}
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                required
-              />
-            </div>
-          </div>
+              </div>
 
-          <div className="bg-primary/5 p-4 rounded-lg">
-            <h4 className="font-medium text-primary mb-2">
-              ¿Qué incluye tu entrevista AI gratuita?
-            </h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Preguntas personalizadas basadas en tu CV y la vacante</li>
-              <li>• Análisis de tus respuestas con IA</li>
-              <li>• Feedback específico para mejorar</li>
-              <li>• Sugerencias de preparación para la entrevista real</li>
-              <li>• La entrevista AI será enviada directamente a tu email</li>
-            </ul>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Recibirás la entrevista AI y los resultados en este email
+                </p>
+              </div>
 
-          <div className="flex gap-3">
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={isSubmitting || !uploadedCV}
-            >
-              {isSubmitting ? (
-                <>
-                  <Clock className="w-4 h-4 mr-2 animate-spin" />
-                  Enviando solicitud...
-                </>
-              ) : (
-                <>
-                  <Mail className="w-4 h-4 mr-2" />
-                  Enviar solicitud
-                </>
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              disabled={isSubmitting}
-            >
-              Cancelar
-            </Button>
-          </div>
-        </form>
+              <div className="space-y-2">
+                <Label htmlFor="whatsapp">WhatsApp *</Label>
+                <Input
+                  id="whatsapp"
+                  name="whatsapp"
+                  type="tel"
+                  placeholder="+52 1 234 567 8900"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Solo se permite una entrevista de prueba gratuita por email
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Título del puesto *</Label>
+                <Input
+                  id="jobTitle"
+                  name="jobTitle"
+                  placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="jobDescription">
+                  Descripción de la vacante *
+                </Label>
+                <Textarea
+                  id="jobDescription"
+                  name="jobDescription"
+                  placeholder="Describe la posición: responsabilidades principales, tecnologías requeridas, requisitos, etc."
+                  className="min-h-[120px]"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Mientras más específico seas, más personalizada será tu
+                  entrevista AI
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="language">Idioma de la entrevista *</Label>
+                <Select value={language} onValueChange={setLanguage}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona el idioma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="es">Español</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Selecciona en qué idioma quieres recibir tu entrevista AI
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cv">Sube tu CV *</Label>
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center relative">
+                  {uploadedCV ? (
+                    <div className="flex items-center justify-center gap-2 text-primary">
+                      <FileText className="w-5 h-5" />
+                      <span className="font-medium">{uploadedCV.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setUploadedCV(null)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        Cambiar
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Arrastra tu CV aquí o haz clic para seleccionar
+                      </p>
+                      <Button type="button" variant="outline" size="sm">
+                        Seleccionar archivo
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Solo archivos PDF, máximo 2MB
+                      </p>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="bg-primary/5 p-4 rounded-lg">
+                <h4 className="font-medium text-primary mb-2">
+                  ¿Qué incluye tu entrevista AI gratuita?
+                </h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>
+                    • Preguntas personalizadas basadas en tu CV y la vacante
+                  </li>
+                  <li>• Análisis de tus respuestas con IA</li>
+                  <li>• Feedback específico para mejorar</li>
+                  <li>• Sugerencias de preparación para la entrevista real</li>
+                  <li>
+                    • La entrevista AI será enviada directamente a tu email
+                  </li>
+                </ul>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={isSubmitting || !uploadedCV}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Clock className="w-4 h-4 mr-2 animate-spin" />
+                      Enviando solicitud...
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-4 h-4 mr-2" />
+                      Verificar email y enviar solicitud
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsOpen(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </form>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,16 +10,12 @@ import { CouponInput } from "./CouponInput";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-interface PaymentPageProps {
-  onPaymentComplete: () => void;
-  onBackToSignup: () => void;
-}
-
-export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPageProps) => {
+export const PaymentPage = () => {
   const [selectedPlan, setSelectedPlan] = useState("premium");
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const navigate = useNavigate();
 
   const plans = [
     {
@@ -70,14 +67,14 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
         }
         
         toast.success("¡Acceso gratuito activado!");
-        onPaymentComplete();
+        navigate('/dashboard');
         return;
       }
 
       // Simulate regular payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
       toast.success("¡Pago completado exitosamente!");
-      onPaymentComplete();
+      navigate('/dashboard');
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Error al procesar el pago");
@@ -221,7 +218,7 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
                       type="button" 
                       variant="outline" 
                       className="w-full"
-                      onClick={onBackToSignup}
+                      onClick={() => navigate('/signup')}
                     >
                       Volver al registro
                     </Button>
@@ -251,7 +248,7 @@ export const PaymentPage = ({ onPaymentComplete, onBackToSignup }: PaymentPagePr
                       type="button" 
                       variant="outline" 
                       className="w-full"
-                      onClick={onBackToSignup}
+                      onClick={() => navigate('/signup')}
                     >
                       Volver al registro
                     </Button>

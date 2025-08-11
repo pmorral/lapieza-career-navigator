@@ -231,7 +231,7 @@ serve(async (req) => {
         email: candidateEmail, // Email from the profiles table
         templateID: "d-598226c9e4d645ceb04979cfaeda952e",
         bcc: [],
-        replyTo: ["tulia.valdez@lapieza.io"],
+        replyTo: [],
         isHTML: false,
         attachments: [],
         variables: {

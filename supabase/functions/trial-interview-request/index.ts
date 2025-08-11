@@ -103,20 +103,20 @@ serve(async (req) => {
       );
     }
 
-    // Check if WhatsApp number has already been used for trial
-    console.log("🔍 Checking WhatsApp number:", whatsapp);
+    // Check if email has already been used for trial
+    console.log("🔍 Checking email:", email);
     const { data: existingProfile, error: checkError } = await supabase
       .from("profiles" as any)
-      .select("whatsapp, trial_interview_used")
-      .eq("whatsapp", whatsapp)
+      .select("email, trial_interview_used")
+      .eq("email", email)
       .single();
 
     if (checkError && checkError.code !== "PGRST116") {
       // PGRST116 = no rows returned
-      console.error("❌ Error checking WhatsApp:", checkError);
+      console.error("❌ Error checking email:", checkError);
       return new Response(
         JSON.stringify({
-          error: "Error verificando el número de WhatsApp",
+          error: "Error verificando el email",
         }),
         {
           status: 500,
@@ -126,11 +126,11 @@ serve(async (req) => {
     }
 
     if (existingProfile && existingProfile.trial_interview_used) {
-      console.error("❌ WhatsApp already used for trial:", whatsapp);
+      console.error("❌ Email already used for trial:", email);
       return new Response(
         JSON.stringify({
           error:
-            "Este número de WhatsApp ya ha sido usado para una entrevista de prueba gratuita",
+            "Este email ya ha sido usado para una entrevista de prueba gratuita",
         }),
         {
           status: 400,
@@ -221,6 +221,7 @@ serve(async (req) => {
       .from("profiles" as any)
       .update({
         full_name: fullName,
+        email,
         whatsapp,
         is_new_user: true,
         trial_interview_used: true,
@@ -250,14 +251,14 @@ serve(async (req) => {
       cv_url: cvUrl,
       fullname: fullName,
       language,
-      enabled_webhook: false,
+      enabled_webhook: true,
       source: "academy",
     };
 
     console.log("📦 API payload:", apiPayload);
 
     const apiResponse = await fetch(
-      "https://interview-api.lapieza.io/api/v1/interview",
+      "https://interview-api-dev.lapieza.io/api/v1/interview",
       {
         method: "POST",
         headers: {
@@ -290,6 +291,10 @@ serve(async (req) => {
       .from("interviews" as any)
       .insert({
         user_id: userId,
+        interview_request_id: result.interview_id || `trial_${Date.now()}`, // Use interview_id or generate one
+        task_id: result.candidate_id || `task_${Date.now()}`, // Use candidate_id or generate one
+        candidate_id: result.candidate_id,
+        interview_id: result.interview_id,
         fullname: fullName,
         email,
         job_title: jobTitle,
@@ -300,8 +305,6 @@ serve(async (req) => {
         status: "pending",
         api_message: result.message,
         source: "trial",
-        candidate_id: result.candidate_id,
-        interview_id: result.interview_id,
       })
       .select()
       .single();

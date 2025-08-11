@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,69 +6,71 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LandingPage } from "./components/LandingPage";
 import { Dashboard } from "./components/Dashboard";
 import { PaymentPage } from "./components/PaymentPage";
+import { LoginPage } from "./components/LoginPage";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PublicRoute } from "./components/PublicRoute";
+import { LoadingSpinner } from "./components/LoadingSpinner";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import NotFound from "./pages/NotFound";
-import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [showPayment, setShowPayment] = useState(false);
+const AppRoutes = () => {
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
+    <Routes>
+      {/* Rutas públicas */}
+      <Route path="/" element={<LandingPage />} />
+      <Route 
+        path="/login" 
+        element={
+          <PublicRoute user={user}>
+            <LoginPage />
+          </PublicRoute>
+        } 
+      />
+      <Route 
+        path="/payment" 
+        element={
+          <ProtectedRoute user={user}>
+            <PaymentPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Rutas protegidas */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute user={user}>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Ruta 404 */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
+const App = () => {
+  return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route 
-              path="/" 
-              element={
-                showPayment ? (
-                  <PaymentPage 
-                    onPaymentComplete={() => {
-                      setShowPayment(false);
-                    }}
-                    onBackToSignup={() => setShowPayment(false)}
-                  />
-                ) : user ? (
-                  <Dashboard />
-                ) : (
-                  <LandingPage 
-                    onAccessDashboard={() => setShowPayment(true)}
-                    onLogin={() => {
-                      // Authentication is handled by the auth state change listener
-                    }}
-                  />
-                )
-              } 
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
