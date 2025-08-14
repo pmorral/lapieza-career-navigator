@@ -47,6 +47,7 @@ export function LoginPage() {
             variant: "destructive",
           });
         } else {
+          window.location.reload();
           toast({
             title: "¡Bienvenido!",
             description: "Has iniciado sesión correctamente",
@@ -85,12 +86,30 @@ export function LoginPage() {
           });
         } else {
           toast({
-            title: "¡Cuenta creada!",
+            title: "¡Cuenta creada exitosamente!",
             description:
-              "Verifica tu correo electrónico para activar tu cuenta",
+              "Verifica tu correo electrónico para activar tu cuenta. Revisa tu bandeja de entrada y spam.",
+            variant: "default",
           });
-          // Redirigir a la página de pago después del registro
-          navigate("/payment");
+
+          // Limpiar el formulario
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
+          setName("");
+
+          // Cambiar a modo login
+          setIsLogin(true);
+
+          // Mostrar mensaje adicional
+          setTimeout(() => {
+            toast({
+              title: "Importante",
+              description:
+                "Debes verificar tu email antes de poder iniciar sesión",
+              variant: "default",
+            });
+          }, 2000);
         }
       }
     } catch (error) {

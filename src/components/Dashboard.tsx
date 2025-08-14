@@ -60,6 +60,7 @@ import { ELearningHub } from "./ELearningHub";
 import { MockInterviews } from "./MockInterviews";
 import { CareerCoach } from "./CareerCoach";
 import { AdditionalServices } from "./AdditionalServices";
+import { ServicesHistory } from "./ServicesHistory";
 import { ReferAndEarn } from "./ReferAndEarn";
 import { GeneralSettings } from "./GeneralSettings";
 import { AutomatedMessages } from "./AutomatedMessages";
@@ -262,7 +263,12 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
       case "automated-messages":
         return <AutomatedMessages />;
       case "services":
-        return <AdditionalServices />;
+        return (
+          <div className="space-y-8">
+            <AdditionalServices />
+            <ServicesHistory />
+          </div>
+        );
       case "settings":
         return <GeneralSettings />;
       case "profile":

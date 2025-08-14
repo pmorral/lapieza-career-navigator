@@ -15,7 +15,7 @@ interface AuthContextType {
   emailVerified: boolean;
   subscriptionActive: boolean;
   signOut: () => Promise<void>;
-  checkSubscriptionStatus: () => Promise<boolean>;
+  checkSubscriptionStatus: (user: User) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,79 +47,82 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   // Verificar estado de suscripción
-  const checkSubscriptionStatus = async (): Promise<boolean> => {
+  const checkSubscriptionStatus = async (user: User): Promise<boolean> => {
     if (!user) return false;
 
     try {
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("subscription_status, subscription_end_date")
-        .eq("user_id", user.id)
-        .single();
+      console.log("🔍 Checking subscription status for user:", user.id);
 
-      if (!error && profile) {
-        const isActive =
-          profile.subscription_status === "active" &&
-          (!profile.subscription_end_date ||
-            new Date(profile.subscription_end_date) > new Date());
-        setSubscriptionActive(isActive);
-        return isActive;
+      // Usar la función de Supabase para verificar el estado del pago
+      const { data, error } = await supabase.functions.invoke(
+        "check-payment-status",
+        {
+          body: { user_id: user.id },
+        }
+      );
+
+      if (error) {
+        console.error("❌ Error calling check-payment-status:", error);
+        return false;
       }
-      return false;
+
+      console.log("📋 Payment status response:", data);
+
+      // Verificar el estado del pago
+      const isActive = data.payment_status === "paid";
+
+      setSubscriptionActive(isActive);
+      return isActive;
     } catch (error) {
-      console.error("Error checking subscription status:", error);
+      console.error("❌ Error checking subscription status:", error);
       return false;
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      // Limpiar todos los estados antes de cerrar sesión
+      setUser(null);
+      setSession(null);
+      setEmailVerified(false);
+      setSubscriptionActive(false);
+
+      // Cerrar sesión en Supabase
+      await supabase.auth.signOut();
+
+      // Redirigir a la landing page
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      // En caso de error, forzar redirección
+      window.location.href = "/";
+    }
+  };
+
+  const getInitialSession = async () => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      setUser(session?.user ?? null);
+      setSession(session);
+
+      if (session?.user) {
+        await checkSubscriptionStatus(session.user);
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error in getInitialSession:", error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     // Obtener sesión inicial
-    const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        // Verificar email usando Supabase Auth y suscripción
-        const emailOk = checkEmailVerification(session.user);
-        setEmailVerified(emailOk);
-        await checkSubscriptionStatus();
-      }
-
-      setLoading(false);
-    };
-
     getInitialSession();
-
-    // Escuchar cambios en el estado de autenticación
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        // Verificar email usando Supabase Auth y suscripción cuando cambie el estado de auth
-        const emailOk = checkEmailVerification(session.user);
-        setEmailVerified(emailOk);
-        await checkSubscriptionStatus();
-      } else {
-        // Resetear estados cuando no hay usuario
-        setEmailVerified(false);
-        setSubscriptionActive(false);
-      }
-
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
 
   const value = {
     user,

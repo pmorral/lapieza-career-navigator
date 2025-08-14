@@ -17,7 +17,6 @@ import { ResetPassword } from "./components/ResetPassword";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
 import { LoadingSpinner } from "./components/LoadingSpinner";
-import { AccountActivation } from "./components/AccountActivation";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import NotFound from "./pages/NotFound";
 import { Button } from "./components/ui/button";
@@ -25,7 +24,7 @@ import { Button } from "./components/ui/button";
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
-  const { user, loading, emailVerified, subscriptionActive } = useAuth();
+  const { user, loading, subscriptionActive } = useAuth();
   const navigate = useNavigate();
 
   // Mostrar spinner mientras se verifica la autenticación
@@ -34,18 +33,6 @@ const AppRoutes = () => {
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner />
       </div>
-    );
-  }
-
-  // Si el usuario está autenticado pero no tiene email verificado o suscripción activa
-  if (user && !emailVerified) {
-    return (
-      <AccountActivation
-        onComplete={() => {
-          // Recargar la página para continuar con el flujo normal
-          window.location.reload();
-        }}
-      />
     );
   }
 
@@ -70,15 +57,17 @@ const AppRoutes = () => {
       {/* Ruta para restablecer contraseña - pública */}
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* Ruta de pago - accesible para usuarios autenticados sin importar suscripción */}
-      <Route
-        path="/payment"
-        element={
-          <ProtectedRoute user={user}>
-            <PaymentPage />
-          </ProtectedRoute>
-        }
-      />
+      {/* Ruta de pago - solo para usuarios autenticados SIN suscripción activa */}
+      {user && !subscriptionActive ? (
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute user={user}>
+              <PaymentPage />
+            </ProtectedRoute>
+          }
+        />
+      ) : null}
 
       {/* Rutas del Dashboard - solo para usuarios con suscripción activa */}
       {user && subscriptionActive ? (
@@ -201,27 +190,17 @@ const AppRoutes = () => {
             }
           />
         </>
-      ) : (
-        // Si el usuario no tiene suscripción activa, mostrar solo la ruta de pago
+      ) : // Si el usuario no tiene suscripción activa, redirigir directamente a payment
+      user ? (
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute user={user}>
-              <div className="min-h-screen flex items-center justify-center bg-background p-4">
-                <div className="text-center space-y-4">
-                  <h1 className="text-2xl font-bold">Acceso Requerido</h1>
-                  <p className="text-muted-foreground">
-                    Necesitas una membresía activa para acceder al dashboard
-                  </p>
-                  <Button onClick={() => navigate("/payment")}>
-                    Adquirir Membresía
-                  </Button>
-                </div>
-              </div>
+              <Navigate to="/payment" replace />
             </ProtectedRoute>
           }
         />
-      )}
+      ) : null}
 
       {/* Ruta 404 */}
       <Route path="*" element={<NotFound />} />
