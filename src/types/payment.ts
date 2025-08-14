@@ -25,8 +25,12 @@ export interface UserProfile {
   full_name: string;
   email: string;
   avatar_url?: string;
-  subscription_status: "active" | "inactive" | "expired";
-  stripe_customer_id?: string;
+  bio?: string;
+  location?: string;
+  phone?: string;
+  subscription_status: string; // Cambiado a string para ser más flexible
+  subscription_plan?: string;
+  interview_credits?: number;
   created_at: string;
   updated_at: string;
 }
