@@ -253,8 +253,8 @@ export function MockInterviews() {
 
       // Get candidate IDs from user interviews
       const candidateIds = userInterviews.map(
-        (interview) => interview.candidate_id
-      );
+        (interview: any) => interview.candidate_id
+      ).filter(Boolean);
 
       // Fetch responses for these candidate IDs
       const { data: responses, error: responsesError } = await supabase
