@@ -7,13 +7,13 @@ import { Mail, Key, ArrowLeft, CheckCircle, Clock, RefreshCw } from "lucide-reac
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-interface EmailVerificationProps {
+interface TrialEmailVerificationProps {
   email: string;
   onVerificationSuccess: () => void;
   onBack: () => void;
 }
 
-export const EmailVerification = ({ email, onVerificationSuccess, onBack }: EmailVerificationProps) => {
+export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }: TrialEmailVerificationProps) => {
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);

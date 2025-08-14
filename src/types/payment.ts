@@ -23,22 +23,20 @@ export interface UserProfile {
   id: string;
   user_id: string;
   full_name: string;
-  name?: string; // Alias para full_name
   email: string;
-  avatar_url?: string;
-  bio?: string;
-  location?: string;
   phone?: string;
-  linkedin_url?: string; // URL del perfil de LinkedIn
-  skills?: string; // Habilidades del usuario
-  experience?: string; // Experiencia profesional
-  subscription_status: string; // Cambiado a string para ser más flexible
+  location?: string;
+  bio?: string;
+  linkedin_url?: string;
+  skills?: string;
+  experience?: string;
   subscription_plan?: string;
-  subscription_start_date?: string; // Fecha de inicio de suscripción
-  subscription_end_date?: string; // Fecha de fin de suscripción
-  stripe_customer_id?: string; // ID del customer en Stripe
-  stripe_subscription_id?: string; // ID de la suscripción en Stripe
+  subscription_status?: string;
   interview_credits?: number;
   created_at: string;
   updated_at: string;
+  subscription_start_date?: string;
+  subscription_end_date?: string;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
 }

@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { EmailVerification } from "./EmailVerification";
+import { TrialEmailVerification } from "./TrialEmailVerification";
 
 export const TrialAIInterview = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -226,7 +226,7 @@ export const TrialAIInterview = () => {
 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         {showEmailVerification ? (
-          <EmailVerification
+          <TrialEmailVerification
             email={emailForVerification}
             onVerificationSuccess={handleVerificationSuccess}
             onBack={() => setShowEmailVerification(false)}

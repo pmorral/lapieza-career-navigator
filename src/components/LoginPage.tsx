@@ -65,7 +65,7 @@ export function LoginPage() {
         }
 
         const redirectUrl = `${window.location.origin}/dashboard`;
-        
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -118,7 +118,7 @@ export function LoginPage() {
           <p className="text-muted-foreground">
             {isLogin
               ? "Inicia sesión para acceder"
-              : "Crea tu cuenta - Requiere membresía $359 USD"}
+              : "Crea tu cuenta - Requiere membresía desde $149 USD"}
           </p>
         </div>
 
@@ -130,7 +130,7 @@ export function LoginPage() {
             <CardDescription className="text-center">
               {isLogin
                 ? "Ingresa tus credenciales para acceder a tu cuenta"
-                : "Completa tus datos para crear tu cuenta. Requiere membresía de $359 USD (5 meses)"}
+                : "Completa tus datos para crear tu cuenta. Requiere membresía desde $149 USD (6 meses)"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

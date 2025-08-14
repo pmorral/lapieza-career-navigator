@@ -544,7 +544,7 @@ function DashboardOverview({
             </CardTitle>
             <CardDescription>
               Acceso a sesiones quincenales y grupo de WhatsApp durante tu
-              membresía de 5 meses
+              membresía
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -808,11 +808,36 @@ function MembershipDetails() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Plan de 6 meses */}
               <div className="border border-border rounded-lg p-4">
-                <h4 className="font-semibold text-lg mb-2">Academy</h4>
-                <p className="text-2xl font-bold text-primary mb-2">$299 USD</p>
+                <h4 className="font-semibold text-lg mb-2">
+                  Academy - 6 Meses
+                </h4>
+                <p className="text-2xl font-bold text-primary mb-2">$149 USD</p>
                 <p className="text-sm text-muted-foreground mb-4">
-                  5 meses de acceso completo
+                  6 meses de acceso completo
+                </p>
+                <ul className="space-y-2 text-sm mb-4">
+                  <li>• CV Boost con AI</li>
+                  <li>• LinkedIn Optimizer</li>
+                  <li>• 5 Entrevistas AI</li>
+                  <li>• E-learning Hub</li>
+                  <li>• Job Tracker</li>
+                </ul>
+                <Button onClick={handleRenewal} className="w-full">
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Activar Plan
+                </Button>
+              </div>
+
+              {/* Plan de 12 meses */}
+              <div className="border border-border rounded-lg p-4">
+                <h4 className="font-semibold text-lg mb-2">
+                  Academy - 12 Meses
+                </h4>
+                <p className="text-2xl font-bold text-primary mb-2">$199 USD</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  12 meses de acceso completo
                 </p>
                 <ul className="space-y-2 text-sm mb-4">
                   <li>• CV Boost con AI</li>

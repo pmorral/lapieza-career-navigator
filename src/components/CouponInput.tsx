@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Gift, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +18,10 @@ interface CouponInputProps {
   appliedCoupon?: any;
 }
 
-export const CouponInput = ({ onCouponApplied, appliedCoupon }: CouponInputProps) => {
+export const CouponInput = ({
+  onCouponApplied,
+  appliedCoupon,
+}: CouponInputProps) => {
   const [couponCode, setCouponCode] = useState("");
   const [isValidating, setIsValidating] = useState(false);
 
@@ -26,10 +35,10 @@ export const CouponInput = ({ onCouponApplied, appliedCoupon }: CouponInputProps
     try {
       // Check if coupon exists and is valid
       const { data: coupon, error } = await supabase
-        .from('coupons')
-        .select('*')
-        .eq('code', couponCode.toUpperCase())
-        .eq('is_active', true)
+        .from("coupons")
+        .select("*")
+        .eq("code", couponCode.toUpperCase())
+        .eq("is_active", true)
         .single();
 
       if (error || !coupon) {
@@ -51,10 +60,10 @@ export const CouponInput = ({ onCouponApplied, appliedCoupon }: CouponInputProps
 
       // Check if user has already used this coupon
       const { data: existingUse } = await supabase
-        .from('coupon_uses')
-        .select('id')
-        .eq('coupon_id', coupon.id)
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .from("coupon_uses")
+        .select("id")
+        .eq("coupon_id", coupon.id)
+        .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
         .single();
 
       if (existingUse) {
@@ -80,12 +89,17 @@ export const CouponInput = ({ onCouponApplied, appliedCoupon }: CouponInputProps
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <Check className="h-5 w-5 text-green-600" />
-              <Badge variant="secondary" className="bg-green-100 text-green-800">
+              <Badge
+                variant="secondary"
+                className="bg-green-100 text-green-800"
+              >
                 {appliedCoupon.code}
               </Badge>
             </div>
             <span className="text-sm text-green-700">
-              {appliedCoupon.discount_type === 'free' ? 'Acceso gratuito aplicado' : appliedCoupon.description}
+              {appliedCoupon.discount_type === "free"
+                ? "Acceso gratuito aplicado"
+                : appliedCoupon.description}
             </span>
           </div>
         </CardContent>
@@ -94,7 +108,7 @@ export const CouponInput = ({ onCouponApplied, appliedCoupon }: CouponInputProps
   }
 
   return (
-    <Card>
+    <Card className="hidden">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Gift className="h-5 w-5" />
@@ -110,10 +124,10 @@ export const CouponInput = ({ onCouponApplied, appliedCoupon }: CouponInputProps
             placeholder="Ej: ACADEMY_100"
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-            onKeyPress={(e) => e.key === 'Enter' && validateCoupon()}
+            onKeyPress={(e) => e.key === "Enter" && validateCoupon()}
           />
-          <Button 
-            onClick={validateCoupon} 
+          <Button
+            onClick={validateCoupon}
             disabled={isValidating}
             variant="outline"
           >

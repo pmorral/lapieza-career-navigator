@@ -435,15 +435,26 @@ export function LandingPage() {
 
           <Card className="relative overflow-hidden border-2 border-primary shadow-xl">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent"></div>
-            <CardHeader className="text-center pb-8">
-              <CardTitle className="text-2xl mb-2">
+            <CardHeader className="text-center">
+              <CardTitle className="text-xl font-semibold mb-2">
                 Academy by LaPieza
               </CardTitle>
-              <div className="text-4xl font-bold text-primary mb-2">
-                $359 USD
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-primary">
+                  $149 USD
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  6 meses de acceso completo
+                </div>
+                <div className="text-2xl font-bold text-primary">
+                  $199 USD
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  12 meses de acceso completo
+                </div>
               </div>
               <CardDescription className="text-lg">
-                Único pago - Acceso completo durante 5 meses
+                Único pago - Acceso completo durante tu membresía
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

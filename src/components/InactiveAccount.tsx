@@ -38,11 +38,23 @@ export function InactiveAccount({ onReactivate, onBackToLanding }: InactiveAccou
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
-              <h3 className="font-semibold text-lg text-center mb-2">Academy Premium</h3>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">$359 USD</div>
-                <div className="text-sm text-muted-foreground">5 meses de acceso completo</div>
+            <div className="space-y-4">
+              {/* Plan de 6 meses */}
+              <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+                <h3 className="font-semibold text-lg text-center mb-2">Academy Premium - 6 Meses</h3>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">$149 USD</div>
+                  <div className="text-sm text-muted-foreground">6 meses de acceso completo</div>
+                </div>
+              </div>
+              
+              {/* Plan de 12 meses */}
+              <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+                <h3 className="font-semibold text-lg text-center mb-2">Academy Premium - 12 Meses</h3>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">$199 USD</div>
+                  <div className="text-sm text-muted-foreground">12 meses de acceso completo</div>
+                </div>
               </div>
             </div>
             
