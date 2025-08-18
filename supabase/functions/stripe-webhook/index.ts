@@ -402,12 +402,31 @@ serve(async (req) => {
             let productInfo = null;
             let productType = "unknown";
 
+            // Obtener la sesión completa con line_items expandidos
+            const expandedSession = await stripe.checkout.sessions.retrieve(
+              session.id,
+              {
+                expand: ["line_items"],
+              }
+            );
+
+            console.log("📦 Expanded session line_items:", {
+              has_line_items: !!expandedSession.line_items,
+              line_items_count: expandedSession.line_items?.data?.length || 0,
+            });
+
             // Buscar el producto en los line_items
             if (
-              session.line_items?.data &&
-              session.line_items.data.length > 0
+              expandedSession.line_items?.data &&
+              expandedSession.line_items.data.length > 0
             ) {
-              const lineItem = session.line_items.data[0];
+              const lineItem = expandedSession.line_items.data[0];
+              console.log("📦 Line item details:", {
+                price_id: lineItem.price?.id,
+                product_id: lineItem.price?.product,
+                description: lineItem.description,
+              });
+
               if (lineItem.price?.product) {
                 const productId =
                   typeof lineItem.price.product === "string"
@@ -421,7 +440,29 @@ serve(async (req) => {
                     product_name: productInfo.name,
                     product_type: productInfo.type,
                   });
+                } else {
+                  console.warn(
+                    "⚠️ Product not found in PRODUCTS config:",
+                    productId
+                  );
                 }
+              }
+            }
+
+            // Fallback: intentar identificar por metadata
+            if (productType === "unknown" && session.metadata.membership_type) {
+              const membershipType = session.metadata.membership_type;
+              if (
+                membershipType === "6months" ||
+                membershipType === "12months"
+              ) {
+                productInfo = PRODUCTS[membershipType];
+                productType = "membership";
+                console.log("📦 Product identified from metadata:", {
+                  membership_type: membershipType,
+                  product_name: productInfo?.name,
+                  product_type: productType,
+                });
               }
             }
 
@@ -433,6 +474,8 @@ serve(async (req) => {
               await handleServicePayment(session, productInfo);
             } else {
               console.warn("⚠️ Unknown product type:", productType);
+              console.log("📦 Available metadata:", session.metadata);
+              console.log("📦 Available PRODUCTS keys:", Object.keys(PRODUCTS));
             }
           } catch (updateError) {
             console.error("❌ Exception processing payment:", updateError);

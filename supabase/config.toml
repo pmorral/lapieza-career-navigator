@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.trial-interview-request]
 verify_jwt = false
+
+[functions.admin-signup]
+verify_jwt = false

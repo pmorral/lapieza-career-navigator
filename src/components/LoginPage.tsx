@@ -65,51 +65,49 @@ export function LoginPage() {
           return;
         }
 
-        const redirectUrl = `${window.location.origin}/dashboard`;
-
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: redirectUrl,
-            data: {
+        // Crear el usuario sin verificación por email usando función admin-signup
+        const { data, error } = await supabase.functions.invoke(
+          "admin-signup",
+          {
+            body: {
+              email,
+              password,
               full_name: name,
             },
-          },
-        });
+          }
+        );
 
-        if (error) {
+        if (error || !data?.success) {
           toast({
             title: "Error al crear cuenta",
-            description: error.message,
+            description: error?.message || "No se pudo crear la cuenta",
             variant: "destructive",
           });
         } else {
+          // Iniciar sesión automáticamente y redirigir a /payment
+          const { error: signInError } = await supabase.auth.signInWithPassword(
+            {
+              email,
+              password,
+            }
+          );
+
+          if (signInError) {
+            toast({
+              title: "Error al iniciar sesión",
+              description: signInError.message,
+              variant: "destructive",
+            });
+            return;
+          }
+
           toast({
-            title: "¡Cuenta creada exitosamente!",
-            description:
-              "Verifica tu correo electrónico para activar tu cuenta. Revisa tu bandeja de entrada y spam.",
-            variant: "default",
+            title: "¡Cuenta creada!",
+            description: "Completa tu membresía para activar tu acceso",
           });
 
-          // Limpiar el formulario
-          setEmail("");
-          setPassword("");
-          setConfirmPassword("");
-          setName("");
-
-          // Cambiar a modo login
-          setIsLogin(true);
-
-          // Mostrar mensaje adicional
-          setTimeout(() => {
-            toast({
-              title: "Importante",
-              description:
-                "Debes verificar tu email antes de poder iniciar sesión",
-              variant: "default",
-            });
-          }, 2000);
+          // Forzar recarga para que AuthProvider detecte la nueva sesión
+          window.location.href = "/payment";
         }
       }
     } catch (error) {
