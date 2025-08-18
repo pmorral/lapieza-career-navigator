@@ -108,23 +108,23 @@ export function LandingPage() {
   const companyLogos = [
     {
       name: "Disney",
-      src: "/lovable-uploads/cced4b4c-7deb-4dac-ad90-ecd3ad4a4637.png",
+      src: "/favicon.ico",
     },
     {
       name: "HSBC",
-      src: "/lovable-uploads/84d3be31-3485-4f6b-93bf-8a36379a4cb2.png",
+      src: "/favicon.ico",
     },
     {
       name: "Nielsen",
-      src: "/lovable-uploads/2e4864cb-2e37-49cc-88f8-cae9458d66f2.png",
+      src: "/favicon.ico",
     },
     {
       name: "Deloitte",
-      src: "/lovable-uploads/6fc386bb-8736-48a3-83e6-5b95cf54ed89.png",
+      src: "/favicon.ico",
     },
     {
       name: "Warner Bros",
-      src: "/lovable-uploads/7f911ddc-8bd9-4939-9458-0a2b9e698023.png",
+      src: "/favicon.ico",
     },
   ];
 
@@ -133,11 +133,7 @@ export function LandingPage() {
       {/* Header with Logo */}
       <header className="absolute top-0 left-0 right-0 z-50 p-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <img
-            src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
-            alt="Academy by LaPieza"
-            className="h-12"
-          />
+          <img src="/favicon.ico" alt="Academy by LaPieza" className="h-12" />
           <div className="flex gap-4">
             <Button
               variant="outline"

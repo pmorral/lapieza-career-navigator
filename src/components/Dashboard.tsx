@@ -300,7 +300,7 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
             <div className={`p-6 ${sidebarCollapsed ? "px-2" : "px-6"}`}>
               <div className="flex justify-center mb-2">
                 <img
-                  src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
+                  src="/favicon.ico"
                   alt="Academy by LaPieza"
                   className={`h-8 ${sidebarCollapsed ? "scale-90" : ""}`}
                 />
@@ -433,7 +433,7 @@ function DashboardOverview({
 }) {
   const coachInfo = {
     name: "María González",
-    photo: "/lovable-uploads/team-collaboration.png",
+    photo: "/placeholder.svg",
     whatsappLink:
       "https://wa.me/+523337872943?text=Hola%20María,%20necesito%20ayuda%20con%20mi%20desarrollo%20profesional",
     availability: "Disponible",
