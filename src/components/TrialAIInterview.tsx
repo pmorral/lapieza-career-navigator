@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,7 +38,17 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { TrialEmailVerification } from "./TrialEmailVerification";
 
-export const TrialAIInterview = () => {
+interface TrialAIInterviewProps {
+  externalOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTriggerCard?: boolean;
+}
+
+export const TrialAIInterview = ({
+  externalOpen,
+  onOpenChange,
+  hideTriggerCard = false,
+}: TrialAIInterviewProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [uploadedCV, setUploadedCV] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,6 +57,17 @@ export const TrialAIInterview = () => {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [emailForVerification, setEmailForVerification] = useState("");
   const [formData, setFormData] = useState<FormData | null>(null);
+
+  useEffect(() => {
+    if (typeof externalOpen === "boolean") {
+      setIsOpen(externalOpen);
+    }
+  }, [externalOpen]);
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    onOpenChange?.(open);
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -144,6 +165,7 @@ export const TrialAIInterview = () => {
     setIsOpen(false);
     setShowEmailVerification(false);
     setFormData(null);
+    onOpenChange?.(false);
     // Reset form fields
     const form = document.getElementById("trial-form") as HTMLFormElement;
     if (form) form.reset();
@@ -151,7 +173,49 @@ export const TrialAIInterview = () => {
 
   if (isSubmitted) {
     return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
+        {!hideTriggerCard && (
+          <DialogTrigger asChild>
+            <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+              <CardHeader className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-8 h-8 text-primary" />
+                </div>
+                <CardTitle className="text-xl">
+                  Prueba gratuita de entrevista AI
+                </CardTitle>
+                <CardDescription>
+                  Experimenta nuestro simulador de entrevistas con inteligencia
+                  artificial
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <Badge className="bg-green-100 text-green-800 mb-4">
+                  <CheckCircle className="w-4 h-4 mr-1" />
+                  Solicitud enviada
+                </Badge>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Tu entrevista AI será enviada directamente a tu email. Revisa
+                  tu bandeja de entrada y spam.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={resetForm}
+                  className="w-full"
+                >
+                  Hacer otra solicitud
+                </Button>
+              </CardContent>
+            </Card>
+          </DialogTrigger>
+        )}
+      </Dialog>
+    );
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
+      {!hideTriggerCard && (
         <DialogTrigger asChild>
           <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
             <CardHeader className="text-center">
@@ -167,62 +231,28 @@ export const TrialAIInterview = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <Badge className="bg-green-100 text-green-800 mb-4">
-                <CheckCircle className="w-4 h-4 mr-1" />
-                Solicitud enviada
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="w-4 h-4" />
+                  15-20 minutos de duración
+                </div>
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <Mail className="w-4 h-4" />
+                  Resultados por email
+                </div>
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <FileText className="w-4 h-4" />
+                  Análisis personalizado
+                </div>
+              </div>
+              <Badge className="bg-primary/10 text-primary mb-4">
+                100% Gratuito
               </Badge>
-              <p className="text-sm text-muted-foreground mb-4">
-                Tu entrevista AI será enviada directamente a tu email. Revisa tu
-                bandeja de entrada y spam.
-              </p>
-              <Button variant="outline" onClick={resetForm} className="w-full">
-                Hacer otra solicitud
-              </Button>
+              <Button className="w-full">Solicitar entrevista gratuita</Button>
             </CardContent>
           </Card>
         </DialogTrigger>
-      </Dialog>
-    );
-  }
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
-          <CardHeader className="text-center">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-8 h-8 text-primary" />
-            </div>
-            <CardTitle className="text-xl">
-              Prueba gratuita de entrevista AI
-            </CardTitle>
-            <CardDescription>
-              Experimenta nuestro simulador de entrevistas con inteligencia
-              artificial
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <Clock className="w-4 h-4" />
-                15-20 minutos de duración
-              </div>
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <Mail className="w-4 h-4" />
-                Resultados por email
-              </div>
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <FileText className="w-4 h-4" />
-                Análisis personalizado
-              </div>
-            </div>
-            <Badge className="bg-primary/10 text-primary mb-4">
-              100% Gratuito
-            </Badge>
-            <Button className="w-full">Solicitar entrevista gratuita</Button>
-          </CardContent>
-        </Card>
-      </DialogTrigger>
+      )}
 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         {showEmailVerification ? (
@@ -322,22 +352,6 @@ export const TrialAIInterview = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="language">Idioma de la entrevista *</Label>
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona el idioma" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="es">Español</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  Selecciona en qué idioma quieres recibir tu entrevista AI
-                </p>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="cv">Sube tu CV *</Label>
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center relative">
                   {uploadedCV ? (
@@ -416,7 +430,7 @@ export const TrialAIInterview = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => handleDialogOpenChange(false)}
                   disabled={isSubmitting}
                 >
                   Cancelar

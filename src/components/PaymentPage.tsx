@@ -11,21 +11,52 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Star, CreditCard, Lock, ArrowLeft } from "lucide-react";
+import { Star, CreditCard, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { CouponInput } from "./CouponInput";
 import { useAuth } from "@/contexts/AuthContext";
+import { TrialAIInterview } from "./TrialAIInterview";
+
+// Tipado mínimo para el cupón aplicado
+type AppliedCoupon = {
+  id: string;
+  discount_type: "free" | "percentage" | "fixed";
+  current_uses: number;
+  description?: string | null;
+};
 
 export const PaymentPage = () => {
   const navigate = useNavigate();
   const { user, checkSubscriptionStatus } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState("premium-6");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
+    null
+  );
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
   const [paymentCheckInterval, setPaymentCheckInterval] =
     useState<NodeJS.Timeout | null>(null);
+  const [trialOpen, setTrialOpen] = useState(false);
+  const [trialUsed, setTrialUsed] = useState(false);
+
+  // Cargar estado de uso de entrevista de prueba
+  useEffect(() => {
+    const loadTrialStatus = async () => {
+      if (!user) return;
+      const res = await supabase
+        .from("profiles")
+        .select("trial_interview_used")
+        .eq("user_id", user.id)
+        .single();
+      const trialUsedVal = Boolean(
+        (res as { data?: { trial_interview_used?: boolean } }).data
+          ?.trial_interview_used
+      );
+      setTrialUsed(trialUsedVal);
+    };
+    loadTrialStatus();
+  }, [user]);
 
   // Función para verificar el estado del pago
   const checkPaymentStatus = async () => {
@@ -33,7 +64,7 @@ export const PaymentPage = () => {
 
     try {
       setIsCheckingPayment(true);
-      const isActive = await checkSubscriptionStatus();
+      const isActive = await checkSubscriptionStatus(user);
 
       if (isActive) {
         console.log("✅ Payment completed! Redirecting to dashboard...");
@@ -102,6 +133,19 @@ export const PaymentPage = () => {
 
   const plans = [
     {
+      id: "trial",
+      name: "Entrevista AI de prueba",
+      price: 0,
+      description: "Prueba gratuita del simulador de entrevistas con IA",
+      features: [
+        "Resultados por email",
+        "Análisis personalizado",
+        "Duración 15-20 minutos",
+      ],
+      popular: false,
+      months: 0,
+    },
+    {
       id: "premium-6",
       name: "Academy Premium - 6 Meses",
       price: 149,
@@ -137,6 +181,17 @@ export const PaymentPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Si el usuario selecciona la entrevista de prueba, abrir modal (si no está usada)
+    if (selectedPlan === "trial") {
+      if (trialUsed) {
+        toast.error("Ya usaste tu entrevista de prueba gratuita");
+        return;
+      }
+      setTrialOpen(true);
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -249,7 +304,7 @@ export const PaymentPage = () => {
         console.error("❌ Error invoking function:", invokeError);
         toast.error(
           `Error al invocar la función: ${
-            invokeError.message || "Error desconocido"
+            (invokeError as Error).message || "Error desconocido"
           }`
         );
       }
@@ -281,73 +336,108 @@ export const PaymentPage = () => {
           {/* Plans Selection */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold mb-4">Selecciona tu plan</h2>
-            {plans.map((plan) => (
-              <Card
-                key={plan.id}
-                className={`cursor-pointer transition-all duration-200 ${
-                  selectedPlan === plan.id
-                    ? "ring-2 ring-primary border-primary"
-                    : "hover:border-primary/50"
-                } ${plan.popular ? "relative" : ""}`}
-                onClick={() => setSelectedPlan(plan.id)}
-              >
-                {plan.popular && (
-                  <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground">
-                    <Star className="w-3 h-3 mr-1" />
-                    Más Popular
-                  </Badge>
-                )}
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{plan.name}</CardTitle>
-                      <CardDescription className="text-sm">
-                        {plan.description}
-                      </CardDescription>
-                    </div>
-                    <div className="text-right">
-                      {appliedCoupon &&
-                      appliedCoupon.discount_type === "free" ? (
-                        <div className="text-2xl font-bold text-green-600">
-                          GRATIS
-                        </div>
-                      ) : (
-                        <>
-                          <div className="text-2xl font-bold text-primary">
-                            ${plan.price}
+            {plans.map((plan) => {
+              const isTrial = plan.id === "trial";
+              const isDisabled = isTrial && trialUsed;
+              return (
+                <Card
+                  key={plan.id}
+                  className={`transition-all duration-200 ${
+                    selectedPlan === plan.id
+                      ? "ring-2 ring-primary border-primary"
+                      : "hover:border-primary/50"
+                  } ${plan.popular ? "relative" : ""} ${
+                    isDisabled ? "opacity-60 grayscale" : "cursor-pointer"
+                  }`}
+                  onClick={() => {
+                    if (isDisabled) {
+                      toast.info("Ya usaste tu entrevista de prueba gratuita");
+                      return;
+                    }
+                    setSelectedPlan(plan.id);
+                  }}
+                >
+                  {plan.popular && plan.id !== "trial" && (
+                    <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground">
+                      <Star className="w-3 h-3 mr-1" />
+                      Más Popular
+                    </Badge>
+                  )}
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          {plan.name}
+                          {isTrial && !trialUsed && (
+                            <Badge className="bg-green-100 text-green-800">
+                              Gratis
+                            </Badge>
+                          )}
+                          {isTrial && trialUsed && (
+                            <Badge
+                              variant="secondary"
+                              className="bg-muted text-muted-foreground"
+                            >
+                              Usado
+                            </Badge>
+                          )}
+                        </CardTitle>
+                        <CardDescription className="text-sm">
+                          {plan.description}
+                        </CardDescription>
+                      </div>
+                      <div className="text-right">
+                        {isTrial ? (
+                          <div className="text-2xl font-bold text-green-600">
+                            $0
                           </div>
-                          <div className="text-sm text-muted-foreground">
-                            USD
+                        ) : appliedCoupon &&
+                          appliedCoupon.discount_type === "free" ? (
+                          <div className="text-2xl font-bold text-green-600">
+                            GRATIS
                           </div>
-                        </>
-                      )}
+                        ) : (
+                          <>
+                            <div className="text-2xl font-bold text-primary">
+                              {plan.price}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              USD
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm mb-4">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm mb-4">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              );
+            })}
 
-            <CouponInput
-              onCouponApplied={setAppliedCoupon}
-              appliedCoupon={appliedCoupon}
-            />
+            {selectedPlan !== "trial" && (
+              <CouponInput
+                onCouponApplied={(coupon) =>
+                  setAppliedCoupon(coupon as AppliedCoupon)
+                }
+                appliedCoupon={appliedCoupon}
+              />
+            )}
           </div>
 
           {/* Payment Summary */}
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Resumen de tu Membresía</CardTitle>
+                <CardTitle>Resumen de tu Selección</CardTitle>
                 <CardDescription>
                   Revisa los detalles antes de continuar
                 </CardDescription>
@@ -355,24 +445,28 @@ export const PaymentPage = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between">
+                    <span>Plan {selectedPlanData?.name}</span>
                     <span>
-                      Plan {plans.find((p) => p.id === selectedPlan)?.name}
-                    </span>
-                    <span>
-                      {appliedCoupon && appliedCoupon.discount_type === "free"
+                      {selectedPlanData?.price === 0 ||
+                      (appliedCoupon && appliedCoupon.discount_type === "free")
                         ? "$0 USD"
-                        : `$${
-                            plans.find((p) => p.id === selectedPlan)?.price
-                          } USD`}
+                        : `$${selectedPlanData?.price} USD`}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>
-                      {appliedCoupon && appliedCoupon.discount_type === "free"
+                      {selectedPlanData?.price === 0
+                        ? "Entrevista AI de prueba"
+                        : appliedCoupon &&
+                          appliedCoupon.discount_type === "free"
                         ? "Acceso gratuito con cupón"
                         : "Pago único"}
                     </span>
-                    <span>Acceso completo</span>
+                    <span>
+                      {selectedPlanData?.price === 0
+                        ? "Envío por email"
+                        : "Acceso completo"}
+                    </span>
                   </div>
                 </div>
 
@@ -380,20 +474,48 @@ export const PaymentPage = () => {
                   <div className="flex justify-between font-semibold">
                     <span>Total</span>
                     <span>
-                      {appliedCoupon && appliedCoupon.discount_type === "free"
+                      {selectedPlanData?.price === 0 ||
+                      (appliedCoupon && appliedCoupon.discount_type === "free")
                         ? "$0 USD"
-                        : `$${
-                            plans.find((p) => p.id === selectedPlan)?.price
-                          } USD`}
+                        : `$${selectedPlanData?.price} USD`}
                     </span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Payment Form */}
+            {/* Action Area */}
             <div className="space-y-6">
-              {(!appliedCoupon || appliedCoupon.discount_type !== "free") && (
+              {selectedPlan === "trial" ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Solicitar Entrevista AI Gratuita</CardTitle>
+                    <CardDescription>
+                      Abre el formulario para solicitar tu entrevista de prueba
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      disabled={trialUsed}
+                      onClick={() => {
+                        if (trialUsed) {
+                          toast.info(
+                            "Ya usaste tu entrevista de prueba gratuita"
+                          );
+                          return;
+                        }
+                        setTrialOpen(true);
+                      }}
+                    >
+                      {trialUsed
+                        ? "Ya utilizado"
+                        : "Abrir formulario de entrevista gratuita"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
                 <Card>
                   <CardHeader>
                     <CardTitle>Completar tu Compra</CardTitle>
@@ -432,21 +554,9 @@ export const PaymentPage = () => {
                         >
                           {isProcessing
                             ? "Creando sesión de pago..."
-                            : `Adquirir Membresía - $${
-                                plans.find((p) => p.id === selectedPlan)?.price
+                            : `Adquirir Membresía - ${
+                                selectedPlanData?.price ?? ""
                               } USD`}
-                        </Button>
-
-                        {/* Botón de prueba para debug */}
-
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => navigate("/dashboard")}
-                        >
-                          <ArrowLeft className="w-4 h-4 mr-2" />
-                          Volver al dashboard
                         </Button>
                       </div>
                     </form>
@@ -455,41 +565,41 @@ export const PaymentPage = () => {
               )}
 
               {/* Free Access Button for Coupon Users */}
-              {appliedCoupon && appliedCoupon.discount_type === "free" && (
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="text-center space-y-4">
-                      <div className="text-lg font-semibold text-green-600">
-                        ¡Cupón aplicado! Tienes acceso gratuito
+              {selectedPlan !== "trial" &&
+                appliedCoupon &&
+                appliedCoupon.discount_type === "free" && (
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="text-center space-y-4">
+                        <div className="text-lg font-semibold text-green-600">
+                          ¡Cupón aplicado! Tienes acceso gratuito
+                        </div>
+                        <Button
+                          onClick={() =>
+                            handleSubmit({
+                              preventDefault: () => {},
+                            } as React.FormEvent)
+                          }
+                          className="w-full"
+                          size="lg"
+                          disabled={isProcessing}
+                        >
+                          {isProcessing
+                            ? "Activando..."
+                            : "Activar acceso gratuito"}
+                        </Button>
                       </div>
-                      <Button
-                        onClick={() =>
-                          handleSubmit({
-                            preventDefault: () => {},
-                          } as React.FormEvent)
-                        }
-                        className="w-full"
-                        size="lg"
-                        disabled={isProcessing}
-                      >
-                        {isProcessing
-                          ? "Activando..."
-                          : "Activar acceso gratuito"}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => navigate("/dashboard")}
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Volver al dashboard
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                    </CardContent>
+                  </Card>
+                )}
             </div>
+
+            {/* Modal de entrevista de prueba controlado externamente */}
+            <TrialAIInterview
+              externalOpen={trialOpen}
+              onOpenChange={setTrialOpen}
+              hideTriggerCard
+            />
           </div>
         </div>
       </div>
