@@ -84,6 +84,10 @@ async function handleMembershipPayment(session: any, productInfo: any) {
   expiresAt.setMonth(expiresAt.getMonth() + months);
   console.log("📅 Subscription expires at:", expiresAt.toISOString());
 
+  // Definir créditos de entrevistas según el plan
+  const interviewCredits = months >= 12 ? 10 : 5;
+  console.log("🎫 Interview credits set to:", interviewCredits);
+
   // 1. Insertar en la tabla de suscripciones
   const { data: subscriptionData, error: subscriptionError } = await supabase
     .from("subscriptions")
@@ -116,6 +120,7 @@ async function handleMembershipPayment(session: any, productInfo: any) {
       stripe_session_id: session.id,
       stripe_customer_id: session.customer,
       subscription_months: months,
+      interview_credits: interviewCredits,
     })
     .eq("user_id", session.metadata.user_id)
     .select();

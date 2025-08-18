@@ -1,6 +1,19 @@
 import { useState } from "react";
-import { Calendar, Clock, DollarSign, CheckCircle, AlertCircle, Clock as ClockIcon } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Calendar,
+  Clock,
+  DollarSign,
+  CheckCircle,
+  AlertCircle,
+  Clock as ClockIcon,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useServices, UserService } from "@/hooks/use-services";
@@ -11,19 +24,19 @@ export function ServicesHistory() {
   const [expandedService, setExpandedService] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const formatPrice = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency.toUpperCase()
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
     }).format(amount / 100); // Convertir de centavos a dólares
   };
 
@@ -33,13 +46,25 @@ export function ServicesHistory() {
     const isExpired = now > expiresAt;
 
     if (service.status === "completed") {
-      return <Badge variant="default" className="bg-green-100 text-green-800">Completado</Badge>;
+      return (
+        <Badge variant="default" className="bg-green-100 text-green-800">
+          Completado
+        </Badge>
+      );
     } else if (service.status === "scheduled") {
-      return <Badge variant="default" className="bg-blue-100 text-blue-800">Programado</Badge>;
+      return (
+        <Badge variant="default" className="bg-blue-100 text-blue-800">
+          Programado
+        </Badge>
+      );
     } else if (isExpired) {
       return <Badge variant="destructive">Expirado</Badge>;
     } else {
-      return <Badge variant="default" className="bg-yellow-100 text-yellow-800">Activo</Badge>;
+      return (
+        <Badge variant="default" className="bg-yellow-100 text-yellow-800">
+          Activo
+        </Badge>
+      );
     }
   };
 
@@ -68,11 +93,15 @@ export function ServicesHistory() {
   if (error) {
     return (
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 hidden md:block">
           <div className="text-center">
             <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
             <p className="text-red-600">{error}</p>
-            <Button onClick={refreshServices} variant="outline" className="mt-2">
+            <Button
+              onClick={refreshServices}
+              variant="outline"
+              className="mt-2"
+            >
               Reintentar
             </Button>
           </div>
@@ -87,7 +116,9 @@ export function ServicesHistory() {
         <CardContent className="pt-6">
           <div className="text-center">
             <Calendar className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-500">No tienes servicios adicionales comprados</p>
+            <p className="text-gray-500">
+              No tienes servicios adicionales comprados
+            </p>
             <p className="text-sm text-gray-400 mt-1">
               Los servicios que compres aparecerán aquí
             </p>
@@ -98,7 +129,7 @@ export function ServicesHistory() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 hidden md:block">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Historial de Servicios</h3>
         <Button onClick={refreshServices} variant="outline" size="sm">
@@ -135,9 +166,11 @@ export function ServicesHistory() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setExpandedService(
-                    expandedService === service.id ? null : service.id
-                  )}
+                  onClick={() =>
+                    setExpandedService(
+                      expandedService === service.id ? null : service.id
+                    )
+                  }
                 >
                   {expandedService === service.id ? "Ocultar" : "Ver detalles"}
                 </Button>
@@ -175,7 +208,9 @@ export function ServicesHistory() {
 
                 {service.scheduled_at && (
                   <div>
-                    <span className="font-medium text-sm">Programado para:</span>
+                    <span className="font-medium text-sm">
+                      Programado para:
+                    </span>
                     <p className="text-muted-foreground text-sm">
                       {formatDate(service.scheduled_at)}
                     </p>
@@ -193,7 +228,9 @@ export function ServicesHistory() {
 
                 {Object.keys(service.metadata).length > 0 && (
                   <div>
-                    <span className="font-medium text-sm">Información adicional:</span>
+                    <span className="font-medium text-sm">
+                      Información adicional:
+                    </span>
                     <pre className="text-xs text-muted-foreground bg-gray-50 p-2 rounded mt-1 overflow-x-auto">
                       {JSON.stringify(service.metadata, null, 2)}
                     </pre>

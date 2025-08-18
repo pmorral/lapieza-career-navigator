@@ -440,15 +440,11 @@ export function LandingPage() {
                 Academy by LaPieza
               </CardTitle>
               <div className="space-y-2">
-                <div className="text-3xl font-bold text-primary">
-                  $149 USD
-                </div>
+                <div className="text-3xl font-bold text-primary">$149 USD</div>
                 <div className="text-sm text-muted-foreground">
                   6 meses de acceso completo
                 </div>
-                <div className="text-2xl font-bold text-primary">
-                  $199 USD
-                </div>
+                <div className="text-2xl font-bold text-primary">$199 USD</div>
                 <div className="text-sm text-muted-foreground">
                   12 meses de acceso completo
                 </div>

@@ -28,6 +28,8 @@ import {
   RefreshCw,
   TrendingUp,
   History,
+  MessageCircle,
+  PanelLeft,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -58,15 +60,13 @@ import { LinkedInOptimizer } from "./LinkedInOptimizer";
 import { JobTracker } from "./JobTracker";
 import { ELearningHub } from "./ELearningHub";
 import { MockInterviews } from "./MockInterviews";
-import { CareerCoach } from "./CareerCoach";
 import { AdditionalServices } from "./AdditionalServices";
-import { ServicesHistory } from "./ServicesHistory";
-import { ReferAndEarn } from "./ReferAndEarn";
 import { GeneralSettings } from "./GeneralSettings";
 import { AutomatedMessages } from "./AutomatedMessages";
 import { CVBoost } from "./CVBoost";
 import { PaymentSettings } from "./PaymentSettings";
 import { JobSuccess } from "./JobSuccess";
+import { Progress } from "@/components/ui/progress";
 
 interface DashboardProps {
   defaultSection?: string;
@@ -79,6 +79,7 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -229,12 +230,6 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
       path: "/dashboard/job-tracker",
     },
     {
-      id: "learning",
-      label: "E-learning",
-      icon: BookOpen,
-      path: "/dashboard/learning",
-    },
-    {
       id: "automated-messages",
       label: "Templates de Empleabilidad",
       icon: Users,
@@ -266,7 +261,6 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
         return (
           <div className="space-y-8">
             <AdditionalServices />
-            <ServicesHistory />
           </div>
         );
       case "settings":
@@ -297,34 +291,43 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
     <div className="min-h-screen bg-background">
       <div className="flex">
         {/* Sidebar */}
-        <div className="fixed inset-y-0 left-0 w-64 bg-card border-r border-border shadow-card">
+        <div
+          className={`fixed inset-y-0 left-0 ${
+            sidebarCollapsed ? "w-14" : "w-64"
+          } bg-card border-r border-border shadow-card transition-all duration-200`}
+        >
           <div className="flex flex-col h-full">
-            <div className="p-6">
+            <div className={`p-6 ${sidebarCollapsed ? "px-2" : "px-6"}`}>
               <div className="flex justify-center mb-2">
                 <img
                   src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
                   alt="Academy by LaPieza"
-                  className="h-8"
+                  className={`h-8 ${sidebarCollapsed ? "scale-90" : ""}`}
                 />
               </div>
-              <p className="text-sm text-muted-foreground text-center">
-                Impulsa tu potencial profesional
-              </p>
+              {!sidebarCollapsed && (
+                <p className="text-sm text-muted-foreground text-center">
+                  Impulsa tu potencial profesional
+                </p>
+              )}
             </div>
 
-            <nav className="flex-1 px-4 space-y-2">
+            <nav className="flex-1 px-2 space-y-2">
               {menuItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleSectionChange(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+                  className={`w-full flex items-center gap-3 ${
+                    sidebarCollapsed ? "px-3 justify-center" : "px-4"
+                  } py-3 rounded-lg text-left transition-all duration-200 ${
                     activeSection === item.id
                       ? "bg-primary/10 text-primary border border-primary/20"
                       : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   }`}
+                  title={sidebarCollapsed ? item.label : undefined}
                 >
                   <item.icon className="w-5 h-5" />
-                  {item.label}
+                  {!sidebarCollapsed && <span>{item.label}</span>}
                 </button>
               ))}
             </nav>
@@ -332,37 +335,52 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 ml-64">
-          <header className="bg-card border-b border-border px-6 py-4">
+        <div
+          className={`flex-1 ${
+            sidebarCollapsed ? "ml-14" : "ml-64"
+          } transition-all duration-200`}
+        >
+          <header className="bg-card border-b border-border px-4 md:px-6 py-4">
             <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleSectionChange("overview")}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Dashboard
-                  </Button>
-                  {activeSection !== "overview" && (
-                    <>
-                      <span className="text-muted-foreground">/</span>
-                      <span className="text-foreground font-medium">
-                        {menuItems.find((item) => item.id === activeSection)
-                          ?.label || "Sección"}
-                      </span>
-                    </>
-                  )}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Colapsar menú"
+                  onClick={() => setSidebarCollapsed((v) => !v)}
+                >
+                  <PanelLeft className="w-5 h-5" />
+                </Button>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSectionChange("overview")}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      Dashboard
+                    </Button>
+                    {activeSection !== "overview" && (
+                      <>
+                        <span className="text-muted-foreground">/</span>
+                        <span className="text-foreground font-medium">
+                          {menuItems.find((item) => item.id === activeSection)
+                            ?.label || "Sección"}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <h2 className="text-xl font-semibold text-foreground">
+                    {menuItems.find((item) => item.id === activeSection)
+                      ?.label || "Panel Principal"}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Gestiona tu desarrollo profesional
+                  </p>
                 </div>
-                <h2 className="text-xl font-semibold text-foreground">
-                  {menuItems.find((item) => item.id === activeSection)?.label ||
-                    "Panel Principal"}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Gestiona tu desarrollo profesional
-                </p>
               </div>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
@@ -417,7 +435,7 @@ function DashboardOverview({
     name: "María González",
     photo: "/lovable-uploads/team-collaboration.png",
     whatsappLink:
-      "https://wa.me/+525555555555?text=Hola%20María,%20necesito%20ayuda%20con%20mi%20desarrollo%20profesional",
+      "https://wa.me/+523337872943?text=Hola%20María,%20necesito%20ayuda%20con%20mi%20desarrollo%20profesional",
     availability: "Disponible",
     specialties: ["Entrevistas", "CV", "LinkedIn", "Networking"],
   };
@@ -425,150 +443,75 @@ function DashboardOverview({
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-card">
+        {/* Acciones Rápidas centrado */}
+        <div className="lg:col-span-2 flex justify-center">
+          <Card className="shadow-card w-full max-w-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+                Acciones Rápidas
+              </CardTitle>
+              <CardDescription>
+                Comienza tu desarrollo profesional
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => setActiveSection("cv-boost")}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                CV Boost
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => setActiveSection("linkedin")}
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Optimizar Perfil LinkedIn
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => setActiveSection("job-tracker")}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Agregar Aplicación Laboral
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => setActiveSection("interviews")}
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Iniciar Entrevista Simulada
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* WhatsApp Coach Highlight */}
+        <Card className="shadow-card border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="w-5 h-5 text-primary" />
-              Acciones Rápidas
+            <CardTitle className="flex items-center gap-2 text-green-800">
+              <MessageCircle className="w-5 h-5" />
+              ¿Necesitas ayuda inmediata?
             </CardTitle>
-            <CardDescription>
-              Comienza tu desarrollo profesional
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => setActiveSection("cv-boost")}
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              CV Boost
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => setActiveSection("linkedin")}
-            >
-              <Users className="w-4 h-4 mr-2" />
-              Optimizar Perfil LinkedIn
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => setActiveSection("job-tracker")}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Agregar Aplicación Laboral
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => setActiveSection("interviews")}
-            >
-              <Play className="w-4 h-4 mr-2" />
-              Iniciar Entrevista Simulada
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" />
-              Eventos del Mes
-            </CardTitle>
-            <CardDescription>
-              Próximas sesiones y actividades programadas
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <h4 className="font-medium text-sm">
-                    Estrategias de Networking
-                  </h4>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Jueves 25 de Julio, 2024 - 7:00 PM
-                </p>
-              </div>
-
-              <div className="p-3 bg-muted rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                  <h4 className="font-medium text-sm">
-                    Workshop CV Optimization
-                  </h4>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Martes 30 de Julio, 2024 - 6:00 PM
-                </p>
-              </div>
-
-              <div className="p-3 bg-muted rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-accent rounded-full"></div>
-                  <h4 className="font-medium text-sm">
-                    Simulacro de Entrevistas
-                  </h4>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Viernes 2 de Agosto, 2024 - 7:30 PM
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* CV Templates Section */}
-      <div className="grid grid-cols-1 gap-6 mt-6">
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-primary" />
-              Templates de CV Profesionales
-            </CardTitle>
-            <CardDescription>
-              Descarga templates optimizados para ATS y diferentes industrias
+            <CardDescription className="text-green-700">
+              Escríbenos por WhatsApp y te apoyamos al instante
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CVTemplatesPreview setActiveSection={setActiveSection} />
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-primary" />
-              Sesiones de Comunidad
-            </CardTitle>
-            <CardDescription>
-              Acceso a sesiones quincenales y grupo de WhatsApp durante tu
-              membresía
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center">
-              <div className="p-4 bg-accent/10 border border-accent/20 rounded-lg">
-                <h4 className="font-medium mb-2">Próxima Sesión Grupal</h4>
-                <p className="text-sm font-medium text-primary">
-                  Estrategias de Networking
-                </p>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Jueves 25 de Julio, 2024 - 7:00 PM (Hora México)
-                </p>
-                <Button size="sm" className="w-full">
-                  <Play className="w-4 h-4 mr-2" />
-                  Acceder a la sesión
-                </Button>
-              </div>
-            </div>
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={() => window.open(coachInfo.whatsappLink, "_blank")}
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Enviar mensaje por WhatsApp
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -594,7 +537,17 @@ function MembershipDetails() {
     nextBillingDate: string | null;
   } | null>(null);
 
-  // Cargar información de suscripción desde Supabase
+  interface SubscriptionRow {
+    plan_type: string | null;
+    amount_paid: number | null;
+    currency: string | null;
+    status: string | null;
+    started_at: string | null;
+    expires_at: string | null;
+    id?: string | null;
+    stripe_customer_id?: string | null;
+  }
+
   useEffect(() => {
     const loadSubscriptionInfo = async () => {
       if (!user) return;
@@ -602,109 +555,68 @@ function MembershipDetails() {
       try {
         setIsLoadingPayment(true);
 
-        // Obtener perfil del usuario con información de suscripción
-        const { data: profile, error: profileError } = await supabase
+        // Perfil base
+        const { data: profile } = await supabase
           .from("profiles")
           .select("*")
           .eq("user_id", user.id)
           .single();
 
-        if (profileError) {
-          console.error("Error loading profile:", profileError);
-          toast({
-            title: "Error",
-            description: "No se pudo cargar la información de suscripción",
-            variant: "destructive",
-          });
-          return;
-        }
+        // Suscripción desde función
+        const { data: subResp } = await supabase.functions.invoke(
+          "get-user-subscription",
+          { body: { user_id: user.id } }
+        );
 
-        // Obtener información del customer desde Supabase (si la tabla existe)
-        let customerInfo = null;
-        if ((profile as any).stripe_customer_id) {
-          try {
-            // Usar aserción de tipo para acceder a tablas que pueden no existir
-            const { data: customer, error: customerError } = await (
-              supabase as any
-            )
-              .from("stripe_customers")
-              .select("*")
-              .eq("id", profile.stripe_customer_id)
-              .single();
+        const sub = subResp?.subscription as {
+          plan_type: string | null;
+          amount_paid: number | null;
+          currency: string | null;
+          status: string | null;
+          started_at: string | null;
+          expires_at: string | null;
+          id?: string | null;
+          stripe_customer_id?: string | null;
+        } | null;
 
-            if (!customerError && customer) {
-              customerInfo = customer;
-            }
-          } catch (error) {
-            console.log("No stripe_customers table found, using profile data");
-          }
-        }
-
-        // Obtener información de la suscripción (si la tabla existe)
-        let subscriptionInfo = null;
-        if ((profile as any).stripe_subscription_id) {
-          try {
-            const { data: subscription, error: subscriptionError } = await (
-              supabase as any
-            )
-              .from("stripe_subscriptions")
-              .select("*")
-              .eq("id", profile.stripe_subscription_id)
-              .single();
-
-            if (!subscriptionError && subscription) {
-              subscriptionInfo = subscription;
-            }
-          } catch (error) {
-            console.log(
-              "No stripe_subscriptions table found, using profile data"
-            );
-          }
-        }
-
-        // Obtener historial de pagos (si la tabla existe)
-        let paymentHistory = [];
-        try {
-          const { data: payments, error: paymentsError } = await (
-            supabase as any
-          )
-            .from("stripe_payments")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("created_at", { ascending: false });
-
-          if (!paymentsError && payments) {
-            paymentHistory = payments;
-          }
-        } catch (error) {
-          console.log("No stripe_payments table found");
-        }
-
-        // Construir detalles de suscripción
-        const details = {
-          plan: profile.subscription_plan || "Academy",
-          status: profile.subscription_status || "inactive",
-          startDate:
-            (profile as any).subscription_start_date || profile.created_at,
-          endDate: (profile as any).subscription_end_date || null,
-          credits: profile.interview_credits || 0,
-          customerId: (profile as any).stripe_customer_id || null,
-          subscriptionId: (profile as any).stripe_subscription_id || null,
-          amount: subscriptionInfo?.amount || 299.0,
-          currency: subscriptionInfo?.currency || "usd",
-          nextBillingDate: subscriptionInfo?.next_billing_date || null,
+        let details = {
+          plan: profile?.subscription_plan || "Academy",
+          status: profile?.subscription_status || "inactive",
+          startDate: profile?.created_at || new Date().toISOString(),
+          endDate: null as string | null,
+          credits: profile?.interview_credits || 0,
+          customerId: null as string | null,
+          subscriptionId: null as string | null,
+          amount: 149.0,
+          currency: "usd",
+          nextBillingDate: null as string | null,
         };
 
+        if (sub) {
+          const planKey = (sub.plan_type || "6months").toLowerCase();
+          details = {
+            plan:
+              planKey === "12months"
+                ? "Academy - 12 Meses"
+                : "Academy - 6 Meses",
+            status: sub.status || "active",
+            startDate: sub.started_at || details.startDate,
+            endDate: sub.expires_at || null,
+            credits: details.credits,
+            customerId: sub.stripe_customer_id || null,
+            subscriptionId: sub.id || null,
+            amount:
+              typeof sub.amount_paid === "number"
+                ? Math.max(0, sub.amount_paid / 100)
+                : planKey === "12months"
+                ? 199
+                : 149,
+            currency: (sub.currency || "usd").toLowerCase(),
+            nextBillingDate: null,
+          };
+        }
+
         setSubscriptionDetails(details);
-
-        // Si hay información del customer, también podemos obtener más detalles
-        if (customerInfo) {
-          console.log("Customer info loaded:", customerInfo);
-        }
-
-        if (subscriptionInfo) {
-          console.log("Subscription info loaded:", subscriptionInfo);
-        }
       } catch (error) {
         console.error("Error loading subscription info:", error);
         toast({
@@ -819,7 +731,9 @@ function MembershipDetails() {
                 <h4 className="font-semibold text-lg mb-2">
                   Academy - 6 Meses
                 </h4>
-                <p className="text-2xl font-bold text-primary mb-2">$149 USD</p>
+                <p className="text-2xl font-bold text-primary mb-2">
+                  $149<span className="text-base">149 USD</span>
+                </p>
                 <p className="text-sm text-muted-foreground mb-4">
                   6 meses de acceso completo
                 </p>
@@ -841,7 +755,9 @@ function MembershipDetails() {
                 <h4 className="font-semibold text-lg mb-2">
                   Academy - 12 Meses
                 </h4>
-                <p className="text-2xl font-bold text-primary mb-2">$199 USD</p>
+                <p className="text-2xl font-bold text-primary mb-2">
+                  $199<span className="text-base"> USD</span>
+                </p>
                 <p className="text-sm text-muted-foreground mb-4">
                   12 meses de acceso completo
                 </p>
@@ -901,13 +817,6 @@ function MembershipDetails() {
           {/* Información de la suscripción */}
           {subscriptionDetails && (
             <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Monto del plan:</span>
-                <span className="font-medium">
-                  ${subscriptionDetails.amount.toFixed(2)}{" "}
-                  {subscriptionDetails.currency.toUpperCase()}
-                </span>
-              </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Fecha de inicio:</span>
                 <span className="font-medium">

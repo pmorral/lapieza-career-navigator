@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowRight,
+  MessageCircle,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -236,6 +243,23 @@ export function LoginPage() {
                     ¿Olvidaste tu contraseña?
                   </button>
                 </div>
+              )}
+
+              {!isLogin && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() =>
+                    window.open(
+                      "https://wa.me/+525555555555?text=Hola%20equipo%20de%20Academy%2C%20tengo%20dudas%20sobre%20mi%20registro%20y%20membres%C3%ADa",
+                      "_blank"
+                    )
+                  }
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Habla con un asesor por WhatsApp
+                </Button>
               )}
 
               <Button

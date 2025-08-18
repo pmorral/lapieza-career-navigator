@@ -39,7 +39,7 @@ const PRODUCTS = {
   consultation: {
     id: "prod_SrrFzevNeQh7HO",
     name: "Asesoría General de Empleabilidad",
-    price: 7500,
+    price: 15000,
     duration: "60 minutos",
     type: "service",
   },
@@ -154,6 +154,62 @@ serve(async (req) => {
     let session;
 
     if (productType === "service") {
+      // Lógica de descuento interno para primera compra de Asesoría General
+      let discountsParam: Array<{ coupon: string }> | undefined = undefined;
+      let effectiveUnitAmount = selectedProduct.price; // en centavos
+
+      if (productKey === "consultation") {
+        // Verificar si el usuario ya compró este servicio previamente (completado)
+        const { data: previousPayments, error: previousError } = await supabase
+          .from("payments")
+          .select("id")
+          .eq("user_id", user_id)
+          .eq("payment_type", "service")
+          .eq("status", "completed")
+          .eq("description", selectedProduct.name)
+          .limit(1);
+
+        const isFirstTime =
+          !previousError &&
+          (!previousPayments || previousPayments.length === 0);
+
+        if (isFirstTime) {
+          try {
+            let couponId = Deno.env.get("CONSULTATION_FIRST_TIME_50_COUPON_ID");
+
+            // Si no hay un cupón configurado por env, crear uno (50% una sola vez)
+            if (!couponId) {
+              // Intentar encontrar uno existente por nombre (lista limitada)
+              const existing = await stripe.coupons.list({ limit: 100 });
+              const found = existing.data.find(
+                (c: any) =>
+                  c.name === "CONSULTATION_FIRST_TIME_50" &&
+                  c.percent_off === 50 &&
+                  c.valid
+              );
+              if (found) {
+                couponId = found.id;
+              } else {
+                const created = await stripe.coupons.create({
+                  name: "CONSULTATION_FIRST_TIME_50",
+                  percent_off: 50,
+                  duration: "once",
+                });
+                couponId = created.id;
+              }
+            }
+
+            if (couponId) {
+              discountsParam = [{ coupon: couponId }];
+              // Para nuestro registro interno, reflejar el monto con descuento
+              effectiveUnitAmount = Math.round(selectedProduct.price / 2);
+            }
+          } catch (err) {
+            console.error("❌ Error ensuring discount coupon:", err);
+          }
+        }
+      }
+
       // Para servicios, crear directamente con price_data
       session = await stripe.checkout.sessions.create({
         customer: customer.id,
@@ -171,6 +227,8 @@ serve(async (req) => {
             quantity: 1,
           },
         ],
+        // Aplicar descuento interno sólo si corresponde
+        discounts: discountsParam,
         mode: "payment",
         success_url: success_url,
         cancel_url: cancel_url,
@@ -191,7 +249,7 @@ serve(async (req) => {
       await supabase.from("payments").insert({
         user_id: user_id,
         stripe_session_id: session.id,
-        amount: selectedProduct.price / 100, // Convertir de centavos a dólares
+        amount: (effectiveUnitAmount ?? selectedProduct.price) / 100, // Convertir de centavos a dólares
         currency: "USD",
         status: "pending",
         payment_type: "service",

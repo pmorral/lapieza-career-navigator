@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   DollarSign,
@@ -34,17 +34,53 @@ interface Service {
   special?: boolean;
 }
 
+interface ServiceHistoryItem {
+  id: string;
+  name: string;
+  amount: number;
+  currency: string;
+  status: string;
+  created_at: string;
+  duration?: string;
+}
+
 export function AdditionalServices() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loadingService, setLoadingService] = useState<string | null>(null);
+  const [hasPurchasedConsultation, setHasPurchasedConsultation] =
+    useState(false);
+
+  useEffect(() => {
+    const loadServiceHistory = async () => {
+      if (!user) return;
+      try {
+        const { data, error } = await supabase.functions.invoke(
+          "get-service-history",
+          {
+            body: { user_id: user.id },
+          }
+        );
+        if (!error && data?.services) {
+          const list = data.services as ServiceHistoryItem[];
+          const purchased = list.some(
+            (s) => s.name === "Asesoría General de Empleabilidad"
+          );
+          setHasPurchasedConsultation(purchased);
+        }
+      } catch (e) {
+        // Continuar sin bloquear UI
+      }
+    };
+    loadServiceHistory();
+  }, [user]);
 
   const services: Service[] = [
     {
       id: "consultation",
       title: "Asesoría General de Empleabilidad",
       duration: "60 minutos",
-      price: 75,
+      price: hasPurchasedConsultation ? 150 : 75,
       description:
         "Orientación general sobre tu carrera profesional y estrategias de empleabilidad",
       features: [
@@ -168,19 +204,33 @@ export function AdditionalServices() {
                 <div className="p-2 bg-primary/10 rounded-lg">
                   <service.icon className="w-5 h-5 text-primary" />
                 </div>
-                <div className="flex-1">
-                  <CardTitle className="text-lg">{service.title}</CardTitle>
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-lg flex items-center gap-2 flex-wrap min-w-0">
+                    <span className="truncate">{service.title}</span>
+                    {service.id === "consultation" &&
+                      !hasPurchasedConsultation && (
+                        <Badge className="bg-green-100 text-green-800 whitespace-nowrap px-2 py-0.5 text-xs">
+                          50% OFF primera vez
+                        </Badge>
+                      )}
+                  </CardTitle>
                   <CardDescription className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
                     {service.duration}
                   </CardDescription>
                 </div>
-                <div className="text-right">
+                <div className="text-right whitespace-nowrap">
                   <div className="text-2xl font-bold text-primary">
                     {typeof service.price === "number"
                       ? `$${service.price}`
                       : service.price}
                   </div>
+                  {service.id === "consultation" &&
+                    !hasPurchasedConsultation && (
+                      <div className="text-[10px] text-muted-foreground">
+                        Precio regular $150 USD
+                      </div>
+                    )}
                   {typeof service.price === "number" && (
                     <div className="text-xs text-muted-foreground">USD</div>
                   )}
@@ -205,16 +255,6 @@ export function AdditionalServices() {
                     </li>
                   ))}
                 </ul>
-                {service.investment && (
-                  <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                    <h4 className="text-sm font-medium text-primary mb-2">
-                      Inversión:
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      {service.investment}
-                    </p>
-                  </div>
-                )}
               </div>
 
               <Button
