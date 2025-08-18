@@ -133,7 +133,11 @@ export function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <img src="/favicon.ico" alt="Academy by LaPieza" className="h-16" />
+            <img
+              src="/lovable-uploads/38bdff76-1a8c-4d71-a975-9058214f7ab1.png"
+              alt="Academy by LaPieza"
+              className="h-16"
+            />
           </div>
           <p className="text-muted-foreground">
             {isLogin

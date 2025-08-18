@@ -433,7 +433,7 @@ function DashboardOverview({
 }) {
   const coachInfo = {
     name: "María González",
-    photo: "/placeholder.svg",
+    photo: "/lovable-uploads/team-collaboration.png",
     whatsappLink:
       "https://wa.me/+523337872943?text=Hola%20María,%20necesito%20ayuda%20con%20mi%20desarrollo%20profesional",
     availability: "Disponible",
