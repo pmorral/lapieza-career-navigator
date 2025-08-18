@@ -300,7 +300,7 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
             <div className={`p-6 ${sidebarCollapsed ? "px-2" : "px-6"}`}>
               <div className="flex justify-center mb-2">
                 <img
-                  src="/favicon.ico"
+                  src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
                   alt="Academy by LaPieza"
                   className={`h-8 ${sidebarCollapsed ? "scale-90" : ""}`}
                 />
