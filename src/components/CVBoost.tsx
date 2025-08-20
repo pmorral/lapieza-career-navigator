@@ -530,10 +530,10 @@ export function CVBoost() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Personal Information Section */}
+            {/* 1. Personal Information Section */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">📝 Información Personal</h3>
+                <h3 className="font-medium">👤 Nombre + Headline + Datos de Contacto</h3>
                 <Button
                   onClick={() => copyToClipboard(currentResult.sections?.personal || "Información personal optimizada")}
                   variant="outline"
@@ -544,16 +544,16 @@ export function CVBoost() {
                 </Button>
               </div>
               <Textarea
-                value={currentResult.sections?.personal || "Información de contacto profesional optimizada con elementos clave para ATS."}
+                value={currentResult.sections?.personal || "Nombre completo\nHeadline profesional\nEmail | Teléfono | Ciudad | LinkedIn\n[Abierto a reubicación - solo si aplicó]\n[Portafolio - si aplica]"}
                 readOnly
-                className="min-h-[80px]"
+                className="min-h-[120px]"
               />
             </div>
 
-            {/* Professional Summary */}
+            {/* 2. Professional Summary */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">🎯 Perfil Profesional</h3>
+                <h3 className="font-medium">🎯 Perfil Profesional (máx. 4 líneas)</h3>
                 <Button
                   onClick={() => copyToClipboard(currentResult.sections?.summary || currentResult.improvedContent.split('\n').slice(0, 5).join('\n'))}
                   variant="outline"
@@ -564,13 +564,13 @@ export function CVBoost() {
                 </Button>
               </div>
               <Textarea
-                value={currentResult.sections?.summary || currentResult.improvedContent.split('\n').slice(0, 5).join('\n')}
+                value={currentResult.sections?.summary || "Perfil profesional conciso que describe experiencia, habilidades principales, sector y objetivo profesional."}
                 readOnly
                 className="min-h-[120px]"
               />
             </div>
 
-            {/* Experience Section */}
+            {/* 3. Experience Section */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium">💼 Experiencia Profesional</h3>
@@ -584,13 +584,73 @@ export function CVBoost() {
                 </Button>
               </div>
               <Textarea
-                value={currentResult.sections?.experience || "Experiencia profesional con logros cuantificados y palabras clave del sector."}
+                value={currentResult.sections?.experience || "Las 4-5 experiencias más recientes con 3-7 bullets cada una. Redacción según idioma: ES (pasado 1ra persona/actual infinitivo), EN (pasado/actual gerundio)."}
                 readOnly
-                className="min-h-[150px]"
+                className="min-h-[200px]"
               />
             </div>
 
-            {/* Education Section */}
+            {/* 4. Projects Section (Solo para junior/transición) */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">🚀 Proyectos (solo perfiles junior/transición)</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.projects || "Proyectos destacados")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.projects || "Proyectos relevantes que complementen la experiencia profesional, especialmente para perfiles junior o en transición de carrera."}
+                readOnly
+                className="min-h-[120px]"
+              />
+            </div>
+
+            {/* 5. Skills Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">🛠️ Skills</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.skills || "Habilidades técnicas y blandas")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.skills || "Hard Skills (Básico/Intermedio/Avanzado)\nSoft Skills (Bajo/Medio/Alto)"}
+                readOnly
+                className="min-h-[120px]"
+              />
+            </div>
+
+            {/* 6. Certifications/Courses Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium">📚 Cursos</h3>
+                <Button
+                  onClick={() => copyToClipboard(currentResult.sections?.certifications || "Cursos y certificaciones")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+              <Textarea
+                value={currentResult.sections?.certifications || "Cursos, certificaciones y formación continua relevante para el puesto objetivo."}
+                readOnly
+                className="min-h-[100px]"
+              />
+            </div>
+
+            {/* 7. Education Section */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium">🎓 Educación</h3>
@@ -604,53 +664,13 @@ export function CVBoost() {
                 </Button>
               </div>
               <Textarea
-                value={currentResult.sections?.education || "Formación académica con énfasis en elementos relevantes para el puesto objetivo."}
+                value={currentResult.sections?.education || "Formación académica formal: títulos, instituciones, fechas y logros académicos relevantes."}
                 readOnly
                 className="min-h-[100px]"
               />
             </div>
 
-            {/* Skills Section */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">🛠️ Habilidades</h3>
-                <Button
-                  onClick={() => copyToClipboard(currentResult.sections?.skills || "Habilidades técnicas y blandas")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copiar
-                </Button>
-              </div>
-              <Textarea
-                value={currentResult.sections?.skills || "Habilidades técnicas y blandas categorizadas por relevancia para el puesto objetivo."}
-                readOnly
-                className="min-h-[100px]"
-              />
-            </div>
-
-            {/* Certifications Section */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">🏆 Certificaciones</h3>
-                <Button
-                  onClick={() => copyToClipboard(currentResult.sections?.certifications || "Certificaciones profesionales")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copiar
-                </Button>
-              </div>
-              <Textarea
-                value={currentResult.sections?.certifications || "Certificaciones profesionales y formación continua relevante."}
-                readOnly
-                className="min-h-[80px]"
-              />
-            </div>
-
-            {/* Languages Section */}
+            {/* 8. Languages Section */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium">🌍 Idiomas</h3>
@@ -664,107 +684,7 @@ export function CVBoost() {
                 </Button>
               </div>
               <Textarea
-                value={currentResult.sections?.languages || "Idiomas con niveles de competencia claramente definidos."}
-                readOnly
-                className="min-h-[80px]"
-              />
-            </div>
-
-            {/* Projects Section */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">🚀 Proyectos</h3>
-                <Button
-                  onClick={() => copyToClipboard(currentResult.sections?.projects || "Proyectos destacados")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copiar
-                </Button>
-              </div>
-              <Textarea
-                value={currentResult.sections?.projects || "Proyectos destacados con resultados medibles y tecnologías utilizadas."}
-                readOnly
-                className="min-h-[120px]"
-              />
-            </div>
-
-            {/* Achievements Section */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">⭐ Logros</h3>
-                <Button
-                  onClick={() => copyToClipboard(currentResult.sections?.achievements || "Logros profesionales")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copiar
-                </Button>
-              </div>
-              <Textarea
-                value={currentResult.sections?.achievements || "Logros profesionales, premios y reconocimientos con métricas específicas."}
-                readOnly
-                className="min-h-[100px]"
-              />
-            </div>
-
-            {/* Volunteer Section */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">🤝 Voluntariado</h3>
-                <Button
-                  onClick={() => copyToClipboard(currentResult.sections?.volunteer || "Experiencia de voluntariado")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copiar
-                </Button>
-              </div>
-              <Textarea
-                value={currentResult.sections?.volunteer || "Experiencia de voluntariado que demuestra liderazgo y compromiso social."}
-                readOnly
-                className="min-h-[80px]"
-              />
-            </div>
-
-            {/* Interests Section */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">🎨 Intereses</h3>
-                <Button
-                  onClick={() => copyToClipboard(currentResult.sections?.interests || "Intereses profesionales")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copiar
-                </Button>
-              </div>
-              <Textarea
-                value={currentResult.sections?.interests || "Intereses profesionales que complementan el perfil y muestran soft skills."}
-                readOnly
-                className="min-h-[80px]"
-              />
-            </div>
-
-            {/* Additional Information */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium">📋 Información Adicional</h3>
-                <Button
-                  onClick={() => copyToClipboard(currentResult.sections?.additional || "Información adicional relevante")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copiar
-                </Button>
-              </div>
-              <Textarea
-                value={currentResult.sections?.additional || "Publicaciones, conferencias, membresías profesionales y otra información relevante."}
+                value={currentResult.sections?.languages || "Idiomas con niveles de competencia claramente definidos (Básico, Intermedio, Avanzado, Nativo)."}
                 readOnly
                 className="min-h-[80px]"
               />
