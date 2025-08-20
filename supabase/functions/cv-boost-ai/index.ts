@@ -50,7 +50,9 @@ serve(async (req) => {
 
     const prompt = `Eres un experto senior en recursos humanos, ATS (Applicant Tracking Systems) y optimización de CVs. 
 
-Analiza el siguiente CV y optimízalo según estas preferencias:
+A partir del CV del usuario, reorganiza, mejora la redacción y entrega un CV completo ya redactado, siguiendo la estructura definida. No expliques cómo hacerlo ni des plantillas vacías: redacta directamente el contenido final.
+
+Preferencias del usuario:
 - Idioma: ${preferences.language}
 - Puesto objetivo: ${preferences.targetPosition}
 - Disponible para reubicación: ${preferences.relocation}
@@ -58,55 +60,53 @@ Analiza el siguiente CV y optimízalo según estas preferencias:
 CV a analizar:
 ${cvContent}
 
-INSTRUCCIONES ESPECÍFICAS PARA LA ESTRUCTURA DEL CV:
+⚠️ IMPORTANTE: No inventes información nueva. Solo utiliza lo que ya existe en el CV original. Si faltan logros cuantificables, menciona en el feedback final que el usuario debe agregarlos.
 
 A. ENCABEZADO:
-   - Nombre completo
-   - Agregar un headline profesional debajo del nombre con la posición deseada o frase que resuma el perfil
-   - Datos de contacto: Email, Tel, Ciudad, LinkedIn
-   - "Abierto a reubicación" SOLO si el usuario respondió "Sí" a la pregunta
-   - Portafolio (solo si aplica al perfil)
+Incluye el nombre del candidato y sus datos de contacto.
+Agrega un headline profesional debajo del nombre con la posición deseada o una frase breve que resuma el perfil.
 
-B. PERFIL PROFESIONAL (máximo 4 líneas):
-   - Describe el perfil del candidato
-   - Años de experiencia (si tiene más de 2 años)
-   - Principales habilidades
-   - Sector profesional
-   - Objetivo profesional
+B. PERFIL PROFESIONAL (máx. 4 líneas):
+Redacta un resumen profesional breve:
+- Menciona años de experiencia (solo si son más de 2).
+- Principales habilidades y sector.
+- Objetivo profesional alineado al puesto buscado.
 
 C. EXPERIENCIA PROFESIONAL:
-   - Si el perfil es Senior (más de 8 años): incluye hasta 5 experiencias, CV puede ser hasta 2 páginas
-   - Si el perfil tiene menos de 8 años: incluye solo las 4 experiencias más recientes, CV limitado a 1 página
-   - Entre 3 y 7 bullets por experiencia
-   - Redacción según idioma:
-     * Inglés: verbos en pasado; trabajo actual en gerundio
-     * Español: verbos en pasado en primera persona; trabajo actual en infinitivo
-   - Cada viñeta debe responder: ¿Qué hiciste y para qué?
-   - Resalta logros cuantificables y actividades clave alineadas al puesto
+Incluye únicamente las 4 experiencias más recientes (5 si el perfil es Senior con +8 años).
+Limita la extensión:
+- Perfil junior/intermedio (<8 años): máximo 1 página.
+- Perfil senior (>8 años): máximo 2 páginas.
+Cada experiencia con 3 a 7 viñetas.
+Redacción según idioma:
+- Inglés: verbos en pasado; trabajo actual en gerundio.
+- Español: verbos en pasado en primera persona; trabajo actual en infinitivo.
+Cada viñeta debe responder: qué hiciste y para qué, destacando logros y resultados medibles.
 
 D. SKILLS:
-   - Extrae del CV palabras clave y clasifica en:
-     * Hard Skills (con nivel: Básico, Intermedio, Avanzado)
-     * Soft Skills (con nivel: Bajo, Medio, Alto)
+Clasifica las competencias extraídas del CV en:
+- Hard Skills (con nivel: Básico, Intermedio, Avanzado).
+- Soft Skills (con nivel: Bajo, Medio, Alto).
 
-E. ESTRUCTURA FINAL DEL CV (en este orden):
-   1. Nombre + Headline
-   2. Datos de contacto
-   3. Perfil profesional
-   4. Experiencia profesional
-   5. Proyectos (solo si es perfil junior o en transición)
-   6. Skills
-   7. Cursos
-   8. Educación
-   9. Idiomas
+E. ESTRUCTURA FINAL DEL CV:
+El resultado final debe tener este orden:
+1. Nombre
+2. Datos de contacto (Email, Tel, Ciudad, LinkedIn, Portafolio si aplica, Disponibilidad de reubicación solo si se indicó)
+3. Headline profesional
+4. Perfil profesional
+5. Experiencia profesional
+6. Proyectos (solo si es perfil junior o en transición)
+7. Skills
+8. Cursos
+9. Educación
+10. Idiomas
 
 F. CAMBIO DE CARRERA O CV MAL ORIENTADO:
-   - Si el perfil indica cambio de área o CV no enfocado al puesto objetivo:
-   - Reescribe puestos y funciones con enfoque alineado a la nueva área
-   - Usa habilidades transferibles que tengan relación con el nuevo objetivo
-   - Ajusta redacción con base en lo que el puesto requiere
+Si el perfil indica un cambio de área o está poco enfocado:
+- Reescribe la experiencia resaltando habilidades transferibles y tareas relacionadas con el nuevo objetivo.
+- Ajusta la redacción priorizando lo que aporta al puesto meta, no solo lo que la persona hizo.
 
-CRÍTICO: NO agregues logros, tareas o skills que no estén presentes en el CV original. Solo reorganiza, mejora redacción y alinea a la descripción del puesto. Si el CV original no tiene logros cuantificables, indica en el feedback que el usuario debe agregarlos.
+FEEDBACK: Agrega un bloque con recomendaciones puntuales para mejorar (ejemplo: "Agrega logros cuantificables como % de mejora, métricas de ahorro o crecimiento alcanzado").
 
 FEEDBACK SIEMPRE EN ESPAÑOL: La sección "feedback" SIEMPRE debe estar en español, independientemente del idioma solicitado para el CV.
 
