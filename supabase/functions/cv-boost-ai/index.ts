@@ -58,49 +58,81 @@ Analiza el siguiente CV y optimízalo según estas preferencias:
 CV a analizar:
 ${cvContent}
 
-IMPORTANTE: Debes generar un CV completamente estructurado con TODAS las secciones, incluso si no están presentes en el CV original. Usa tu experiencia para inferir y crear contenido profesional relevante.
+INSTRUCCIONES ESPECÍFICAS PARA LA ESTRUCTURA DEL CV:
 
-FEEDBACK SIEMPRE EN ESPAÑOL: La sección "feedback" SIEMPRE debe estar en español, independientemente del idioma solicitado para el CV. Solo el contenido del CV optimizado debe estar en el idioma solicitado.
+A. ENCABEZADO:
+   - Nombre completo
+   - Agregar un headline profesional debajo del nombre con la posición deseada o frase que resuma el perfil
+   - Datos de contacto: Email, Tel, Ciudad, LinkedIn
+   - "Abierto a reubicación" SOLO si el usuario respondió "Sí" a la pregunta
+   - Portafolio (solo si aplica al perfil)
 
-Debes responder en el siguiente formato JSON:
+B. PERFIL PROFESIONAL (máximo 4 líneas):
+   - Describe el perfil del candidato
+   - Años de experiencia (si tiene más de 2 años)
+   - Principales habilidades
+   - Sector profesional
+   - Objetivo profesional
+
+C. EXPERIENCIA PROFESIONAL:
+   - Si el perfil es Senior (más de 8 años): incluye hasta 5 experiencias, CV puede ser hasta 2 páginas
+   - Si el perfil tiene menos de 8 años: incluye solo las 4 experiencias más recientes, CV limitado a 1 página
+   - Entre 3 y 7 bullets por experiencia
+   - Redacción según idioma:
+     * Inglés: verbos en pasado; trabajo actual en gerundio
+     * Español: verbos en pasado en primera persona; trabajo actual en infinitivo
+   - Cada viñeta debe responder: ¿Qué hiciste y para qué?
+   - Resalta logros cuantificables y actividades clave alineadas al puesto
+
+D. SKILLS:
+   - Extrae del CV palabras clave y clasifica en:
+     * Hard Skills (con nivel: Básico, Intermedio, Avanzado)
+     * Soft Skills (con nivel: Bajo, Medio, Alto)
+
+E. ESTRUCTURA FINAL DEL CV (en este orden):
+   1. Nombre + Headline
+   2. Datos de contacto
+   3. Perfil profesional
+   4. Experiencia profesional
+   5. Proyectos (solo si es perfil junior o en transición)
+   6. Skills
+   7. Cursos
+   8. Educación
+   9. Idiomas
+
+F. CAMBIO DE CARRERA O CV MAL ORIENTADO:
+   - Si el perfil indica cambio de área o CV no enfocado al puesto objetivo:
+   - Reescribe puestos y funciones con enfoque alineado a la nueva área
+   - Usa habilidades transferibles que tengan relación con el nuevo objetivo
+   - Ajusta redacción con base en lo que el puesto requiere
+
+CRÍTICO: NO agregues logros, tareas o skills que no estén presentes en el CV original. Solo reorganiza, mejora redacción y alinea a la descripción del puesto. Si el CV original no tiene logros cuantificables, indica en el feedback que el usuario debe agregarlos.
+
+FEEDBACK SIEMPRE EN ESPAÑOL: La sección "feedback" SIEMPRE debe estar en español, independientemente del idioma solicitado para el CV.
+
+Responde en el siguiente formato JSON:
 {
   "feedback": [
-    "lista detallada de puntos de mejora detectados en el CV original - SIEMPRE EN ESPAÑOL"
+    "lista detallada de puntos de mejora detectados en el CV original - SIEMPRE EN ESPAÑOL. Si no hay logros cuantificables, menciona que debe agregarlos"
   ],
-  "optimizedCV": "CV completo optimizado en formato texto profesional",
+  "optimizedCV": "CV completo optimizado siguiendo la estructura especificada",
   "sections": {
-    "personal": "Información de contacto profesional optimizada (nombre, teléfono, email, ubicación, LinkedIn)",
-    "summary": "Perfil profesional de 3-4 líneas que resuma experiencia clave y valor agregado para el puesto objetivo",
-    "experience": "Experiencia profesional con logros cuantificados, usando palabras clave del sector y métrica específicas",
-    "education": "Formación académica incluyendo títulos, instituciones, fechas y logros académicos relevantes",
-    "skills": "Habilidades técnicas y blandas categorizadas y relevantes para el puesto objetivo",
-    "certifications": "Certificaciones profesionales, cursos relevantes y formación continua",
-    "languages": "Idiomas con niveles de competencia claramente definidos",
-    "projects": "Proyectos destacados con resultados medibles y tecnologías utilizadas",
-    "achievements": "Logros profesionales, premios, reconocimientos y métricas de desempeño",
-    "volunteer": "Experiencia de voluntariado y actividades extracurriculares que agreguen valor",
-    "interests": "Intereses profesionales que complementen el perfil y muestren soft skills",
-    "additional": "Información adicional relevante como publicaciones, conferencias, membresías profesionales"
+    "personal": "Nombre + headline + datos de contacto",
+    "summary": "Perfil profesional de máximo 4 líneas",
+    "experience": "Experiencia profesional con 3-7 bullets por puesto, limitada según años de experiencia",
+    "skills": "Hard Skills (Básico/Intermedio/Avanzado) y Soft Skills (Bajo/Medio/Alto)",
+    "projects": "Proyectos (solo para perfiles junior o en transición)",
+    "education": "Formación académica",
+    "certifications": "Cursos y certificaciones",
+    "languages": "Idiomas con niveles"
   },
   "keywords": [
-    "lista de palabras clave específicas del sector y puesto objetivo que se incluyeron en el CV"
+    "palabras clave específicas del sector incluidas en el CV"
   ],
   "improvements": [
-    "lista detallada de mejoras aplicadas"
+    "mejoras aplicadas siguiendo la estructura especificada"
   ]
-}
-
-REQUISITOS ESPECÍFICOS:
-1. **Análisis de palabras clave**: Identifica e incluye términos técnicos, habilidades y conceptos específicos del puesto objetivo que mejoren la visibilidad en ATS
-2. **Sinónimos estratégicos**: Usa variaciones de términos clave para maximizar coincidencias de búsqueda
-3. **Cuantificación obligatoria**: Todos los logros deben incluir números, porcentajes, fechas o métricas específicas
-4. **Optimización ATS**: Estructura y formato que sea fácil de leer por sistemas de seguimiento de candidatos
-5. **Adaptación al puesto**: Todo el contenido debe estar alineado con el puesto objetivo mencionado
-6. **Completitud**: Genera contenido para TODAS las secciones, incluso si no están en el CV original
-7. **Profesionalismo**: Lenguaje formal, claro y orientado a resultados
-8. **Relevancia sectorial**: Incluye terminología y conceptos específicos de la industria del puesto objetivo
-
-Cada sección debe ser sustancial y profesional, no genérica. Si falta información en el CV original, infiere y crea contenido profesional coherente basado en el puesto objetivo.`;
+}`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
