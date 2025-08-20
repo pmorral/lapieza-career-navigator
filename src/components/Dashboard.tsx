@@ -68,6 +68,13 @@ import { PaymentSettings } from "./PaymentSettings";
 import { JobSuccess } from "./JobSuccess";
 import { Progress } from "@/components/ui/progress";
 
+// Import template preview images
+import templateExecutivePreview from "@/assets/executive-resume.png";
+import templateCreativePreview from "@/assets/graduate-resume.png";
+import templateTechPreview from "@/assets/bussines-resume.png";
+import templateMinimalPreview from "@/assets/clasic-resume.png";
+import templateAtsPreview from "@/assets/last-resume.png";
+
 interface DashboardProps {
   defaultSection?: string;
 }
@@ -930,13 +937,6 @@ function MembershipDetails() {
     </div>
   );
 }
-
-// Import template preview images
-import templateExecutivePreview from "@/assets/template-executive-preview.jpg";
-import templateCreativePreview from "@/assets/template-creative-preview.jpg";
-import templateTechPreview from "@/assets/template-tech-preview.jpg";
-import templateMinimalPreview from "@/assets/template-minimal-preview.jpg";
-import templateAtsPreview from "@/assets/template-ats-preview.jpg";
 
 function CVTemplatesPreview({
   setActiveSection,
