@@ -88,6 +88,7 @@ export const usePayment = () => {
         return {
           payment_status: "unpaid",
           subscription_id: null,
+          customer_id: null,
           expires_at: null,
           created_at: null,
         };

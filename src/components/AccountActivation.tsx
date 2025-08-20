@@ -33,7 +33,7 @@ export function AccountActivation({ onComplete }: AccountActivationProps) {
 
       try {
         // Verificar suscripción
-        const subscriptionOk = await checkSubscriptionStatus();
+        const subscriptionOk = await checkSubscriptionStatus(user);
 
         if (!emailVerified) {
           setCurrentStep("email");
@@ -55,7 +55,7 @@ export function AccountActivation({ onComplete }: AccountActivationProps) {
   const handleEmailVerificationSuccess = async () => {
     try {
       // Verificar suscripción después de verificar email
-      const subscriptionOk = await checkSubscriptionStatus();
+      const subscriptionOk = await checkSubscriptionStatus(user);
 
       if (subscriptionOk) {
         setCurrentStep("complete");

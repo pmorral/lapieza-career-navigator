@@ -69,38 +69,39 @@ export function LandingPage() {
     },
     {
       icon: UserCheck,
-      title: "Comunidad en Vivo",
-      description: "Sesiones grupales y networking con profesionales",
+      title: "Seguimiento con un Career Coach",
+      description: "Acompañamiento personalizado en tu proceso de búsqueda laboral",
     },
   ];
 
   const benefits = [
     "Acceso completo a todas las herramientas de empleabilidad",
-    "Sesiones grupales cada 2 semanas por 5 meses",
+    "Sesiones grupales cada 2 semanas",
     "Templates profesionales para comunicación laboral",
+    "Seguimiento con un Career Coach",
     "Actualizaciones gratuitas de contenido y herramientas",
   ];
 
   const testimonials = [
     {
-      name: "Ana García",
-      role: "Marketing Manager",
+      name: "Álvaro Villa Ruiz",
+      role: "Client Implementation Specialist",
       content:
-        "Gracias a LaPieza Academy conseguí mi trabajo soñado en menos de 2 meses. Las herramientas son increíbles.",
+        "Muy buen servicio y apoyo durante el proceso, mantienen comunicación muy transparente y ayuda mucho a perfilar tus aplicaciones.",
       rating: 5,
     },
     {
-      name: "Carlos Mendoza",
-      role: "Software Developer",
+      name: "Brenda Arteche",
+      role: "Diseñador Gráfico",
       content:
-        "El programa me ayudó a optimizar mi perfil y mejorar mis habilidades de entrevista. 100% recomendado.",
+        "El apoyo con la optimización de LinkedIn es tan buena que incluso ahora que no me encuentro buscando trabajo, de vez en cuando me buscan para proponerme ofertas laborales",
       rating: 5,
     },
     {
-      name: "María López",
-      role: "Project Manager",
+      name: "Luis Contreras",
+      role: "Desarrollador Full Stack",
       content:
-        "La mentoría personalizada fue clave para mi transición profesional. Valió cada peso invertido.",
+        "Contraté los servicios de LaPieza y estoy más que satisfecho con los resultados. Gracias a la orientación y apoyo de sus coaches altamente calificados, logré obtener un nuevo empleo que se ajusta perfectamente a mis objetivos y aspiraciones. Su enfoque personalizado me ayudó a identificar mi valor en el mercado, mejorar mi perfil profesional, prepararme para entrevistas y encontrar el ambiente ideal para mí. Altamente recomendados!",
       rating: 5,
     },
   ];
@@ -175,8 +176,7 @@ export function LandingPage() {
 
             <p className="text-xl md:text-2xl mb-8 text-muted-foreground max-w-3xl mx-auto">
               Conviértete en el candidato ideal. Domina tu búsqueda laboral con
-              IA, sesiones grupales, templates profesionales y recursos
-              actualizados durante 5 meses.
+              IA, sesiones grupales, templates profesionales y seguimiento con un Career Coach.
             </p>
 
             <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center">
@@ -291,14 +291,6 @@ export function LandingPage() {
                 disponibles en Academy by LaPieza para impulsar tu carrera
                 profesional.
               </CardDescription>
-              <Button
-                size="lg"
-                className="text-lg px-8 py-4"
-                onClick={() => navigate("/login")}
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Ver Demo Completo
-              </Button>
             </CardContent>
           </Card>
         </div>
@@ -490,7 +482,7 @@ export function LandingPage() {
             <div className="flex flex-col gap-4">
               <div className="flex justify-center gap-4">
                 <a
-                  href="https://linkedin.com/company/academy-lapieza"
+                  href="https://www.linkedin.com/company/academy-by-lapieza/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
@@ -504,7 +496,7 @@ export function LandingPage() {
                   </svg>
                 </a>
                 <a
-                  href="https://tiktok.com/@academylapieza"
+                  href="https://www.tiktok.com/@academybylapieza"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
@@ -518,7 +510,7 @@ export function LandingPage() {
                   </svg>
                 </a>
                 <a
-                  href="https://instagram.com/academy.lapieza"
+                  href="https://www.instagram.com/academybylapieza/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"

@@ -39,12 +39,13 @@ export function useServices() {
       setLoading(true);
       setError(null);
 
-      // Obtener servicios directamente de la tabla services
-      const { data, error: fetchError } = await supabase
-        .from("services")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("purchased_at", { ascending: false });
+      // Obtener servicios desde el edge function
+      const { data, error: fetchError } = await supabase.functions.invoke(
+        "get-user-services",
+        {
+          body: { user_id: user.id },
+        }
+      );
 
       if (fetchError) {
         console.error("Error fetching services:", fetchError);
@@ -52,7 +53,7 @@ export function useServices() {
         return;
       }
 
-      setServices(data || []);
+      setServices(data?.services || []);
     } catch (err) {
       console.error("Exception fetching services:", err);
       setError("Error inesperado al cargar los servicios");

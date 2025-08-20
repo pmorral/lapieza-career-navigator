@@ -73,5 +73,5 @@ export const PaymentPage = lazy(() =>
 );
 
 export const NotFound = lazy(() =>
-  import("./pages/NotFound").then((module) => ({ default: module.NotFound }))
+  import("./pages/NotFound")
 );
