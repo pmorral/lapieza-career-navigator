@@ -14,8 +14,10 @@ serve(async (req) => {
   }
 
   try {
-    const { personalCVBase64, linkedinCVBase64 } = await req.json();
+    const { personalCVBase64, linkedinProfile, language = 'español' } = await req.json();
     console.log('Received request with personalCVBase64 length:', personalCVBase64?.length || 0);
+    console.log('LinkedIn profile received:', linkedinProfile ? 'Yes' : 'No');
+    console.log('Language preference:', language);
 
     if (!personalCVBase64) {
       throw new Error('No personal CV file provided');
@@ -42,62 +44,66 @@ serve(async (req) => {
       personalCVContent = "Personal CV content from uploaded PDF file";
     }
 
-    // Extract text from LinkedIn CV if provided
-    let linkedinCVContent = null;
-    if (linkedinCVBase64) {
+    // Process LinkedIn profile data from external API
+    let linkedinProfileContent = null;
+    if (linkedinProfile && linkedinProfile.data) {
       try {
-        const linkedinPdfBuffer = Uint8Array.from(atob(linkedinCVBase64), c => c.charCodeAt(0));
-        console.log('LinkedIn PDF buffer size:', linkedinPdfBuffer.length);
+        // Extract relevant information from the LinkedIn profile API response
+        const profile = linkedinProfile.data;
+        const profileSections = [];
         
-        const pdfString = new TextDecoder('utf-8', {ignoreBOM: true, fatal: false}).decode(linkedinPdfBuffer);
-        const textMatches = pdfString.match(/\((.*?)\)/g) || [];
-        const extractedLines = textMatches
-          .map(match => match.slice(1, -1))
-          .filter(text => text.length > 2 && /[a-zA-Z]/.test(text))
-          .join(' ');
+        if (profile.full_name) profileSections.push(`Nombre: ${profile.full_name}`);
+        if (profile.headline) profileSections.push(`Titular: ${profile.headline}`);
+        if (profile.summary) profileSections.push(`Resumen: ${profile.summary}`);
+        if (profile.location) profileSections.push(`Ubicación: ${profile.location}`);
+        if (profile.industry) profileSections.push(`Industria: ${profile.industry}`);
         
-        linkedinCVContent = extractedLines.length > 50 ? extractedLines : 
-          `Perfil de LinkedIn con información profesional relevante.`;
-      } catch (pdfError) {
-        console.error('LinkedIn PDF parsing error:', pdfError);
-        linkedinCVContent = "LinkedIn CV content from uploaded PDF file";
+        if (profile.experience && Array.isArray(profile.experience)) {
+          profile.experience.forEach((exp: any, index: number) => {
+            profileSections.push(`Experiencia ${index + 1}: ${exp.title || 'Título no especificado'} en ${exp.company || 'Empresa no especificada'}`);
+            if (exp.description) profileSections.push(`Descripción: ${exp.description}`);
+          });
+        }
+        
+        if (profile.education && Array.isArray(profile.education)) {
+          profile.education.forEach((edu: any, index: number) => {
+            profileSections.push(`Educación ${index + 1}: ${edu.degree || 'Grado no especificado'} en ${edu.school || 'Institución no especificada'}`);
+          });
+        }
+        
+        if (profile.skills && Array.isArray(profile.skills)) {
+          profileSections.push(`Habilidades: ${profile.skills.join(', ')}`);
+        }
+        
+        linkedinProfileContent = profileSections.join('\n');
+        console.log('LinkedIn profile content extracted successfully');
+      } catch (profileError) {
+        console.error('LinkedIn profile parsing error:', profileError);
+        linkedinProfileContent = "LinkedIn profile content from external API";
       }
     }
 
-    const prompt = `Eres un experto senior en LinkedIn, marketing personal, personal branding y optimización de perfiles profesionales. 
+    // Determine the primary language for the prompt
+    const isEnglish = language === 'inglés' || language === 'english';
+    const primaryLanguage = isEnglish ? 'English' : 'Spanish';
+    const secondaryLanguage = isEnglish ? 'Spanish' : 'English';
 
-Analiza el siguiente CV personal${linkedinCVContent ? ' y el CV de LinkedIn' : ''} para generar contenido completamente optimizado para LinkedIn.
+    const prompt = `You are a senior expert in LinkedIn, personal marketing, personal branding, and professional profile optimization.
 
-CV Personal:
+Analyze the following personal CV${linkedinProfileContent ? ' and the current LinkedIn profile' : ''} to generate completely optimized content for LinkedIn.
+
+Personal CV:
 ${personalCVContent}
 
-${linkedinCVContent ? `CV de LinkedIn actual:\n${linkedinCVContent}\n` : ''}
+${linkedinProfileContent ? `Current LinkedIn Profile:\n${linkedinProfileContent}\n` : ''}
 
-IMPORTANTE: Debes crear contenido profesional específico y relevante, no genérico. Analiza el perfil e incluye palabras clave específicas del sector profesional detectado.
+IMPORTANT: You must create specific and relevant professional content, not generic. Analyze the profile and include specific keywords from the detected professional sector.
 
-OBLIGATORIO: Todas las secciones deben tener contenido válido y completo. NO dejes ninguna sección vacía o con texto genérico.
+MANDATORY: All sections must have valid and complete content. DO NOT leave any section empty or with generic text.
 
-Genera contenido profesional para LinkedIn en ESPAÑOL y INGLÉS con el siguiente formato JSON:
+Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and ${secondaryLanguage.toUpperCase()} with the following JSON format:
 {
-  "spanish": {
-    "headline": "titular profesional de máximo 220 caracteres, optimizado con palabras clave del sector",
-    "summary": "resumen profesional de 3-4 párrafos (máximo 2600 caracteres) con emojis estratégicos, que incluya propuesta de valor, experiencia clave, logros cuantificados y call-to-action",
-    "experiences": [
-      {
-        "title": "título del puesto",
-        "company": "nombre de la empresa",
-        "description": "descripción detallada con logros específicos, métricas cuantificadas y palabras clave del sector (mínimo 150 caracteres)"
-      }
-    ],
-    "education": "formación académica con contexto relevante, proyectos destacados y logros académicos (mínimo 100 caracteres)",
-    "skills": ["al menos 10 habilidades técnicas y blandas específicas del sector"],
-    "certifications": "certificaciones profesionales con fechas, instituciones y relevancia para el sector (mínimo 80 caracteres)",
-    "projects": "proyectos profesionales destacados con resultados medibles, tecnologías usadas y impacto (mínimo 120 caracteres)",
-    "volunteer": "experiencia de voluntariado que demuestre liderazgo, valores y habilidades transferibles (mínimo 80 caracteres)",
-    "accomplishments": "logros específicos, premios, reconocimientos, publicaciones o presentaciones relevantes (mínimo 80 caracteres)",
-    "interests": "intereses profesionales que complementen el perfil y muestren pasión por el sector (mínimo 60 caracteres)"
-  },
-  "english": {
+  "${primaryLanguage === 'Spanish' ? 'spanish' : 'english'}": {
     "headline": "professional headline max 220 characters, optimized with industry keywords",
     "summary": "professional summary 3-4 paragraphs (max 2600 characters) with strategic emojis, including value proposition, key experience, quantified achievements and call-to-action",
     "experiences": [
@@ -115,29 +121,47 @@ Genera contenido profesional para LinkedIn en ESPAÑOL y INGLÉS con el siguient
     "accomplishments": "specific achievements, awards, recognition, publications or relevant presentations (minimum 80 characters)",
     "interests": "professional interests that complement profile and show passion for the industry (minimum 60 characters)"
   },
+  "${secondaryLanguage === 'Spanish' ? 'spanish' : 'english'}": {
+    "headline": "titular profesional de máximo 220 caracteres, optimizado con palabras clave del sector",
+    "summary": "resumen profesional de 3-4 párrafos (máximo 2600 caracteres) con emojis estratégicos, que incluya propuesta de valor, experiencia clave, logros cuantificados y call-to-action",
+    "experiences": [
+      {
+        "title": "título del puesto",
+        "company": "nombre de la empresa",
+        "description": "descripción detallada con logros específicos, métricas cuantificadas y palabras clave del sector (mínimo 150 caracteres)"
+      }
+    ],
+    "education": "formación académica con contexto relevante, proyectos destacados y logros académicos (mínimo 100 caracteres)",
+    "skills": ["al menos 10 habilidades técnicas y blandas específicas del sector"],
+    "certifications": "certificaciones profesionales con fechas, instituciones y relevancia para el sector (mínimo 80 caracteres)",
+    "projects": "proyectos profesionales destacados con resultados medibles, tecnologías usadas e impacto (mínimo 120 caracteres)",
+    "volunteer": "experiencia de voluntariado que demuestre liderazgo, valores y habilidades transferibles (mínimo 80 caracteres)",
+    "accomplishments": "logros específicos, premios, reconocimientos, publicaciones o presentaciones relevantes (mínimo 80 caracteres)",
+    "interests": "intereses profesionales que complementen el perfil y muestren pasión por el sector (mínimo 60 caracteres)"
+  },
   "keywords_analysis": {
-    "primary_keywords": ["palabras", "clave", "principales", "del", "sector"],
-    "secondary_keywords": ["términos", "complementarios", "y", "sinónimos"],
-    "industry_terms": ["terminología", "específica", "del", "sector", "profesional"]
+    "primary_keywords": ["primary", "keywords", "from", "sector"],
+    "secondary_keywords": ["complementary", "terms", "and", "synonyms"],
+    "industry_terms": ["specific", "terminology", "from", "professional", "sector"]
   },
   "optimization_tips": [
-    "consejos específicos para maximizar la visibilidad del perfil en LinkedIn"
+    "specific tips to maximize profile visibility on LinkedIn"
   ]
 }
 
-REQUISITOS ESPECÍFICOS:
-1. **Análisis sectorial profundo**: Identifica el sector profesional y usa terminología específica
-2. **Palabras clave estratégicas**: Incluye términos que los reclutadores buscan en ese sector
-3. **Sinónimos y variaciones**: Usa diferentes formas de expresar las mismas competencias
-4. **Optimización de búsqueda**: El contenido debe ser encontrable por reclutadores
-5. **Personalización**: Adapta el tono y contenido al nivel de seniority del profesional
-6. **Storytelling profesional**: Cuenta una historia coherente de crecimiento profesional
-7. **Call-to-action específico**: Incluye invitación clara para contactar
-8. **Cuantificación obligatoria**: Todos los logros con números específicos
-9. **Relevancia actual**: Contenido alineado con tendencias actuales del sector
-10. **Diferenciación**: Destaca elementos únicos que distingan del resto de candidatos
+SPECIFIC REQUIREMENTS:
+1. **Deep sector analysis**: Identify the professional sector and use specific terminology
+2. **Strategic keywords**: Include terms that recruiters search for in that sector
+3. **Synonyms and variations**: Use different ways to express the same competencies
+4. **Search optimization**: Content must be findable by recruiters
+5. **Personalization**: Adapt tone and content to professional seniority level
+6. **Professional storytelling**: Tell a coherent story of professional growth
+7. **Specific call-to-action**: Include clear invitation to contact
+8. **Mandatory quantification**: All achievements with specific numbers
+9. **Current relevance**: Content aligned with current sector trends
+10. **Differentiation**: Highlight unique elements that distinguish from other candidates
 
-El contenido debe ser específico al perfil analizado, no genérico. Infiere el sector profesional y adapta todo el contenido en consecuencia.`;
+Content must be specific to the analyzed profile, not generic. Infer the professional sector and adapt all content accordingly.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -146,9 +170,9 @@ El contenido debe ser específico al perfil analizado, no genérico. Infiere el 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'Eres un experto en LinkedIn y marketing personal. Respondes siempre en formato JSON válido.' },
+          { role: 'system', content: 'You are an expert in LinkedIn and personal marketing. You always respond in valid JSON format.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.8,
@@ -168,6 +192,7 @@ El contenido debe ser específico al perfil analizado, no genérico. Infiere el 
     try {
       result = JSON.parse(aiResponse);
     } catch (e) {
+      console.error('JSON parsing error:', e);
       // Fallback if JSON parsing fails
       result = {
         spanish: {

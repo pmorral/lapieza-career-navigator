@@ -1,22 +1,121 @@
 import { useState, useEffect } from "react";
-import { Upload, Users, Copy, CheckCircle, AlertCircle, Linkedin, History, Calendar, Trash2 } from "lucide-react";
+import {
+  Upload,
+  Users,
+  Copy,
+  CheckCircle,
+  AlertCircle,
+  Linkedin,
+  History,
+  Calendar,
+  Trash2,
+  Globe,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import axios from "axios";
+
+// Define types for the LinkedIn optimization data
+interface LinkedInProfile {
+  data?: {
+    full_name?: string;
+    headline?: string;
+    summary?: string;
+    location?: string;
+    industry?: string;
+    experience?: Array<{
+      title?: string;
+      company?: string;
+      description?: string;
+    }>;
+    education?: Array<{
+      degree?: string;
+      school?: string;
+    }>;
+    skills?: string[];
+  };
+  success?: boolean;
+  info?: string;
+}
+
+interface OptimizedContent {
+  spanish: {
+    headline: string;
+    summary: string;
+    experiences?: Array<{
+      title: string;
+      company: string;
+      description: string;
+    }>;
+    experience?: string;
+    education?: string;
+    skills?: string[];
+    certifications?: string;
+    projects?: string;
+    volunteer?: string;
+    accomplishments?: string;
+    interests?: string;
+  };
+  english: {
+    headline: string;
+    summary: string;
+    experiences?: Array<{
+      title: string;
+      company: string;
+      description: string;
+    }>;
+    experience?: string;
+    education?: string;
+    skills?: string[];
+    certifications?: string;
+    projects?: string;
+    volunteer?: string;
+    accomplishments?: string;
+    interests?: string;
+  };
+  keywords_analysis?: {
+    primary_keywords: string[];
+    secondary_keywords: string[];
+    industry_terms: string[];
+  };
+  optimization_tips?: string[];
+}
+
+interface HistoryItem {
+  id: string;
+  personal_cv_filename: string;
+  linkedin_url?: string;
+  optimized_content: OptimizedContent;
+  created_at: string;
+}
 
 export function LinkedInOptimizer() {
+  const [linkedinUrl, setLinkedinUrl] = useState("");
   const [personalCV, setPersonalCV] = useState<File | null>(null);
-  const [linkedinCV, setLinkedinCV] = useState<File | null>(null);
-  const [language, setLanguage] = useState('');
-  const [optimizedContent, setOptimizedContent] = useState<any>(null);
+  const [language, setLanguage] = useState("");
+  const [optimizedContent, setOptimizedContent] =
+    useState<OptimizedContent | null>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [isFetchingProfile, setIsFetchingProfile] = useState(false);
+  const [linkedinProfile, setLinkedinProfile] =
+    useState<LinkedInProfile | null>(null);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [showForm, setShowForm] = useState(true);
   const { toast } = useToast();
 
   // Load history on component mount
@@ -26,38 +125,59 @@ export function LinkedInOptimizer() {
 
   const loadHistory = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         const { data, error } = await supabase
-          .from('linkedin_optimizations')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+          .from("linkedin_optimizations")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
         if (error) throw error;
-        setHistoryItems(data || []);
+
+        // Transform the data to match our interface
+        const transformedData: HistoryItem[] = (data || []).map(
+          (item: {
+            id: string;
+            personal_cv_filename: string;
+            linkedin_url?: string;
+            optimized_content: unknown;
+            created_at: string;
+          }) => ({
+            id: item.id,
+            personal_cv_filename: item.personal_cv_filename,
+            linkedin_url: item.linkedin_url,
+            optimized_content: item.optimized_content as OptimizedContent,
+            created_at: item.created_at,
+          })
+        );
+
+        setHistoryItems(transformedData);
       }
     } catch (error) {
-      console.error('Error loading history:', error);
+      console.error("Error loading history:", error);
     }
   };
 
   const deleteHistoryItem = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('linkedin_optimizations')
+        .from("linkedin_optimizations")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
-      
+
       await loadHistory();
       toast({
         title: "Eliminado",
-        description: "La optimización de LinkedIn ha sido eliminada del historial",
+        description:
+          "La optimización de LinkedIn ha sido eliminada del historial",
       });
     } catch (error) {
-      console.error('Error deleting history item:', error);
+      console.error("Error deleting history item:", error);
       toast({
         title: "Error",
         description: "No se pudo eliminar el elemento del historial",
@@ -66,7 +186,9 @@ export function LinkedInOptimizer() {
     }
   };
 
-  const handlePersonalCVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePersonalCVUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file && file.type === "application/pdf") {
       // Check file size (max 5MB)
@@ -92,120 +214,135 @@ export function LinkedInOptimizer() {
     }
   };
 
-  const handleLinkedInCVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type === "application/pdf") {
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Error",
-          description: "El archivo es demasiado grande. Máximo 5MB.",
-          variant: "destructive",
-        });
-        return;
-      }
-      setLinkedinCV(file);
+  const fetchLinkedInProfile = async () => {
+    if (!linkedinUrl.trim()) {
       toast({
-        title: "CV LinkedIn cargado",
-        description: "Tu CV de LinkedIn ha sido cargado correctamente",
-      });
-    } else {
-      toast({
-        title: "Tipo de archivo inválido",
-        description: "Por favor sube un archivo PDF",
+        title: "Error",
+        description: "Por favor ingresa una URL de LinkedIn válida",
         variant: "destructive",
       });
+      return;
+    }
+
+    setIsFetchingProfile(true);
+
+    try {
+      console.log("Fetching LinkedIn profile from:", linkedinUrl);
+
+      const response = await axios.post(
+        "https://us-central1-lapieza-production.cloudfunctions.net/getLinkedinProfile",
+        {
+          url1: linkedinUrl.trim(),
+        }
+      );
+
+      const data = response.data;
+      console.log("LinkedIn profile data:", data);
+
+      if (!data.success) {
+        throw new Error(data.info || "Error al obtener el perfil de LinkedIn");
+      }
+
+      setLinkedinProfile(data);
+      toast({
+        title: "Perfil obtenido",
+        description: "El perfil de LinkedIn se ha obtenido correctamente",
+      });
+    } catch (error) {
+      console.error("Error fetching LinkedIn profile:", error);
+      toast({
+        title: "Error",
+        description: `No se pudo obtener el perfil: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsFetchingProfile(false);
     }
   };
 
   const optimizeProfile = async () => {
-    if (!personalCV) return;
-    
+    if (!personalCV || !linkedinProfile) return;
+
     setIsOptimizing(true);
-    
+
     try {
-      console.log('Processing LinkedIn optimization with files:', {
+      console.log("Processing LinkedIn optimization with:", {
         personalCV: personalCV?.name,
-        linkedinCV: linkedinCV?.name
+        linkedinProfile: linkedinProfile,
       });
-      
+
       // Convert personal CV to base64
-      const reader1 = new FileReader();
+      const reader = new FileReader();
       const personalCVBase64 = await new Promise<string>((resolve, reject) => {
-        reader1.onload = () => {
-          const result = reader1.result as string;
-          const base64Data = result.split(',')[1];
-          console.log('Personal CV base64 conversion successful, length:', base64Data.length);
+        reader.onload = () => {
+          const result = reader.result as string;
+          const base64Data = result.split(",")[1];
+          console.log(
+            "Personal CV base64 conversion successful, length:",
+            base64Data.length
+          );
           resolve(base64Data);
         };
-        reader1.onerror = (error) => {
-          console.error('Personal CV file reading error:', error);
+        reader.onerror = (error) => {
+          console.error("Personal CV file reading error:", error);
           reject(error);
         };
-        reader1.readAsDataURL(personalCV);
+        reader.readAsDataURL(personalCV);
       });
 
-      // Convert LinkedIn CV to base64 if provided
-      let linkedinCVBase64 = null;
-      if (linkedinCV) {
-        const reader2 = new FileReader();
-        linkedinCVBase64 = await new Promise<string>((resolve, reject) => {
-          reader2.onload = () => {
-            const result = reader2.result as string;
-            const base64Data = result.split(',')[1];
-            console.log('LinkedIn CV base64 conversion successful, length:', base64Data.length);
-            resolve(base64Data);
-          };
-          reader2.onerror = (error) => {
-            console.error('LinkedIn CV file reading error:', error);
-            reject(error);
-          };
-          reader2.readAsDataURL(linkedinCV);
-        });
-      }
-      
-      console.log('Calling linkedin-optimizer-ai function...');
-      
+      console.log("Calling linkedin-optimizer-ai function...");
+
       // Call our LinkedIn Optimizer AI function using Supabase
-      const { data, error } = await supabase.functions.invoke('linkedin-optimizer-ai', {
-        body: {
-          personalCVBase64,
-          linkedinCVBase64
+      const { data, error } = await supabase.functions.invoke(
+        "linkedin-optimizer-ai",
+        {
+          body: {
+            personalCVBase64,
+            linkedinProfile: linkedinProfile,
+            language: language || "español",
+          },
         }
-      });
+      );
+      console.log("LinkedIn Optimizer AI response:", JSON.stringify(data));
+      console.log("Spanish content:", data.spanish);
+      console.log("English content:", data.english);
+      console.log("Keywords analysis:", data.keywords_analysis);
+      console.log("Optimization tips:", data.optimization_tips);
 
       if (error) {
-        console.error('Edge function error:', error);
+        console.error("Edge function error:", error);
         throw new Error(`Error al optimizar el perfil: ${error.message}`);
       }
 
       setOptimizedContent(data);
+      setShowForm(false); // Ocultar el formulario después de la optimización
 
       // Save to history
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user && data) {
         const { error: saveError } = await supabase
-          .from('linkedin_optimizations')
+          .from("linkedin_optimizations")
           .insert({
             user_id: user.id,
             personal_cv_filename: personalCV.name,
-            linkedin_cv_filename: linkedinCV?.name || null,
-            optimized_content: data
+            linkedin_url: linkedinUrl,
+            optimized_content: data,
           });
 
         if (saveError) {
-          console.error('Error saving to history:', saveError);
+          console.error("Error saving to history:", saveError);
         } else {
           await loadHistory();
         }
       }
-      
     } catch (error) {
-      console.error('Error optimizing profile:', error);
+      console.error("Error optimizing profile:", error);
       toast({
         title: "Error",
         description: "No se pudo optimizar el perfil. Inténtalo de nuevo.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsOptimizing(false);
@@ -215,9 +352,15 @@ export function LinkedInOptimizer() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied to clipboard",
-      description: "Content has been copied to your clipboard",
+      title: "Copiado",
+      description: "Contenido copiado al portapapeles",
     });
+  };
+
+  const validateLinkedInUrl = (url: string) => {
+    const linkedinRegex =
+      /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
+    return linkedinRegex.test(url);
   };
 
   return (
@@ -231,7 +374,7 @@ export function LinkedInOptimizer() {
           size="sm"
         >
           <History className="w-4 h-4 mr-2" />
-          {showHistory ? 'Ocultar Historial' : 'Ver Historial'}
+          {showHistory ? "Ocultar Historial" : "Ver Historial"}
         </Button>
       </div>
 
@@ -258,18 +401,28 @@ export function LinkedInOptimizer() {
                   <div key={item.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h4 className="font-medium">{item.personal_cv_filename}</h4>
-                        {item.linkedin_cv_filename && (
-                          <p className="text-sm text-muted-foreground">+ {item.linkedin_cv_filename}</p>
+                        <h4 className="font-medium">
+                          {item.personal_cv_filename}
+                        </h4>
+                        {item.linkedin_url && (
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <Linkedin className="w-3 h-3" />
+                            {item.linkedin_url}
+                          </p>
                         )}
                         <p className="text-sm text-muted-foreground flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {new Date(item.created_at).toLocaleDateString('es-ES')}
+                          {new Date(item.created_at).toLocaleDateString(
+                            "es-ES"
+                          )}
                         </p>
                       </div>
                       <div className="flex gap-2">
                         <Button
-                          onClick={() => setOptimizedContent(item.optimized_content)}
+                          onClick={() => {
+                            setOptimizedContent(item.optimized_content);
+                            setShowForm(false); // Ocultar el formulario cuando se ve el historial
+                          }}
                           variant="outline"
                           size="sm"
                         >
@@ -292,176 +445,281 @@ export function LinkedInOptimizer() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upload Section */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Upload className="w-5 h-5 text-primary" />
-              Subir CVs para Optimización
-            </CardTitle>
-            <CardDescription>
-              Sube tu CV personal y tu CV de LinkedIn para generar contenido optimizado
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Personal CV Upload */}
-            <div>
-              <h4 className="text-sm font-medium mb-2">1. CV Personal Optimizado</h4>
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handlePersonalCVUpload}
-                  className="hidden"
-                  id="personal-cv-upload"
-                />
-                <label
-                  htmlFor="personal-cv-upload"
-                  className="cursor-pointer flex flex-col items-center gap-2"
-                >
-                  <Upload className="w-8 h-8 text-muted-foreground" />
-                  <p className="text-sm font-medium">
-                    Subir CV Personal (PDF)
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Tu CV actualizado y optimizado
-                  </p>
-                </label>
-              </div>
-              
-              {personalCV && (
-                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg mt-2">
-                  <Upload className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">{personalCV.name}</span>
-                  <Badge variant="secondary">Listo</Badge>
+      {/* Form Section - Only show when showForm is true */}
+      {showForm && (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* LinkedIn URL Section */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Linkedin className="w-5 h-5 text-primary" />
+                  Obtener Perfil de LinkedIn
+                </CardTitle>
+                <CardDescription>
+                  Ingresa la URL de tu perfil de LinkedIn para obtener la
+                  información
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label
+                    htmlFor="linkedin-url"
+                    className="text-sm font-medium mb-2 block"
+                  >
+                    URL de tu perfil de LinkedIn
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="linkedin-url"
+                      type="url"
+                      placeholder="https://linkedin.com/in/tu-perfil"
+                      value={linkedinUrl}
+                      onChange={(e) => setLinkedinUrl(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={fetchLinkedInProfile}
+                      disabled={!linkedinUrl.trim() || isFetchingProfile}
+                      size="sm"
+                    >
+                      {isFetchingProfile ? (
+                        <>
+                          <Users className="w-4 h-4 mr-2 animate-spin" />
+                          Obteniendo...
+                        </>
+                      ) : (
+                        <>
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Obtener
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  {linkedinUrl && !validateLinkedInUrl(linkedinUrl) && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Por favor ingresa una URL válida de LinkedIn
+                    </p>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* LinkedIn CV Upload */}
-            <div>
-              <h4 className="text-sm font-medium mb-2">2. CV de LinkedIn (Opcional)</h4>
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleLinkedInCVUpload}
-                  className="hidden"
-                  id="linkedin-cv-upload"
-                />
-                <label
-                  htmlFor="linkedin-cv-upload"
-                  className="cursor-pointer flex flex-col items-center gap-2"
-                >
-                  <Linkedin className="w-8 h-8 text-muted-foreground" />
-                  <p className="text-sm font-medium">
-                    Subir CV de LinkedIn (PDF)
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Para comparar y mejorar
-                  </p>
-                </label>
-              </div>
-              
-              {linkedinCV && (
-                <div className="flex items-center gap-2 p-3 bg-accent rounded-lg mt-2">
-                  <Linkedin className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">{linkedinCV.name}</span>
-                  <Badge variant="secondary">Listo</Badge>
-                </div>
-              )}
-            </div>
-            
-            <Button
-              onClick={optimizeProfile}
-              disabled={!personalCV || isOptimizing}
-              className="w-full"
-              variant="professional"
-            >
-              {isOptimizing ? (
-                <>
-                  <Users className="w-4 h-4 mr-2 animate-spin" />
-                  Generando contenido para LinkedIn... (puede tardar más de 1 minuto)
-                </>
-              ) : (
-                <>
-                  <Users className="w-4 h-4 mr-2" />
-                  Generar Contenido LinkedIn
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+                {linkedinProfile && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-green-700">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">
+                        Perfil obtenido correctamente
+                      </span>
+                    </div>
+                    <p className="text-xs text-green-600 mt-1">
+                      Ahora puedes proceder con la optimización
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-        {/* How to get LinkedIn CV */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Linkedin className="w-5 h-5 text-info" />
-              ¿Cómo obtener tu CV de LinkedIn?
-            </CardTitle>
-            <CardDescription>
-              Sigue estos pasos para descargar tu perfil como PDF
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">1</div>
+            {/* Personal CV Upload Section */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="w-5 h-5 text-primary" />
+                  CV Personal para Comparación
+                </CardTitle>
+                <CardDescription>
+                  Sube tu CV personal para comparar y generar contenido
+                  optimizado
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handlePersonalCVUpload}
+                    className="hidden"
+                    id="personal-cv-upload"
+                  />
+                  <label
+                    htmlFor="personal-cv-upload"
+                    className="cursor-pointer flex flex-col items-center gap-2"
+                  >
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                    <p className="text-sm font-medium">
+                      Subir CV Personal (PDF)
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Tu CV actualizado para comparar
+                    </p>
+                  </label>
+                </div>
+
+                {personalCV && (
+                  <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
+                    <Upload className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium">
+                      {personalCV.name}
+                    </span>
+                    <Badge variant="secondary">Listo</Badge>
+                  </div>
+                )}
+
+                {/* Language Selection */}
                 <div>
-                  <p className="text-sm font-medium">Ve a tu perfil de LinkedIn</p>
-                  <p className="text-xs text-muted-foreground">Haz click en "Ver perfil" desde tu página principal</p>
+                  <Label className="text-sm font-medium mb-2 block">
+                    Idioma para la optimización
+                  </Label>
+                  <RadioGroup value={language} onValueChange={setLanguage}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="español" id="es" />
+                      <Label htmlFor="es">Español</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="inglés" id="en" />
+                      <Label htmlFor="en">Inglés</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <Button
+                  onClick={optimizeProfile}
+                  disabled={
+                    !personalCV || !linkedinProfile || !language || isOptimizing
+                  }
+                  className="w-full"
+                  variant="default"
+                >
+                  {isOptimizing ? (
+                    <>
+                      <Users className="w-4 h-4 mr-2 animate-spin" />
+                      Generando contenido para LinkedIn... (puede tardar más de
+                      1 minuto)
+                    </>
+                  ) : (
+                    <>
+                      <Users className="w-4 h-4 mr-2" />
+                      Generar Contenido LinkedIn
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* How to get LinkedIn URL */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-info" />
+                ¿Cómo obtener la URL de tu perfil de LinkedIn?
+              </CardTitle>
+              <CardDescription>
+                Sigue estos pasos para copiar la URL de tu perfil
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">
+                    1
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">
+                      Ve a tu perfil de LinkedIn
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Haz click en "Ver perfil" desde tu página principal
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">
+                    2
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">
+                      Copia la URL del navegador
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      La URL debe verse como: linkedin.com/in/tu-nombre
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">
+                    3
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">
+                      Pega la URL en el campo superior
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Haz click en "Obtener" para extraer tu información
+                    </p>
+                  </div>
+                </div>
+                <div className="border border-info/20 rounded-lg p-3 mt-4">
+                  <p className="text-xs text-muted-foreground">
+                    💡 Tip: Asegúrate de que tu perfil esté completo y público
+                    para obtener mejores resultados en la optimización.
+                  </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">2</div>
-                <div>
-                  <p className="text-sm font-medium">Busca "Más opciones"</p>
-                  <p className="text-xs text-muted-foreground">Click en los tres puntos (...) en la sección superior</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">3</div>
-                <div>
-                  <p className="text-sm font-medium">Selecciona "Guardar como PDF"</p>
-                  <p className="text-xs text-muted-foreground">El archivo se descargará automáticamente</p>
-                </div>
-              </div>
-              <div className="border border-info/20 rounded-lg p-3 mt-4">
-                <p className="text-xs text-muted-foreground">
-                  💡 Tip: Asegúrate de que tu perfil esté completo antes de descargarlo para obtener mejores resultados en la optimización.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
 
       {/* Optimization Results */}
       {optimizedContent && (
         <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-success">
+              ✅ Optimización Completada
+            </h2>
+            <Button
+              onClick={() => {
+                setShowForm(true);
+                setOptimizedContent(null);
+                setLinkedinProfile(null);
+                setPersonalCV(null);
+                setLinkedinUrl("");
+                setLanguage("");
+              }}
+              variant="outline"
+              size="sm"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Nueva Optimización
+            </Button>
+          </div>
+
           <Card className="shadow-card">
             <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-success" />
-              Contenido Optimizado para LinkedIn
-            </CardTitle>
-            <CardDescription>
-              Contenido optimizado por IA listo para copiar a tu perfil de LinkedIn
-            </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-success" />
+                Contenido Optimizado para LinkedIn
+              </CardTitle>
+              <CardDescription>
+                Contenido optimizado por IA listo para copiar a tu perfil de
+                LinkedIn
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Contenido en Español */}
               <div className="border-b pb-6">
-                <h2 className="text-lg font-semibold mb-4">🇪🇸 Contenido en Español</h2>
-                
+                <h2 className="text-lg font-semibold mb-4">
+                  🇪🇸 Contenido en Español
+                </h2>
+
                 {/* Headline Español */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Titular Profesional</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.headline)}
+                      onClick={() =>
+                        copyToClipboard(optimizedContent.spanish.headline)
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -481,7 +739,9 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Acerca de (About)</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.summary)}
+                      onClick={() =>
+                        copyToClipboard(optimizedContent.spanish.summary)
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -497,13 +757,56 @@ export function LinkedInOptimizer() {
                 </div>
 
                 {/* Experience Español */}
-                {optimizedContent.spanish.experiences && optimizedContent.spanish.experiences.length > 0 ? (
-                  optimizedContent.spanish.experiences.map((exp: any, index: number) => (
-                    <div key={index} className="mb-4">
+                {optimizedContent.spanish.experiences &&
+                  optimizedContent.spanish.experiences.length > 0 &&
+                  optimizedContent.spanish.experiences.some(
+                    (exp) => exp.description && exp.description.trim()
+                  ) &&
+                  optimizedContent.spanish.experiences.map(
+                    (
+                      exp: {
+                        title: string;
+                        company: string;
+                        description: string;
+                      },
+                      index: number
+                    ) =>
+                      exp.description &&
+                      exp.description.trim() && (
+                        <div key={index} className="mb-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-medium">
+                              Experiencia {index + 1}: {exp.title} -{" "}
+                              {exp.company}
+                            </h3>
+                            <Button
+                              onClick={() => copyToClipboard(exp.description)}
+                              variant="outline"
+                              size="sm"
+                            >
+                              <Copy className="w-4 h-4 mr-2" />
+                              Copiar
+                            </Button>
+                          </div>
+                          <Textarea
+                            value={exp.description}
+                            readOnly
+                            className="min-h-[100px]"
+                          />
+                        </div>
+                      )
+                  )}
+
+                {/* Education Español */}
+                {optimizedContent.spanish.education &&
+                  optimizedContent.spanish.education.trim() && (
+                    <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium">Experiencia {index + 1}: {exp.title} - {exp.company}</h3>
+                        <h3 className="font-medium">Educación</h3>
                         <Button
-                          onClick={() => copyToClipboard(exp.description)}
+                          onClick={() =>
+                            copyToClipboard(optimizedContent.spanish.education)
+                          }
                           variant="outline"
                           size="sm"
                         >
@@ -512,178 +815,183 @@ export function LinkedInOptimizer() {
                         </Button>
                       </div>
                       <Textarea
-                        value={exp.description || "Descripción de experiencia profesional no disponible"}
+                        value={optimizedContent.spanish.education}
+                        readOnly
+                        className="min-h-[80px]"
+                      />
+                    </div>
+                  )}
+
+                {/* Certifications Español */}
+                {optimizedContent.spanish.certifications &&
+                  optimizedContent.spanish.certifications.trim() && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">
+                          Licencias y Certificaciones
+                        </h3>
+                        <Button
+                          onClick={() =>
+                            copyToClipboard(
+                              optimizedContent.spanish.certifications
+                            )
+                          }
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copiar
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={optimizedContent.spanish.certifications}
+                        readOnly
+                        className="min-h-[80px]"
+                      />
+                    </div>
+                  )}
+
+                {/* Projects Español */}
+                {optimizedContent.spanish.projects &&
+                  optimizedContent.spanish.projects.trim() && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">Proyectos</h3>
+                        <Button
+                          onClick={() =>
+                            copyToClipboard(optimizedContent.spanish.projects)
+                          }
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copiar
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={optimizedContent.spanish.projects}
                         readOnly
                         className="min-h-[100px]"
                       />
                     </div>
-                  ))
-                ) : (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium">Experiencia</h3>
-                      <Button
-                        onClick={() => copyToClipboard(optimizedContent.spanish.experience || "No disponible")}
-                        variant="outline"
-                        size="sm"
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copiar
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={optimizedContent.spanish.experience || "Experiencia profesional no disponible"}
-                      readOnly
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                )}
-
-                {/* Education Español */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Educación</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.education || "No disponible")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copiar
-                    </Button>
-                  </div>
-                  <Textarea
-                    value={optimizedContent.spanish.education || "Información de educación no disponible"}
-                    readOnly
-                    className="min-h-[80px]"
-                  />
-                </div>
-
-                {/* Certifications Español */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Licencias y Certificaciones</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.certifications || "No disponible")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copiar
-                    </Button>
-                  </div>
-                  <Textarea
-                    value={optimizedContent.spanish.certifications || "Certificaciones no disponibles"}
-                    readOnly
-                    className="min-h-[80px]"
-                  />
-                </div>
-
-                {/* Projects Español */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Proyectos</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.projects || "No disponible")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copiar
-                    </Button>
-                  </div>
-                  <Textarea
-                    value={optimizedContent.spanish.projects || "Proyectos no disponibles"}
-                    readOnly
-                    className="min-h-[100px]"
-                  />
-                </div>
+                  )}
 
                 {/* Volunteer Español */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Voluntariado</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.volunteer || "No disponible")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copiar
-                    </Button>
-                  </div>
-                  <Textarea
-                    value={optimizedContent.spanish.volunteer || "Experiencia de voluntariado no disponible"}
-                    readOnly
-                    className="min-h-[60px]"
-                  />
-                </div>
+                {optimizedContent.spanish.volunteer &&
+                  optimizedContent.spanish.volunteer.trim() && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">Voluntariado</h3>
+                        <Button
+                          onClick={() =>
+                            copyToClipboard(optimizedContent.spanish.volunteer)
+                          }
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copiar
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={optimizedContent.spanish.volunteer}
+                        readOnly
+                        className="min-h-[60px]"
+                      />
+                    </div>
+                  )}
 
                 {/* Accomplishments Español */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Logros y Reconocimientos</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.accomplishments || "No disponible")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copiar
-                    </Button>
-                  </div>
-                  <Textarea
-                    value={optimizedContent.spanish.accomplishments || "Logros no disponibles"}
-                    readOnly
-                    className="min-h-[60px]"
-                  />
-                </div>
+                {optimizedContent.spanish.accomplishments &&
+                  optimizedContent.spanish.accomplishments.trim() && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">
+                          Logros y Reconocimientos
+                        </h3>
+                        <Button
+                          onClick={() =>
+                            copyToClipboard(
+                              optimizedContent.spanish.accomplishments
+                            )
+                          }
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copiar
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={optimizedContent.spanish.accomplishments}
+                        readOnly
+                        className="min-h-[60px]"
+                      />
+                    </div>
+                  )}
 
                 {/* Interests Español */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Intereses</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.spanish.interests || "No disponible")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copiar
-                    </Button>
-                  </div>
-                  <Textarea
-                    value={optimizedContent.spanish.interests || "Intereses no disponibles"}
-                    readOnly
-                    className="min-h-[60px]"
-                  />
-                </div>
+                {optimizedContent.spanish.interests &&
+                  optimizedContent.spanish.interests.trim() && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">Intereses</h3>
+                        <Button
+                          onClick={() =>
+                            copyToClipboard(optimizedContent.spanish.interests)
+                          }
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copiar
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={optimizedContent.spanish.interests}
+                        readOnly
+                        className="min-h-[60px]"
+                      />
+                    </div>
+                  )}
 
                 {/* Skills Español */}
-                <div>
-                  <h3 className="font-medium mb-2">Aptitudes Recomendadas</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {optimizedContent.spanish.skills && optimizedContent.spanish.skills.length > 0 ? (
-                      optimizedContent.spanish.skills.map((skill: string, index: number) => (
-                        <Badge key={index} variant="secondary">{skill}</Badge>
-                      ))
-                    ) : (
-                      <Badge variant="outline">Aptitudes no disponibles</Badge>
-                    )}
-                  </div>
-                </div>
+                {optimizedContent.spanish.skills &&
+                  optimizedContent.spanish.skills.length > 0 &&
+                  optimizedContent.spanish.skills.some(
+                    (skill) => skill && skill.trim()
+                  ) && (
+                    <div>
+                      <h3 className="font-medium mb-2">
+                        Aptitudes Recomendadas
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {optimizedContent.spanish.skills
+                          .filter((skill) => skill && skill.trim())
+                          .map((skill: string, index: number) => (
+                            <Badge key={index} variant="secondary">
+                              {skill}
+                            </Badge>
+                          ))}
+                      </div>
+                    </div>
+                  )}
               </div>
 
               {/* Contenido en Inglés */}
               <div>
-                <h2 className="text-lg font-semibold mb-4">🇺🇸 Content in English</h2>
-                
+                <h2 className="text-lg font-semibold mb-4">
+                  🇺🇸 Content in English
+                </h2>
+
                 {/* Headline English */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Professional Headline</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.headline)}
+                      onClick={() =>
+                        copyToClipboard(optimizedContent.english.headline)
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -703,7 +1011,9 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">About Section</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.summary)}
+                      onClick={() =>
+                        copyToClipboard(optimizedContent.english.summary)
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -719,13 +1029,56 @@ export function LinkedInOptimizer() {
                 </div>
 
                 {/* Experience English */}
-                {optimizedContent.english.experiences && optimizedContent.english.experiences.length > 0 ? (
-                  optimizedContent.english.experiences.map((exp: any, index: number) => (
-                    <div key={index} className="mb-4">
+                {optimizedContent.english.experiences &&
+                  optimizedContent.english.experiences.length > 0 &&
+                  optimizedContent.english.experiences.some(
+                    (exp) => exp.description && exp.description.trim()
+                  ) &&
+                  optimizedContent.english.experiences.map(
+                    (
+                      exp: {
+                        title: string;
+                        company: string;
+                        description: string;
+                      },
+                      index: number
+                    ) =>
+                      exp.description &&
+                      exp.description.trim() && (
+                        <div key={index} className="mb-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-medium">
+                              Experience {index + 1}: {exp.title} -{" "}
+                              {exp.company}
+                            </h3>
+                            <Button
+                              onClick={() => copyToClipboard(exp.description)}
+                              variant="outline"
+                              size="sm"
+                            >
+                              <Copy className="w-4 h-4 mr-2" />
+                              Copy
+                            </Button>
+                          </div>
+                          <Textarea
+                            value={exp.description}
+                            readOnly
+                            className="min-h-[100px]"
+                          />
+                        </div>
+                      )
+                  )}
+
+                {/* Education English */}
+                {optimizedContent.english.education &&
+                  optimizedContent.english.education.trim() && (
+                    <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium">Experience {index + 1}: {exp.title} - {exp.company}</h3>
+                        <h3 className="font-medium">Education</h3>
                         <Button
-                          onClick={() => copyToClipboard(exp.description)}
+                          onClick={() =>
+                            copyToClipboard(optimizedContent.english.education)
+                          }
                           variant="outline"
                           size="sm"
                         >
@@ -734,59 +1087,24 @@ export function LinkedInOptimizer() {
                         </Button>
                       </div>
                       <Textarea
-                        value={exp.description || "Professional experience description not available"}
+                        value={optimizedContent.english.education}
                         readOnly
-                        className="min-h-[100px]"
+                        className="min-h-[80px]"
                       />
                     </div>
-                  ))
-                ) : (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium">Experience</h3>
-                      <Button
-                        onClick={() => copyToClipboard(optimizedContent.english.experience || "Not available")}
-                        variant="outline"
-                        size="sm"
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copy
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={optimizedContent.english.experience || "Professional experience not available"}
-                      readOnly
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                )}
-
-                {/* Education English */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Education</h3>
-                    <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.education || "Not available")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy
-                    </Button>
-                  </div>
-                  <Textarea
-                    value={optimizedContent.english.education || "Education information not available"}
-                    readOnly
-                    className="min-h-[80px]"
-                  />
-                </div>
+                  )}
 
                 {/* Certifications English */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Licenses & Certifications</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.certifications || "Not available")}
+                      onClick={() =>
+                        copyToClipboard(
+                          optimizedContent.english.certifications ||
+                            "Not available"
+                        )
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -795,7 +1113,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.certifications || "Certifications not available"}
+                    value={optimizedContent.english.certifications}
                     readOnly
                     className="min-h-[80px]"
                   />
@@ -806,7 +1124,11 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Projects</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.projects || "Not available")}
+                      onClick={() =>
+                        copyToClipboard(
+                          optimizedContent.english.projects || "Not available"
+                        )
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -815,7 +1137,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.projects || "Projects not available"}
+                    value={optimizedContent.english.projects}
                     readOnly
                     className="min-h-[100px]"
                   />
@@ -826,7 +1148,11 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Volunteer Experience</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.volunteer || "Not available")}
+                      onClick={() =>
+                        copyToClipboard(
+                          optimizedContent.english.volunteer || "Not available"
+                        )
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -835,7 +1161,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.volunteer || "Volunteer experience not available"}
+                    value={optimizedContent.english.volunteer}
                     readOnly
                     className="min-h-[60px]"
                   />
@@ -846,7 +1172,12 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Accomplishments</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.accomplishments || "Not available")}
+                      onClick={() =>
+                        copyToClipboard(
+                          optimizedContent.english.accomplishments ||
+                            "Not available"
+                        )
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -855,7 +1186,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.accomplishments || "Accomplishments not available"}
+                    value={optimizedContent.english.accomplishments}
                     readOnly
                     className="min-h-[60px]"
                   />
@@ -866,7 +1197,11 @@ export function LinkedInOptimizer() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium">Interests</h3>
                     <Button
-                      onClick={() => copyToClipboard(optimizedContent.english.interests || "Not available")}
+                      onClick={() =>
+                        copyToClipboard(
+                          optimizedContent.english.interests || "Not available"
+                        )
+                      }
                       variant="outline"
                       size="sm"
                     >
@@ -875,7 +1210,7 @@ export function LinkedInOptimizer() {
                     </Button>
                   </div>
                   <Textarea
-                    value={optimizedContent.english.interests || "Interests not available"}
+                    value={optimizedContent.english.interests}
                     readOnly
                     className="min-h-[60px]"
                   />
@@ -885,16 +1220,155 @@ export function LinkedInOptimizer() {
                 <div>
                   <h3 className="font-medium mb-2">Recommended Skills</h3>
                   <div className="flex flex-wrap gap-2">
-                    {optimizedContent.english.skills && optimizedContent.english.skills.length > 0 ? (
-                      optimizedContent.english.skills.map((skill: string, index: number) => (
-                        <Badge key={index} variant="secondary">{skill}</Badge>
-                      ))
+                    {optimizedContent.english.skills &&
+                    optimizedContent.english.skills.length > 0 ? (
+                      optimizedContent.english.skills.map(
+                        (skill: string, index: number) => (
+                          <Badge key={index} variant="secondary">
+                            {skill}
+                          </Badge>
+                        )
+                      )
                     ) : (
-                      <Badge variant="outline">Skills not available</Badge>
+                      <p className="text-sm text-muted-foreground">
+                        No skills available
+                      </p>
                     )}
                   </div>
                 </div>
               </div>
+
+              {/* Keywords Analysis Section */}
+              {optimizedContent.keywords_analysis &&
+                ((optimizedContent.keywords_analysis.primary_keywords &&
+                  optimizedContent.keywords_analysis.primary_keywords.length >
+                    0 &&
+                  optimizedContent.keywords_analysis.primary_keywords.some(
+                    (k) => k && k.trim()
+                  )) ||
+                  (optimizedContent.keywords_analysis.secondary_keywords &&
+                    optimizedContent.keywords_analysis.secondary_keywords
+                      .length > 0 &&
+                    optimizedContent.keywords_analysis.secondary_keywords.some(
+                      (k) => k && k.trim()
+                    )) ||
+                  (optimizedContent.keywords_analysis.industry_terms &&
+                    optimizedContent.keywords_analysis.industry_terms.length >
+                      0 &&
+                    optimizedContent.keywords_analysis.industry_terms.some(
+                      (t) => t && t.trim()
+                    ))) && (
+                  <div className="border-t pt-6 mt-6">
+                    <h2 className="text-lg font-semibold mb-4">
+                      🔍 Análisis de Palabras Clave
+                    </h2>
+
+                    {/* Primary Keywords */}
+                    {optimizedContent.keywords_analysis.primary_keywords &&
+                      optimizedContent.keywords_analysis.primary_keywords
+                        .length > 0 &&
+                      optimizedContent.keywords_analysis.primary_keywords.some(
+                        (k) => k && k.trim()
+                      ) && (
+                        <div className="mb-4">
+                          <h3 className="font-medium mb-2">
+                            Palabras Clave Principales
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {optimizedContent.keywords_analysis.primary_keywords
+                              .filter((k) => k && k.trim())
+                              .map((keyword: string, index: number) => (
+                                <Badge
+                                  key={index}
+                                  variant="default"
+                                  className="bg-primary text-primary-foreground"
+                                >
+                                  {keyword}
+                                </Badge>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* Secondary Keywords */}
+                    {optimizedContent.keywords_analysis.secondary_keywords &&
+                      optimizedContent.keywords_analysis.secondary_keywords
+                        .length > 0 &&
+                      optimizedContent.keywords_analysis.secondary_keywords.some(
+                        (k) => k && k.trim()
+                      ) && (
+                        <div className="mb-4">
+                          <h3 className="font-medium mb-2">
+                            Palabras Clave Secundarias
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {optimizedContent.keywords_analysis.secondary_keywords
+                              .filter((k) => k && k.trim())
+                              .map((keyword: string, index: number) => (
+                                <Badge key={index} variant="secondary">
+                                  {keyword}
+                                </Badge>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {/* Industry Terms */}
+                    {optimizedContent.keywords_analysis.industry_terms &&
+                      optimizedContent.keywords_analysis.industry_terms.length >
+                        0 &&
+                      optimizedContent.keywords_analysis.industry_terms.some(
+                        (t) => t && t.trim()
+                      ) && (
+                        <div className="mb-4">
+                          <h3 className="font-medium mb-2">
+                            Términos de la Industria
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {optimizedContent.keywords_analysis.industry_terms
+                              .filter((t) => t && t.trim())
+                              .map((term: string, index: number) => (
+                                <Badge
+                                  key={index}
+                                  variant="outline"
+                                  className="border-blue-300 text-blue-700"
+                                >
+                                  {term}
+                                </Badge>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                )}
+
+              {/* Optimization Tips Section */}
+              {optimizedContent.optimization_tips &&
+                optimizedContent.optimization_tips.length > 0 &&
+                optimizedContent.optimization_tips.some(
+                  (tip) => tip && tip.trim()
+                ) && (
+                  <div className="border-t pt-6 mt-6">
+                    <h2 className="text-lg font-semibold mb-4">
+                      💡 Consejos de Optimización
+                    </h2>
+                    <div className="space-y-3">
+                      {optimizedContent.optimization_tips
+                        .filter((tip) => tip && tip.trim())
+                        .map((tip: string, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                          >
+                            <div className="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium mt-0.5">
+                              {index + 1}
+                            </div>
+                            <p className="text-sm text-blue-800">{tip}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
             </CardContent>
           </Card>
         </div>
