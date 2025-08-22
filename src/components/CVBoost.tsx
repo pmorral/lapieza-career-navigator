@@ -277,6 +277,7 @@ export function CVBoost() {
           preferences,
         },
       });
+      console.log("CV Boost AI response:", data, error);
 
       if (error) {
         console.error("Edge function error:", error);

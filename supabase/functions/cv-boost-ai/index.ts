@@ -1,52 +1,235 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import axios from "https://esm.sh/axios@1.6.0";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY_CV_BOOST');
+const openAIApiKey = Deno.env.get("OPENAI_API_KEY_CV_BOOST");
+const supabaseUrl = Deno.env.get("SUPABASE_URL");
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { pdfBase64, preferences } = await req.json();
-    console.log('Received request with pdfBase64 length:', pdfBase64?.length || 0);
+
+    console.log("Request received:", {
+      hasCV: !!pdfBase64,
+      preferences,
+      cvLength: pdfBase64?.length || 0,
+    });
 
     if (!pdfBase64) {
-      throw new Error('No PDF file provided');
+      throw new Error("No PDF file provided");
     }
 
-    // Extract text from PDF using simple text extraction
-    let cvContent;
-    try {
-      // Convert base64 to text - simple approach for basic PDF text extraction
-      const pdfBuffer = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0));
-      console.log('PDF buffer size:', pdfBuffer.length);
-      
-      // Convert buffer to string and extract readable text
-      const pdfString = new TextDecoder('utf-8', {ignoreBOM: true, fatal: false}).decode(pdfBuffer);
-      
-      // Extract text between stream objects (basic PDF text extraction)
-      const textMatches = pdfString.match(/\((.*?)\)/g) || [];
-      const extractedLines = textMatches
-        .map(match => match.slice(1, -1)) // Remove parentheses
-        .filter(text => text.length > 2 && /[a-zA-Z]/.test(text)) // Filter meaningful text
-        .join(' ');
-      
-      cvContent = extractedLines.length > 50 ? extractedLines : 
-        `CV profesional con experiencia relevante. Documento PDF procesado correctamente con ${Math.round(pdfBuffer.length / 1024)}KB de contenido.`;
-      
-      console.log('Extracted CV content length:', cvContent.length);
-      
-    } catch (pdfError) {
-      console.error('PDF parsing error:', pdfError);
-      cvContent = "CV content from uploaded PDF file - Error in extraction, using fallback processing";
+    // Initialize Supabase client
+    const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
+
+    // Get user from JWT token
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      throw new Error("Authorization header is required");
     }
+
+    const { data: userData, error: userError } = await supabase.auth.getUser(
+      authHeader.replace("Bearer ", "")
+    );
+
+    if (userError || !userData.user) {
+      throw new Error("Invalid user token");
+    }
+
+    const userId = userData.user.id;
+    console.log("Processing request for user:", userId);
+
+    // Check for cached CV analysis data
+    console.log("Checking for cached CV analysis data...");
+    const { data: cachedProfile, error: cacheError } = await supabase
+      .from("user_profile_cache")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
+    if (cacheError && cacheError.code !== "PGRST116") {
+      console.warn("Cache query error (non-critical):", cacheError);
+    }
+
+    console.log("Cache query result:", {
+      hasCachedProfile: !!cachedProfile,
+      hasError: !!cacheError,
+    });
+
+    let cvContent;
+    let shouldAnalyzeCV = false;
+
+    // Check if we have cached CV analysis data and if it's still valid (< 3 months)
+    if (
+      cachedProfile &&
+      cachedProfile.cv_analysis_data &&
+      cachedProfile.last_cv_analysis
+    ) {
+      const lastAnalysis = new Date(cachedProfile.last_cv_analysis);
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+      if (lastAnalysis > threeMonthsAgo) {
+        console.log("Using cached CV analysis data");
+        cvContent = cachedProfile.cv_analysis_data;
+      } else {
+        console.log(
+          "Cached CV analysis data is older than 3 months, analyzing new data"
+        );
+        shouldAnalyzeCV = true;
+      }
+    } else {
+      console.log("No cached CV analysis data found, analyzing new data");
+      shouldAnalyzeCV = true;
+    }
+
+    // Analyze CV if needed
+    if (shouldAnalyzeCV) {
+      try {
+        console.log("Uploading CV to Supabase storage...");
+
+        // Convert base64 to Uint8Array
+        const pdfBuffer = Uint8Array.from(atob(pdfBase64), (c) =>
+          c.charCodeAt(0)
+        );
+
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomId = Math.random().toString(36).substring(2, 15);
+        const fileName = `cv-boost-${timestamp}-${randomId}.pdf`;
+
+        // Upload to Supabase storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("cv-interview")
+          .upload(fileName, pdfBuffer, {
+            contentType: "application/pdf",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw new Error(`Upload error: ${uploadError.message}`);
+        }
+
+        console.log("CV uploaded successfully:", uploadData.path);
+
+        // Create a signed URL (valid for 1 hour)
+        const { data: signedUrlData, error: signedUrlError } =
+          await supabase.storage
+            .from("cv-interview")
+            .createSignedUrl(fileName, 3600); // 1 hour expiration
+
+        if (signedUrlError) {
+          throw new Error(`Signed URL error: ${signedUrlError.message}`);
+        }
+
+        console.log(
+          "Signed URL created, analyzing CV using CV analysis API..."
+        );
+
+        // Now call the CV analysis API with the URL
+        const cvAnalysisResponse = await axios.post(
+          "https://interview-api-dev.lapieza.io/api/v1/analize/cv",
+          {
+            cv_url: signedUrlData.signedUrl,
+            mode: "file",
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (cvAnalysisResponse.data && cvAnalysisResponse.data.result) {
+          cvContent = cvAnalysisResponse.data.result;
+          console.log(
+            "CV analysis successful, content length:",
+            cvContent.length
+          );
+
+          // Update cache with new CV analysis data
+          const cacheUpdateData = {
+            cv_analysis_data: cvContent,
+            last_cv_analysis: new Date().toISOString(),
+          };
+
+          if (cachedProfile) {
+            await supabase
+              .from("user_profile_cache")
+              .update(cacheUpdateData)
+              .eq("user_id", userId);
+          } else {
+            await supabase.from("user_profile_cache").insert({
+              user_id: userId,
+              ...cacheUpdateData,
+            });
+          }
+          console.log("CV analysis data cached successfully");
+        } else {
+          throw new Error("No result from CV analysis API");
+        }
+
+        // Clean up: delete the temporary file after analysis
+        try {
+          await supabase.storage.from("cv-interview").remove([fileName]);
+          console.log("Temporary CV file deleted successfully");
+        } catch (deleteError) {
+          console.warn("Failed to delete temporary CV file:", deleteError);
+        }
+      } catch (cvAnalysisError) {
+        console.error("CV analysis API error:", cvAnalysisError);
+
+        // Fallback to basic PDF text extraction
+        try {
+          const personalPdfBuffer = Uint8Array.from(atob(pdfBase64), (c) =>
+            c.charCodeAt(0)
+          );
+          console.log("Personal PDF buffer size:", personalPdfBuffer.length);
+
+          // Extract text from PDF
+          const pdfString = new TextDecoder("utf-8", {
+            ignoreBOM: true,
+            fatal: false,
+          }).decode(personalPdfBuffer);
+          const textMatches = pdfString.match(/\((.*?)\)/g) || [];
+          const extractedLines = textMatches
+            .map((match) => match.slice(1, -1))
+            .filter((text) => text.length > 2 && /[a-zA-Z]/.test(text))
+            .join(" ");
+
+          cvContent =
+            extractedLines.length > 50
+              ? extractedLines
+              : `CV profesional con experiencia relevante. Documento PDF procesado correctamente con ${Math.round(
+                  personalPdfBuffer.length / 1024
+                )}KB de contenido.`;
+        } catch (pdfError) {
+          console.error("Personal PDF parsing error:", pdfError);
+          cvContent =
+            "CV content from uploaded PDF file - Error in extraction, using fallback processing";
+        }
+      }
+    }
+
+    // Ensure we have CV content
+    if (!cvContent) {
+      console.error("No CV content available for processing");
+      cvContent = "CV content not available";
+    }
+
+    console.log("Final CV content length:", cvContent?.length || 0);
 
     const prompt = `Eres un experto senior en recursos humanos, ATS (Applicant Tracking Systems) y optimización de CVs. 
 
@@ -92,14 +275,14 @@ E. ESTRUCTURA FINAL DEL CV:
 El resultado final debe tener este orden:
 1. Nombre
 2. Datos de contacto (Email, Tel, Ciudad, LinkedIn, Portafolio si aplica, Disponibilidad de reubicación solo si se indicó)
-3. Headline profesional
-4. Perfil profesional
-5. Experiencia profesional
-6. Proyectos (solo si es perfil junior o en transición)
-7. Skills
-8. Cursos
-9. Educación
-10. Idiomas
+2. Headline profesional
+3. Perfil profesional
+4. Experiencia profesional
+5. Proyectos (solo si es perfil junior o en transición)
+6. Skills
+7. Cursos
+8. Educación
+9. Idiomas
 
 F. CAMBIO DE CARRERA O CV MAL ORIENTADO:
 Si el perfil indica un cambio de área o está poco enfocado:
@@ -134,35 +317,45 @@ Responde en el siguiente formato JSON:
   ]
 }`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+    console.log("About to call OpenAI API...");
+    console.log("OpenAI API Key available:", !!openAIApiKey);
+    console.log("Prompt length:", prompt.length);
+
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-4o-mini",
         messages: [
-          { role: 'system', content: 'Eres un experto en optimización de CVs y recursos humanos. Respondes siempre en formato JSON válido.' },
-          { role: 'user', content: prompt }
+          {
+            role: "system",
+            content:
+              "Eres un experto en optimización de CVs y recursos humanos. Respondes siempre en formato JSON válido.",
+          },
+          { role: "user", content: prompt },
         ],
-        temperature: 0.8,
+        temperature: 0.2,
         max_tokens: 4000,
-      }),
-    });
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${openAIApiKey}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
+    console.log("OpenAI API response received");
+    console.log("OpenAI API response:", JSON.stringify(response.data));
 
-    const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
-    
+    const aiResponse = response.data.choices[0].message.content;
+
     // Parse JSON response
     let result;
     try {
       result = JSON.parse(aiResponse);
+      console.log("result", result);
     } catch (e) {
+      console.error("JSON parsing error:", e);
       // Fallback if JSON parsing fails
       result = {
         feedback: ["No se pudo analizar el CV anterior completamente"],
@@ -179,25 +372,22 @@ Responde en el siguiente formato JSON:
           achievements: "Logros profesionales",
           volunteer: "Experiencia de voluntariado",
           interests: "Intereses profesionales",
-          additional: "Información adicional"
+          additional: "Información adicional",
         },
         keywords: ["palabras", "clave", "relevantes"],
-        improvements: ["CV optimizado con IA"]
+        improvements: ["CV optimizado con IA"],
       };
     }
 
+    console.log("Returning result to client");
     return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (error) {
-    console.error('Error in cv-boost-ai function:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }), 
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    console.error("Error in cv-boost-ai function:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
