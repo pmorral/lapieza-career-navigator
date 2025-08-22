@@ -24,7 +24,6 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import axios from "axios";
@@ -106,7 +105,6 @@ interface HistoryItem {
 export function LinkedInOptimizer() {
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [personalCV, setPersonalCV] = useState<File | null>(null);
-  const [language, setLanguage] = useState("");
   const [optimizedContent, setOptimizedContent] =
     useState<OptimizedContent | null>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
@@ -213,7 +211,7 @@ export function LinkedInOptimizer() {
   };
 
   const optimizeProfile = async () => {
-    if (!personalCV || !linkedinUrl || !language) {
+    if (!personalCV || !linkedinUrl) {
       toast({
         title: "Error",
         description: "Por favor completa todos los campos requeridos",
@@ -228,7 +226,6 @@ export function LinkedInOptimizer() {
       console.log("Processing LinkedIn optimization with:", {
         personalCV: personalCV?.name,
         linkedinUrl: linkedinUrl,
-        language: language,
       });
 
       // Convert personal CV to base64
@@ -259,7 +256,6 @@ export function LinkedInOptimizer() {
           body: {
             personalCVBase64,
             linkedinUrl: linkedinUrl,
-            language: language || "español",
           },
         }
       );
@@ -490,28 +486,9 @@ export function LinkedInOptimizer() {
                   </div>
                 )}
 
-                {/* Language Selection */}
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">
-                    Idioma para la optimización
-                  </Label>
-                  <RadioGroup value={language} onValueChange={setLanguage}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="español" id="es" />
-                      <Label htmlFor="es">Español</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="inglés" id="en" />
-                      <Label htmlFor="en">Inglés</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-
                 <Button
                   onClick={optimizeProfile}
-                  disabled={
-                    !personalCV || !linkedinUrl || !language || isOptimizing
-                  }
+                  disabled={!personalCV || !linkedinUrl || isOptimizing}
                   className="w-full"
                   variant="default"
                 >
@@ -609,7 +586,6 @@ export function LinkedInOptimizer() {
                 setOptimizedContent(null);
                 setPersonalCV(null);
                 setLinkedinUrl("");
-                setLanguage("");
               }}
               variant="outline"
               size="sm"

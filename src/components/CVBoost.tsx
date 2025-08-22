@@ -79,6 +79,96 @@ const cvTemplates = [
   },
 ];
 
+// Helper functions to format the new data structure
+const formatPersonalSection = (personal: any) => {
+  if (!personal) return "Información personal no disponible";
+  return `${personal.name || "Nombre"}\n${
+    personal.headline || "Headline profesional"
+  }\n${personal.contact?.email || ""} | ${personal.contact?.phone || ""} | ${
+    personal.contact?.city || ""
+  }\n${
+    personal.contact?.linkedin ? `LinkedIn: ${personal.contact.linkedin}` : ""
+  }\n${
+    personal.contact?.portfolio
+      ? `Portafolio: ${personal.contact.portfolio}`
+      : ""
+  }\n${personal.contact?.relocation || ""}`;
+};
+
+const formatExperienceSection = (experience: any[]) => {
+  if (!experience || !Array.isArray(experience))
+    return "Experiencia profesional no disponible";
+  return experience
+    .map(
+      (exp) =>
+        `${exp.position || "Puesto"} en ${exp.company || "Empresa"}\n${
+          exp.description || ""
+        }\n${
+          exp.bullets
+            ? exp.bullets.map((bullet: string) => `• ${bullet}`).join("\n")
+            : ""
+        }`
+    )
+    .join("\n\n");
+};
+
+const formatSkillsSection = (skills: any) => {
+  if (!skills) return "Habilidades no disponibles";
+  let result = "";
+  if (skills.hardSkills) {
+    result += "HARD SKILLS:\n";
+    Object.entries(skills.hardSkills).forEach(([skill, level]) => {
+      result += `• ${skill}: ${level}\n`;
+    });
+  }
+  if (skills.softSkills) {
+    result += "\nSOFT SKILLS:\n";
+    Object.entries(skills.softSkills).forEach(([skill, level]) => {
+      result += `• ${skill}: ${level}\n`;
+    });
+  }
+  return result;
+};
+
+const formatProjectsSection = (projects: any[]) => {
+  if (!projects || !Array.isArray(projects)) return "Proyectos no disponibles";
+  return projects
+    .map(
+      (project) => `${project.name || "Proyecto"}: ${project.description || ""}`
+    )
+    .join("\n\n");
+};
+
+const formatEducationSection = (education: any[]) => {
+  if (!education || !Array.isArray(education)) return "Educación no disponible";
+  return education
+    .map(
+      (edu) =>
+        `${edu.degree || "Grado"} en ${edu.school || "Institución"}\n${
+          edu.location || ""
+        } | ${edu.startDate || ""} - ${edu.endDate || ""}`
+    )
+    .join("\n\n");
+};
+
+const formatCertificationsSection = (certifications: any[]) => {
+  if (!certifications || !Array.isArray(certifications))
+    return "Certificaciones no disponibles";
+  return certifications
+    .map(
+      (cert) =>
+        `${cert.name || "Certificación"}: ${cert.description || ""}\n${
+          cert.startDate || ""
+        } - ${cert.endDate || ""}`
+    )
+    .join("\n\n");
+};
+
+const formatLanguagesSection = (languages: string[]) => {
+  if (!languages || !Array.isArray(languages)) return "Idiomas no disponibles";
+  return languages.join("\n");
+};
+
 export function CVBoost() {
   const [activeView, setActiveView] = useState("config"); // "config" or "results"
   const [preferences, setPreferences] = useState({
@@ -285,11 +375,24 @@ export function CVBoost() {
       }
 
       const aiResult = data;
+      console.log("AI Result structure:", JSON.stringify(aiResult, null, 2));
 
+      // Transform the new data structure to match the expected format
       const result = {
         originalContent: file.name,
-        improvedContent: aiResult.optimizedCV,
-        sections: aiResult.sections || {},
+        improvedContent: aiResult.optimizedCV || {},
+        sections: {
+          personal: formatPersonalSection(aiResult.optimizedCV?.personal),
+          summary: aiResult.optimizedCV?.summary || "",
+          experience: formatExperienceSection(aiResult.optimizedCV?.experience),
+          skills: formatSkillsSection(aiResult.optimizedCV?.skills),
+          projects: formatProjectsSection(aiResult.optimizedCV?.projects),
+          education: formatEducationSection(aiResult.optimizedCV?.education),
+          certifications: formatCertificationsSection(
+            aiResult.optimizedCV?.certifications
+          ),
+          languages: formatLanguagesSection(aiResult.optimizedCV?.languages),
+        },
         keywords: aiResult.keywords || [],
         configApplied: {
           language: preferences.language,
