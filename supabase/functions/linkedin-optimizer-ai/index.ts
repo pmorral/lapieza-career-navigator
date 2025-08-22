@@ -362,10 +362,9 @@ serve(async (req) => {
       linkedinProfileContent?.length || 0
     );
 
-    // Determine the primary language for the prompt
-    const isEnglish = language === "inglés" || language === "english";
-    const primaryLanguage = isEnglish ? "English" : "Spanish";
-    const secondaryLanguage = isEnglish ? "Spanish" : "English";
+    // Always generate content in both languages
+    const primaryLanguage = "Spanish";
+    const secondaryLanguage = "English";
 
     const prompt = `You are a senior expert in LinkedIn, personal marketing, personal branding, and professional profile optimization.
 
@@ -409,7 +408,7 @@ Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and $
     "accomplishments": "specific achievements, awards, recognition, publications or relevant presentations (minimum 80 characters)",
     "interests": "professional interests that complement profile and show passion for the industry (minimum 60 characters)"
   },
-  "${secondaryLanguage === "Spanish" ? "spanish" : "english"}": {
+  "${primaryLanguage === "Spanish" ? "spanish" : "english"}": {
     "headline": "titular profesional de máximo 220 caracteres, optimizado con palabras clave del sector",
     "summary": "resumen profesional de 3-4 párrafos (máximo 2600 caracteres) con emojis estratégicos, que incluya propuesta de valor, experiencia clave, logros cuantificados y call-to-action",
     "experiences": [

@@ -504,10 +504,10 @@ function DashboardOverview({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-green-800">
               <MessageCircle className="w-5 h-5" />
-              ¿Necesitas ayuda inmediata?
+              Chatea con tu Career Coach
             </CardTitle>
             <CardDescription className="text-green-700">
-              Escríbenos por WhatsApp y te apoyamos al instante
+              Escríbenos de Lunes a Viernes de 9:00 am - 6:00pm hora CDMX
             </CardDescription>
           </CardHeader>
           <CardContent>

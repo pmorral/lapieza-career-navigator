@@ -301,13 +301,20 @@ Responde en el siguiente formato JSON:
   "optimizedCV": "CV completo optimizado siguiendo la estructura especificada",
   "sections": {
     "personal": "Nombre + headline + datos de contacto",
-    "summary": "Perfil profesional de máximo 4 líneas",
-    "experience": "Experiencia profesional con 3-7 bullets por puesto, limitada según años de experiencia",
+    "summary": "Perfil profesional",
+    "experience": [
+      {
+        "company": "Nombre de la empresa",
+        "position": "Puesto",
+        "description": "Descripción de la experiencia",
+        "bullets": ["Bullets de la experiencia"]
+      }
+    ],
     "skills": "Hard Skills (Básico/Intermedio/Avanzado) y Soft Skills (Bajo/Medio/Alto)",
-    "projects": "Proyectos (solo para perfiles junior o en transición)",
-    "education": "Formación académica",
-    "certifications": "Cursos y certificaciones",
-    "languages": "Idiomas con niveles"
+    "projects": "Proyectos (solo para perfiles junior o en transición) array de objetos con los siguientes campos: 'name', 'description', 'bullets'",
+    "education": "Formación académica array de objetos con los siguientes campos: 'degree', 'school', 'location', 'startDate', 'endDate'",
+    "certifications": "Cursos y certificaciones array de objetos con los siguientes campos: 'name', 'description', 'startDate', 'endDate'",
+    "languages": "Aqui debe de mandarse los lenguages detectados en el CV, para poder optimizar y poner niveles de habilidad ejemplo: 'Inglés: Intermedio', 'Español: Nativo'"
   },
   "keywords": [
     "palabras clave específicas del sector incluidas en el CV"
@@ -319,7 +326,7 @@ Responde en el siguiente formato JSON:
 
     console.log("About to call OpenAI API...");
     console.log("OpenAI API Key available:", !!openAIApiKey);
-    console.log("Prompt length:", prompt.length);
+    console.log("Prompt length:", prompt);
 
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
@@ -347,19 +354,26 @@ Responde en el siguiente formato JSON:
     console.log("OpenAI API response received");
     console.log("OpenAI API response:", JSON.stringify(response.data));
 
-    const aiResponse = response.data.choices[0].message.content;
+    let text = response.data.choices[0].message.content;
+
+    // Limpiar etiquetas ```json ... ``` si las trae
+    text = text.replace(/```json|```/g, "").trim();
+
+    // Convertir a objeto
+    const data = JSON.parse(text);
 
     // Parse JSON response
     let result;
+
     try {
-      result = JSON.parse(aiResponse);
+      result = data;
       console.log("result", result);
     } catch (e) {
       console.error("JSON parsing error:", e);
       // Fallback if JSON parsing fails
       result = {
         feedback: ["No se pudo analizar el CV anterior completamente"],
-        optimizedCV: aiResponse,
+        optimizedCV: text,
         sections: {
           personal: "Información de contacto profesional",
           summary: "Perfil profesional optimizado",
