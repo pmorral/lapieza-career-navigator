@@ -36,6 +36,36 @@ import templateTechPreview from "@/assets/bussines-resume.png";
 import templateMinimalPreview from "@/assets/clasic-resume.png";
 import templateAtsPreview from "@/assets/last-resume.png";
 
+// Type definitions
+interface CVResult {
+  originalContent: string;
+  improvedContent: string;
+  sections: {
+    personal?: string;
+    summary?: string;
+    experience?: string;
+    projects?: string;
+    skills?: string;
+    certifications?: string;
+    education?: string;
+    languages?: string;
+  };
+  keywords: string[];
+  configApplied: {
+    language: string;
+    targetPosition: string;
+  };
+  feedback: string[];
+  fileName: string;
+}
+
+interface HistoryItem {
+  id: string;
+  original_filename: string;
+  optimized_content: CVResult;
+  created_at: string;
+}
+
 const cvTemplates = [
   {
     id: 1,
@@ -91,16 +121,16 @@ export function CVBoost() {
       id: string;
       fileName: string;
       date: string;
-      result: unknown;
+      result: CVResult;
       feedback: string[];
       score?: number;
     }>
   >([]);
-  const [historyItems, setHistoryItems] = useState<unknown[]>([]);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [currentResult, setCurrentResult] = useState<unknown>(null);
+  const [currentResult, setCurrentResult] = useState<CVResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -185,7 +215,23 @@ export function CVBoost() {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        setHistoryItems(data || []);
+        
+        // Transform the data to match our interface
+        const transformedData: HistoryItem[] = (data || []).map(
+          (item: {
+            id: string;
+            original_filename: string;
+            optimized_content: unknown;
+            created_at: string;
+          }) => ({
+            id: item.id,
+            original_filename: item.original_filename,
+            optimized_content: item.optimized_content as CVResult,
+            created_at: item.created_at,
+          })
+        );
+        
+        setHistoryItems(transformedData);
       }
     } catch (error) {
       console.error("Error loading history:", error);

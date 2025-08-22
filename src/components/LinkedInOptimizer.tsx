@@ -213,7 +213,7 @@ export function LinkedInOptimizer() {
   };
 
   const optimizeProfile = async () => {
-    if (!personalCV || !linkedinUrl || !language) {
+    if (!personalCV || !linkedinUrl) {
       toast({
         title: "Error",
         description: "Por favor completa todos los campos requeridos",
@@ -228,7 +228,6 @@ export function LinkedInOptimizer() {
       console.log("Processing LinkedIn optimization with:", {
         personalCV: personalCV?.name,
         linkedinUrl: linkedinUrl,
-        language: language,
       });
 
       // Convert personal CV to base64
@@ -259,7 +258,7 @@ export function LinkedInOptimizer() {
           body: {
             personalCVBase64,
             linkedinUrl: linkedinUrl,
-            language: language || "español",
+            language: "español", // Default to español since we provide both languages
           },
         }
       );
@@ -490,27 +489,10 @@ export function LinkedInOptimizer() {
                   </div>
                 )}
 
-                {/* Language Selection */}
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">
-                    Idioma para la optimización
-                  </Label>
-                  <RadioGroup value={language} onValueChange={setLanguage}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="español" id="es" />
-                      <Label htmlFor="es">Español</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="inglés" id="en" />
-                      <Label htmlFor="en">Inglés</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-
                 <Button
                   onClick={optimizeProfile}
                   disabled={
-                    !personalCV || !linkedinUrl || !language || isOptimizing
+                    !personalCV || !linkedinUrl || isOptimizing
                   }
                   className="w-full"
                   variant="default"
@@ -609,7 +591,6 @@ export function LinkedInOptimizer() {
                 setOptimizedContent(null);
                 setPersonalCV(null);
                 setLinkedinUrl("");
-                setLanguage("");
               }}
               variant="outline"
               size="sm"
