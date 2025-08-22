@@ -110,9 +110,7 @@ export function LinkedInOptimizer() {
   const [optimizedContent, setOptimizedContent] =
     useState<OptimizedContent | null>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [isFetchingProfile, setIsFetchingProfile] = useState(false);
-  const [linkedinProfile, setLinkedinProfile] =
-    useState<LinkedInProfile | null>(null);
+
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -214,61 +212,23 @@ export function LinkedInOptimizer() {
     }
   };
 
-  const fetchLinkedInProfile = async () => {
-    if (!linkedinUrl.trim()) {
+  const optimizeProfile = async () => {
+    if (!personalCV || !linkedinUrl || !language) {
       toast({
         title: "Error",
-        description: "Por favor ingresa una URL de LinkedIn válida",
+        description: "Por favor completa todos los campos requeridos",
         variant: "destructive",
       });
       return;
     }
-
-    setIsFetchingProfile(true);
-
-    try {
-      console.log("Fetching LinkedIn profile from:", linkedinUrl);
-
-      const response = await axios.post(
-        "https://us-central1-lapieza-production.cloudfunctions.net/getLinkedinProfile",
-        {
-          url1: linkedinUrl.trim(),
-        }
-      );
-
-      const data = response.data;
-      console.log("LinkedIn profile data:", data);
-
-      if (!data.success) {
-        throw new Error(data.info || "Error al obtener el perfil de LinkedIn");
-      }
-
-      setLinkedinProfile(data);
-      toast({
-        title: "Perfil obtenido",
-        description: "El perfil de LinkedIn se ha obtenido correctamente",
-      });
-    } catch (error) {
-      console.error("Error fetching LinkedIn profile:", error);
-      toast({
-        title: "Error",
-        description: `No se pudo obtener el perfil: ${error.message}`,
-        variant: "destructive",
-      });
-    } finally {
-      setIsFetchingProfile(false);
-    }
-  };
-
-  const optimizeProfile = async () => {
-    if (!personalCV || !linkedinProfile) return;
 
     setIsOptimizing(true);
 
     try {
       console.log("Processing LinkedIn optimization with:", {
         personalCV: personalCV?.name,
-        linkedinProfile: linkedinProfile,
+        linkedinUrl: linkedinUrl,
+        language: language,
       });
 
       // Convert personal CV to base64
@@ -298,17 +258,12 @@ export function LinkedInOptimizer() {
         {
           body: {
             personalCVBase64,
-            linkedinProfile: linkedinProfile,
+            linkedinUrl: linkedinUrl,
             language: language || "español",
           },
         }
       );
-      console.log("LinkedIn Optimizer AI response:", JSON.stringify(data));
-      console.log("Spanish content:", data.spanish);
-      console.log("English content:", data.english);
-      console.log("Keywords analysis:", data.keywords_analysis);
-      console.log("Optimization tips:", data.optimization_tips);
-
+      console.log("LinkedIn Optimizer AI response:", data, error);
       if (error) {
         console.error("Edge function error:", error);
         throw new Error(`Error al optimizar el perfil: ${error.message}`);
@@ -469,53 +424,24 @@ export function LinkedInOptimizer() {
                   >
                     URL de tu perfil de LinkedIn
                   </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="linkedin-url"
-                      type="url"
-                      placeholder="https://linkedin.com/in/tu-perfil"
-                      value={linkedinUrl}
-                      onChange={(e) => setLinkedinUrl(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={fetchLinkedInProfile}
-                      disabled={!linkedinUrl.trim() || isFetchingProfile}
-                      size="sm"
-                    >
-                      {isFetchingProfile ? (
-                        <>
-                          <Users className="w-4 h-4 mr-2 animate-spin" />
-                          Obteniendo...
-                        </>
-                      ) : (
-                        <>
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Obtener
-                        </>
-                      )}
-                    </Button>
-                  </div>
+                  <Input
+                    id="linkedin-url"
+                    type="url"
+                    placeholder="https://linkedin.com/in/tu-perfil"
+                    value={linkedinUrl}
+                    onChange={(e) => setLinkedinUrl(e.target.value)}
+                    className="w-full"
+                  />
                   {linkedinUrl && !validateLinkedInUrl(linkedinUrl) && (
                     <p className="text-xs text-red-500 mt-1">
                       Por favor ingresa una URL válida de LinkedIn
                     </p>
                   )}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    El perfil se obtendrá automáticamente durante la
+                    optimización
+                  </p>
                 </div>
-
-                {linkedinProfile && (
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center gap-2 text-green-700">
-                      <CheckCircle className="w-4 h-4" />
-                      <span className="text-sm font-medium">
-                        Perfil obtenido correctamente
-                      </span>
-                    </div>
-                    <p className="text-xs text-green-600 mt-1">
-                      Ahora puedes proceder con la optimización
-                    </p>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
@@ -584,7 +510,7 @@ export function LinkedInOptimizer() {
                 <Button
                   onClick={optimizeProfile}
                   disabled={
-                    !personalCV || !linkedinProfile || !language || isOptimizing
+                    !personalCV || !linkedinUrl || !language || isOptimizing
                   }
                   className="w-full"
                   variant="default"
@@ -681,7 +607,6 @@ export function LinkedInOptimizer() {
               onClick={() => {
                 setShowForm(true);
                 setOptimizedContent(null);
-                setLinkedinProfile(null);
                 setPersonalCV(null);
                 setLinkedinUrl("");
                 setLanguage("");
