@@ -305,7 +305,7 @@ export function CVBoost() {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        
+
         // Transform the data to match our interface
         const transformedData: HistoryItem[] = (data || []).map(
           (item: {
@@ -320,7 +320,7 @@ export function CVBoost() {
             created_at: item.created_at,
           })
         );
-        
+
         setHistoryItems(transformedData);
       }
     } catch (error) {
@@ -380,6 +380,10 @@ export function CVBoost() {
 
   const processCV = async (file: File) => {
     setIsProcessing(true);
+
+    // Clear previous results and file to prevent data mixing
+    setCurrentResult(null);
+    setUploadedFile(null);
 
     try {
       console.log("Processing CV file:", file.name, "Size:", file.size);
@@ -497,6 +501,17 @@ export function CVBoost() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const resetState = () => {
+    setCurrentResult(null);
+    setUploadedFile(null);
+    setActiveView("config");
+    setPreferences({
+      language: "",
+      targetPosition: "",
+      relocation: "",
+    });
   };
 
   const copyToClipboard = (text: string) => {
@@ -1319,6 +1334,14 @@ export function CVBoost() {
                 </>
               )}
             </Button>
+
+            {/* Botón para limpiar y procesar un nuevo CV */}
+            {currentResult && (
+              <Button onClick={resetState} variant="outline" className="w-full">
+                <Upload className="w-4 h-4 mr-2" />
+                Procesar Nuevo CV
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
