@@ -7,8 +7,12 @@
     "dev": "vite --port 3001",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "clean": "rm -rf dist",
+    "build:clean": "npm run clean && npm run build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:prod": "npm run build:clean && gcloud compute scp --recurse --zone=us-central1-a --project=\"lapieza-production\" ./dist/* root@academy-services:/var/www/talento.lapieza.io/html",
+    "deploy:dev": "npm run build:clean && npm run build:dev && gcloud compute scp --recurse --zone=us-central1-a --project=\"lapieza-production\" ./dist/* root@academy-services:/var/www/talento.lapieza.io/html"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

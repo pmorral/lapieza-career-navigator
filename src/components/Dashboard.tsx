@@ -66,7 +66,6 @@ import { AutomatedMessages } from "./AutomatedMessages";
 import { CVBoost } from "./CVBoost";
 import { PaymentSettings } from "./PaymentSettings";
 import { JobSuccess } from "./JobSuccess";
-import { Progress } from "@/components/ui/progress";
 
 // Import template preview images
 import templateExecutivePreview from "@/assets/executive-resume.png";

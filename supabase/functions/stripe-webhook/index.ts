@@ -2,31 +2,31 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Configuración de productos para identificar servicios
+// Configuración de productos para identificar servicios (PRODUCCIÓN)
 const PRODUCTS = {
   // Membresías
-  prod_SrQL4oLcpuKNV8: {
+  prod_SvldrwtrNzfFn1: {
     name: "Academy 6-Month Membership",
     type: "membership",
     months: 6,
   },
-  prod_SrQMnG1v3ilHY4: {
+  prod_SvlfRUPYDiOlEv: {
     name: "Academy 12-Month Membership",
     type: "membership",
     months: 12,
   },
   // Servicios adicionales
-  prod_SrrFzevNeQh7HO: {
+  prod_SvlhK9ysej83lH: {
     name: "Asesoría General de Empleabilidad",
     type: "service",
     duration: "60 minutos",
   },
-  prod_SrrGIYm0shK6wZ: {
+  prod_SvlgrTbgc3irnc: {
     name: "Entrevista con Career Coach",
     type: "service",
     duration: "45 minutos",
   },
-  prod_SrrG1esLfVgD0a: {
+  prod_SvlgvWI3gsj8Qf: {
     name: "20 Vacantes Personalizadas",
     type: "service",
     duration: "48 horas",

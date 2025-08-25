@@ -51,52 +51,11 @@ serve(async (req) => {
     const userId = userData.user.id;
     console.log("Processing request for user:", userId);
 
-    // Check for cached CV analysis data
-    console.log("Checking for cached CV analysis data...");
-    const { data: cachedProfile, error: cacheError } = await supabase
-      .from("user_profile_cache")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
-
-    if (cacheError && cacheError.code !== "PGRST116") {
-      console.warn("Cache query error (non-critical):", cacheError);
-    }
-
-    console.log("Cache query result:", {
-      hasCachedProfile: !!cachedProfile,
-      hasError: !!cacheError,
-    });
-
+    // For CV Boost, we always analyze the new CV to avoid reusing previous data
+    console.log("CV Boost: Always analyzing new CV data to ensure fresh results");
+    
     let cvContent;
-    let shouldAnalyzeCV = false;
-
-    // Check if we have cached CV analysis data and if it's still valid (< 3 months)
-    if (
-      cachedProfile &&
-      cachedProfile.cv_analysis_data &&
-      cachedProfile.last_cv_analysis
-    ) {
-      const lastAnalysis = new Date(cachedProfile.last_cv_analysis);
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-      if (lastAnalysis > threeMonthsAgo) {
-        console.log("Using cached CV analysis data");
-        cvContent = cachedProfile.cv_analysis_data;
-      } else {
-        console.log(
-          "Cached CV analysis data is older than 3 months, analyzing new data"
-        );
-        shouldAnalyzeCV = true;
-      }
-    } else {
-      console.log("No cached CV analysis data found, analyzing new data");
-      shouldAnalyzeCV = true;
-    }
-
-    // Analyze CV if needed
-    if (shouldAnalyzeCV) {
+    let shouldAnalyzeCV = true;
       try {
         console.log("Uploading CV to Supabase storage...");
 
@@ -159,24 +118,8 @@ serve(async (req) => {
             cvContent.length
           );
 
-          // Update cache with new CV analysis data
-          const cacheUpdateData = {
-            cv_analysis_data: cvContent,
-            last_cv_analysis: new Date().toISOString(),
-          };
-
-          if (cachedProfile) {
-            await supabase
-              .from("user_profile_cache")
-              .update(cacheUpdateData)
-              .eq("user_id", userId);
-          } else {
-            await supabase.from("user_profile_cache").insert({
-              user_id: userId,
-              ...cacheUpdateData,
-            });
-          }
-          console.log("CV analysis data cached successfully");
+          // CV Boost: Skip caching to ensure fresh analysis for each CV
+          console.log("CV Boost: Skipping cache to ensure fresh results");
         } else {
           throw new Error("No result from CV analysis API");
         }
@@ -221,7 +164,6 @@ serve(async (req) => {
             "CV content from uploaded PDF file - Error in extraction, using fallback processing";
         }
       }
-    }
 
     // Ensure we have CV content
     if (!cvContent) {

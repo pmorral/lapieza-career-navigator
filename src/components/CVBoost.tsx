@@ -385,6 +385,9 @@ export function CVBoost() {
     setCurrentResult(null);
     setUploadedFile(null);
 
+    // Clear any cached data by resetting preferences temporarily
+    const originalPreferences = { ...preferences };
+
     try {
       console.log("Processing CV file:", file.name, "Size:", file.size);
 
@@ -418,6 +421,11 @@ export function CVBoost() {
         },
       });
       console.log("CV Boost AI response:", data, error);
+      setPreferences({
+        language: "",
+        targetPosition: "",
+        relocation: "",
+      });
 
       if (error) {
         console.error("Edge function error:", error);
@@ -512,6 +520,12 @@ export function CVBoost() {
       targetPosition: "",
       relocation: "",
     });
+
+    // Clear the file input to ensure a fresh start
+    const fileInput = document.getElementById("cv-upload") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   const copyToClipboard = (text: string) => {

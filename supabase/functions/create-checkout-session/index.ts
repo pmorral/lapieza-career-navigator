@@ -18,18 +18,18 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL");
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Product configuration - using existing products
+// Product configuration - using production products
 const PRODUCTS = {
   // Membresías
   "6months": {
-    id: "prod_SrQL4oLcpuKNV8",
+    id: "prod_SvldrwtrNzfFn1",
     name: "Academy 6-Month Membership",
     price: 14900,
     months: 6,
     type: "membership",
   },
   "12months": {
-    id: "prod_SrQMnG1v3ilHY4",
+    id: "prod_SvlfRUPYDiOlEv",
     name: "Academy 12-Month Membership",
     price: 19900,
     months: 12,
@@ -37,21 +37,21 @@ const PRODUCTS = {
   },
   // Servicios adicionales
   consultation: {
-    id: "prod_SrrFzevNeQh7HO",
+    id: "prod_SvlhK9ysej83lH",
     name: "Asesoría General de Empleabilidad",
     price: 15000,
     duration: "60 minutos",
     type: "service",
   },
   "interview-45": {
-    id: "prod_SrrGIYm0shK6wZ",
+    id: "prod_SvlgrTbgc3irnc",
     name: "Entrevista con Career Coach",
     price: 10000,
     duration: "45 minutos",
     type: "service",
   },
   "job-vacancies": {
-    id: "prod_SrrG1esLfVgD0a",
+    id: "prod_SvlgvWI3gsj8Qf",
     name: "20 Vacantes Personalizadas",
     price: 10000,
     duration: "48 horas",
