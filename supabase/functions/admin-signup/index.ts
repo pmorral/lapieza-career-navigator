@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, password, full_name } = await req.json();
+    const { email, password, full_name, whatsapp } = await req.json();
 
     if (!email || !password) {
       return new Response(
@@ -36,6 +36,7 @@ serve(async (req) => {
       email_confirm: true,
       user_metadata: {
         full_name: full_name || null,
+        whatsapp: whatsapp || null,
       },
     });
 
@@ -44,6 +45,26 @@ serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Crear o actualizar el perfil del usuario con WhatsApp
+    if (data.user?.id) {
+      const { error: profileError } = await supabase.from("profiles").upsert(
+        {
+          user_id: data.user.id,
+          full_name: full_name || null,
+          email: email,
+          whatsapp: whatsapp || null,
+        },
+        {
+          onConflict: "user_id",
+        }
+      );
+
+      if (profileError) {
+        console.error("Error updating profile:", profileError);
+        // No fallamos si hay error en el perfil, solo lo registramos
+      }
     }
 
     return new Response(

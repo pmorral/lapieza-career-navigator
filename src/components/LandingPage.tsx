@@ -70,7 +70,8 @@ export function LandingPage() {
     {
       icon: UserCheck,
       title: "Seguimiento con un Career Coach",
-      description: "Acompañamiento personalizado en tu proceso de búsqueda laboral",
+      description:
+        "Acompañamiento personalizado en tu proceso de búsqueda laboral",
     },
   ];
 
@@ -132,7 +133,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header with Logo */}
-      <header className="absolute top-0 left-0 right-0 z-50 p-6">
+      <header className="absolute top-0 left-0 right-0 z-50 p-6 bg-white/95 backdrop-blur-sm shadow-lg">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <img
             src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
@@ -155,7 +156,7 @@ export function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-32">
         `
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="text-foreground">
@@ -167,16 +168,17 @@ export function LandingPage() {
               Más de 320 casos de éxito
             </Badge>
 
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900">
               Impulsa tu carrera con nuestro
               <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 programa 360° de empleabilidad
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl mb-8 text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-8 text-gray-700 max-w-3xl mx-auto">
               Conviértete en el candidato ideal. Domina tu búsqueda laboral con
-              IA, sesiones grupales, templates profesionales y seguimiento con un Career Coach.
+              IA, sesiones grupales, templates profesionales y seguimiento con
+              un Career Coach.
             </p>
 
             <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center">
@@ -431,16 +433,7 @@ export function LandingPage() {
               <CardTitle className="text-xl font-semibold mb-2">
                 Academy by LaPieza
               </CardTitle>
-              <div className="space-y-2">
-                <div className="text-3xl font-bold text-primary">$149 USD</div>
-                <div className="text-sm text-muted-foreground">
-                  6 meses de acceso completo
-                </div>
-                <div className="text-2xl font-bold text-primary">$199 USD</div>
-                <div className="text-sm text-muted-foreground">
-                  12 meses de acceso completo
-                </div>
-              </div>
+
               <CardDescription className="text-lg">
                 Único pago - Acceso completo durante tu membresía
               </CardDescription>
@@ -459,7 +452,13 @@ export function LandingPage() {
                 size="lg"
                 className="w-full text-lg py-4"
                 variant="professional"
-                onClick={() => navigate("/dashboard")}
+                onClick={() => {
+                  if (user) {
+                    navigate("/dashboard");
+                  } else {
+                    navigate("/login");
+                  }
+                }}
               >
                 Comenzar Mi Transformación Profesional
                 <ArrowRight className="w-5 h-5 ml-2" />

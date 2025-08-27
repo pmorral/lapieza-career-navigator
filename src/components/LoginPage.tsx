@@ -6,6 +6,7 @@ import {
   Lock,
   ArrowRight,
   MessageCircle,
+  Phone,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -80,6 +82,7 @@ export function LoginPage() {
               email,
               password,
               full_name: name,
+              whatsapp: whatsapp,
             },
           }
         );
@@ -140,9 +143,7 @@ export function LoginPage() {
             />
           </div>
           <p className="text-muted-foreground">
-            {isLogin
-              ? "Inicia sesión para acceder"
-              : "Crea tu cuenta - Requiere membresía desde $149 USD"}
+            {isLogin ? "Inicia sesión para acceder" : "Crea tu cuenta"}
           </p>
         </div>
 
@@ -154,7 +155,7 @@ export function LoginPage() {
             <CardDescription className="text-center">
               {isLogin
                 ? "Ingresa tus credenciales para acceder a tu cuenta"
-                : "Completa tus datos para crear tu cuenta. Requiere membresía desde $149 USD (6 meses)"}
+                : "Completa tus datos para crear tu cuenta."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -170,6 +171,24 @@ export function LoginPage() {
                     onChange={(e) => setName(e.target.value)}
                     required
                   />
+                </div>
+              )}
+
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="whatsapp">WhatsApp</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="whatsapp"
+                      type="tel"
+                      placeholder="+52 55 1234 5678"
+                      className="pl-10"
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
               )}
 
