@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -30,6 +31,7 @@ export function LoginPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -69,6 +71,15 @@ export function LoginPage() {
           toast({
             title: "Error",
             description: "Las contraseñas no coinciden",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!acceptTerms) {
+          toast({
+            title: "Error",
+            description: "Debes aceptar los términos y condiciones",
             variant: "destructive",
           });
           return;
@@ -249,6 +260,35 @@ export function LoginPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
+                  </div>
+                </div>
+              )}
+
+              {!isLogin && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="terms"
+                      checked={acceptTerms}
+                      onCheckedChange={(checked: boolean | "indeterminate") => {
+                        if (checked === true || checked === false) {
+                          setAcceptTerms(checked);
+                        }
+                      }}
+                    />
+                    <Label
+                      htmlFor="terms"
+                      className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Acepto los{" "}
+                      <a
+                        href="/terms-conditions"
+                        target="_blank"
+                        className="text-primary hover:underline"
+                      >
+                        términos y condiciones
+                      </a>
+                    </Label>
                   </div>
                 </div>
               )}

@@ -597,6 +597,31 @@ function DashboardOverview({
             </Button>
           </CardContent>
         </Card>
+
+        {/* Community Sessions */}
+        <Card className="shadow-card border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-blue-800">
+              🧩 Sesión de Comunidad
+            </CardTitle>
+            <CardDescription className="text-blue-700">
+              Sesiones Quincenales de Empleabilidad
+              <br />
+              <span className="text-xs">Zona horaria: America/Mexico_City</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full"
+              onClick={() => window.open("https://meet.google.com/ohr-tjqn-ybg", "_blank")}
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Unirse a Google Meet
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
