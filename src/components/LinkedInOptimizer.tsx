@@ -588,7 +588,6 @@ export function LinkedInOptimizer() {
                 setOptimizedContent(null);
                 setPersonalCV(null);
                 setLinkedinUrl("");
-                setLanguage("");
               }}
               variant="outline"
               size="sm"

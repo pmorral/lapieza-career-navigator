@@ -468,17 +468,240 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Team Section */}
+      <section className="py-20 bg-card/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Nuestro equipo
+            </h3>
+            <p className="text-lg text-muted-foreground">
+              Profesionales comprometidos con tu éxito laboral
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                  <img
+                    src="/lovable-uploads/bd0a9499-f9c9-4e55-8098-281b435f6fa7.png"
+                    alt="Mariana Osuna"
+                    className="w-full h-full object-cover filter sepia contrast-125 brightness-110"
+                  />
+                </div>
+                <h4 className="font-semibold text-foreground mb-1">Mariana Osuna</h4>
+                <p className="text-sm text-muted-foreground">Interim CEO</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                  <img
+                    src="/lovable-uploads/ae54c6eb-237c-4bec-acec-80f9b7244947.png"
+                    alt="Tulia Valdez"
+                    className="w-full h-full object-cover filter sepia contrast-125 brightness-110"
+                  />
+                </div>
+                <h4 className="font-semibold text-foreground mb-1">Tulia Valdez</h4>
+                <p className="text-sm text-muted-foreground">Career Coach Lead</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                  <img
+                    src="/lovable-uploads/32d710f3-6703-48bd-ba91-3aaf054fa3fb.png"
+                    alt="Alejandra Isosorbe"
+                    className="w-full h-full object-cover filter sepia contrast-125 brightness-110"
+                  />
+                </div>
+                <h4 className="font-semibold text-foreground mb-1">Alejandra Isosorbe</h4>
+                <p className="text-sm text-muted-foreground">Sr. Career Coach</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                  <img
+                    src="/lovable-uploads/302b18c9-f921-4a7f-a50a-bef4ee92bb1c.png"
+                    alt="Jossette García"
+                    className="w-full h-full object-cover filter sepia contrast-125 brightness-110"
+                  />
+                </div>
+                <h4 className="font-semibold text-foreground mb-1">Jossette García</h4>
+                <p className="text-sm text-muted-foreground">Sr. Career Coach</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold text-foreground mb-4">
+              Preguntas Frecuentes
+            </h3>
+            <p className="text-lg text-muted-foreground">
+              Resolvemos las dudas más comunes sobre nuestro programa
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Qué es el Programa de Empleabilidad 360 de Academy by LaPieza?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Es un programa integral en donde encontrarás todas las principales herramientas que hemos desarrollado durante los últimos 5 años para ayudar a cientos de personas a encontrar empleo en un sólo lugar. Combina e-learning, simulaciones de entrevistas con IA, optimización de CV y LinkedIn con IA, seguimiento personalizado con un Career Coach a través de WhatsApp y sesiones en comunidad. Para que gestiones tu búsqueda de empleo de forma estratégica, autónoma y organizada.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Cuánto dura el programa y cómo funciona?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  El programa está pensado para que lo hagas a tu propio ritmo, así que depende mucho de ti. En nuestra experiencia, recomendamos aplicar todos los conocimientos del programa sin pausas en los primeros 2 a 3 meses. Pero cómo entendemos que muchas cosas pueden pasar en ese inter, por eso te damos las opciones de más tiempo en las herramientas para poder hacerlo sin prisa; en las siguientes dos modalidades:
+                </p>
+                <ul className="list-disc list-inside text-muted-foreground space-y-2">
+                  <li>6 meses</li>
+                  <li>12 meses</li>
+                </ul>
+                <p className="text-muted-foreground mt-4">
+                  Durante este tiempo tendrás acceso completo a la plataforma, materiales, sesiones grupales de empleabilidad y acompañamiento a través de WhatsApp. Tú marcas el ritmo: puedes avanzar de forma autónoma en los recursos digitales y pedir apoyo de tu Career Coach cuando lo necesites.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Qué diferencia hay con otros programas de empleabilidad?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  A diferencia de cursos genéricos, aquí combinas aprendizaje práctico + herramientas digitales + acompañamiento humano. Desde el 2020 hemos acompañado a más de 450 personas en Latinoamérica, logrando que más del 70% consiguiera entrevistas en menos de 3 meses.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Puedo pagar en mensualidades o parcialidades?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Actualmente no ofrecemos pagos en mensualidades. El pago se realiza en una sola exhibición al momento de contratar el programa.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Qué pasa si no consigo trabajo durante el programa?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  El programa está diseñado para darte todas las herramientas y el acompañamiento necesario, pero el éxito depende de tu compromiso con las actividades. En caso de no lograr el resultado esperado, lo que te llevas son habilidades, metodologías y herramientas que podrás aplicar por tu cuenta en cualquier momento de tu carrera profesional.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Qué incluye exactamente mi plan?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Ambos planes incluyen acceso completo a la plataforma, simulaciones de entrevista (5 en plan de 6 meses, 10 en plan de 12 meses), optimización de CV y LinkedIn con herramientas digitales, sesiones grupales de empleabilidad cada 2 semanas, acompañamiento por WhatsApp con un Career Coach, acceso al tablero de vacantes para seguimiento de todos tus procesos y acceso a servicios adicionales on demand a precio preferente.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Puedo contratar servicios adicionales dentro de la plataforma?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Sí. Además del programa de empleabilidad, tendrás acceso a servicios on demand que puedes contratar de manera opcional y con precio preferente por ser parte del programa.
+                </p>
+                <p className="text-muted-foreground mb-2">Entre ellos:</p>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1 mb-4">
+                  <li>Asesoría general de empleabilidad para resolver dudas específicas.</li>
+                  <li>Entrevistas personalizadas con un Career Coach para preparar mejor tus procesos.</li>
+                  <li>20 vacantes personalizadas, seleccionadas según tu perfil y objetivos.</li>
+                </ul>
+                <p className="text-muted-foreground">
+                  De esta forma, puedes complementar tu plan según tu avance, eligiendo los apoyos puntuales que más valor te den en tu búsqueda laboral.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Cómo funciona el soporte técnico de la plataforma?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  El soporte es rápido y sencillo: basta con escribirnos un mensaje vía WhatsApp y nuestro equipo te ayudará con cualquier duda técnica o de uso.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Qué pasa si no alcanzo el precio de introducción?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  El precio de introducción es exclusivo para los primeros usuarios que se unan a la lista de espera. Si no alcanzas esta oferta, podrás acceder al programa con el precio regular.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">¿Puedo acceder desde cualquier país?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Sí. Aunque nuestra base está en México, parte importante de nuestro objetivo al volver el programa 100% digital es que pueda ser accesible desde cualquier país de Latinoamérica o el mundo.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-card border-t border-border py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h4 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
-              Academy by LaPieza
-            </h4>
-            <p className="text-muted-foreground mb-6">
-              Transformando carreras profesionales desde 2020
-            </p>
-            <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center md:text-left">
+              <h4 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4">
+                Academy by LaPieza
+              </h4>
+              <p className="text-muted-foreground mb-4">
+                Transformando carreras profesionales desde 2020
+              </p>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>Cordoba 95, Roma Norte - CDMX, 06700</p>
+                <p>tulia.valdez@lapieza.io</p>
+                <p>+52 33 3787 2943 (Solo WhatsApp)</p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <h5 className="font-semibold text-foreground mb-4">Síguenos</h5>
               <div className="flex justify-center gap-4">
                 <a
                   href="https://www.linkedin.com/company/academy-by-lapieza/"
@@ -486,11 +709,7 @@ export function LandingPage() {
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
                 </a>
@@ -500,11 +719,7 @@ export function LandingPage() {
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
                   </svg>
                 </a>
@@ -514,23 +729,50 @@ export function LandingPage() {
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                   </svg>
                 </a>
               </div>
-              <div className="flex justify-center gap-6 text-sm text-muted-foreground">
-                <span>© 2024 Academy by LaPieza</span>
-                <span>•</span>
-                <span>Términos y Condiciones</span>
-                <span>•</span>
-                <span>Política de Privacidad</span>
+            </div>
+
+            <div className="text-center md:text-right">
+              <h5 className="font-semibold text-foreground mb-4">Legal</h5>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <a
+                    href="/terms-conditions"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Términos y Condiciones
+                  </a>
+                </div>
+                <div>
+                  <a
+                    href="https://empresas.lapieza.io/privacy-policy/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Política de Privacidad
+                  </a>
+                </div>
+                <div>
+                  <a
+                    href="https://empresas.lapieza.io/usability/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Usabilidad
+                  </a>
+                </div>
               </div>
             </div>
+          </div>
+          
+          <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
+            <p>Copyright © 2021 Talento Startup SAPI de CV</p>
           </div>
         </div>
       </footer>
