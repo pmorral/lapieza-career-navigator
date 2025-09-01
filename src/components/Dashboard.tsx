@@ -67,6 +67,7 @@ import { AutomatedMessages } from "./AutomatedMessages";
 import { CVBoost } from "./CVBoost";
 import { PaymentSettings } from "./PaymentSettings";
 import { JobSuccess } from "./JobSuccess";
+
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Sheet,
@@ -280,6 +281,7 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
             <AdditionalServices />
           </div>
         );
+
       case "settings":
         return <GeneralSettings />;
       case "profile":
@@ -615,7 +617,9 @@ function DashboardOverview({
               variant="outline"
               size="lg"
               className="w-full"
-              onClick={() => window.open("https://meet.google.com/ohr-tjqn-ybg", "_blank")}
+              onClick={() =>
+                window.open("https://meet.google.com/ohr-tjqn-ybg", "_blank")
+              }
             >
               <Calendar className="w-4 h-4 mr-2" />
               Unirse a Google Meet

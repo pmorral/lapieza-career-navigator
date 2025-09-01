@@ -179,11 +179,23 @@ export function AdditionalServices() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Servicios Adicionales</h2>
-        <p className="text-muted-foreground">
-          Acelera tu desarrollo profesional con servicios personalizados
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-2xl font-bold">Servicios Adicionales</h2>
+          <p className="text-muted-foreground">
+            Acelera tu desarrollo profesional con servicios personalizados
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            (window.location.href = "/terms-and-conditions-aditional-services")
+          }
+          className="text-xs"
+        >
+          Ver Términos y Condiciones
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

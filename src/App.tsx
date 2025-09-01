@@ -21,6 +21,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import NotFound from "./pages/NotFound";
 import { TermsConditions } from "./pages/TermsConditions";
 import { Button } from "./components/ui/button";
+import { TermsAndConditionsAdditionalServices } from "./components/TermsAndConditionsAdditionalServices";
 
 const queryClient = new QueryClient();
 
@@ -57,9 +58,15 @@ const AppRoutes = () => {
 
       {/* Ruta para restablecer contraseña - pública */}
       <Route path="/reset-password" element={<ResetPassword />} />
-      
+
       {/* Ruta para términos y condiciones - pública */}
       <Route path="/terms-conditions" element={<TermsConditions />} />
+
+      {/* Ruta para términos y condiciones de servicios adicionales - pública */}
+      <Route
+        path="/terms-and-conditions-aditional-services"
+        element={<TermsAndConditionsAdditionalServices />}
+      />
 
       {/* Ruta de pago - solo para usuarios autenticados SIN suscripción activa */}
       {user && !subscriptionActive ? (
