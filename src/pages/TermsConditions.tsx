@@ -9,6 +9,14 @@ export function TermsConditions() {
           <p className="text-lg text-muted-foreground">
             Academy by LaPieza - Programa de Empleabilidad 360°
           </p>
+          <div className="mt-6">
+            <a
+              href="/"
+              className="text-primary hover:underline font-medium"
+            >
+              ← Regresa al inicio
+            </a>
+          </div>
         </div>
 
         <div className="space-y-8">

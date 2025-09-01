@@ -16,6 +16,7 @@ import {
   Clock,
   Heart,
   Play,
+  ChevronDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Carousel,
   CarouselContent,
@@ -39,6 +41,49 @@ export function LandingPage() {
   const [selectedPlan, setSelectedPlan] = useState("academy");
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const faqs = [
+    {
+      question: "¿Qué es el Programa de Empleabilidad 360 de Academy by LaPieza?",
+      answer: "Es un programa integral en donde encontrarás todas las principales herramientas que hemos desarrollado durante los últimos 5 años para ayudar a cientos de personas a encontrar empleo en un sólo lugar. Combina e-learning, simulaciones de entrevistas con, optimización de CV y LinkedIn con IA, seguimiento personalizado con un Career Coach a través de WhatsApp y sesiones en comunidad. Para que gestiones tu búsqueda de empleo de forma estratégica, autónoma y organizada."
+    },
+    {
+      question: "¿Cuánto dura el programa y cómo funciona?",
+      answer: "El programa está pensado para que lo hagas a tu propio ritmo, así que depende mucho de ti. En nuestra experiencia, recomendamos aplicar todos los conocimientos del programa sin pausas en los primeros 2 a 3 meses. Pero cómo entendemos que muchas cosas pueden pasar en ese inter, por eso te damos las opciones de más tiempo en las herramientas para poder hacerlo sin prisa; en las siguientes dos modalidades:\n\n6 meses\n\n12 meses\n\nDurante este tiempo tendrás acceso completo a la plataforma, materiales, sesiones grupales de empleabilidad y acompañamiento a través de WhatsApp. Tú marcas el ritmo: puedes avanzar de forma autónoma en los recursos digitales y pedir apoyo de tu Career Coach cuando lo necesites."
+    },
+    {
+      question: "¿Qué diferencia hay con otros programas de empleabilidad?",
+      answer: "A diferencia de cursos genéricos, aquí combinas aprendizaje práctico + herramientas digitales + acompañamiento humano. Desde el 2020 hemos acompañado a más de 450 personas en Latinoamérica, logrando que más del 70% consiguiera entrevistas en menos de 3 meses."
+    },
+    {
+      question: "¿Puedo pagar en mensualidades o parcialidades?",
+      answer: "Actualmente no ofrecemos pagos en mensualidades. El pago se realiza en una sola exhibición al momento de contratar el programa."
+    },
+    {
+      question: "¿Qué pasa si no consigo trabajo durante el programa?",
+      answer: "El programa está diseñado para darte todas las herramientas y el acompañamiento necesario, pero el éxito depende de tu compromiso con las actividades. En caso de no lograr el resultado esperado, lo que te llevas son habilidades, metodologías y herramientas que podrás aplicar por tu cuenta en cualquier momento de tu carrera profesional."
+    },
+    {
+      question: "¿Qué incluye exactamente mi plan?",
+      answer: "Ambos planes incluyen acceso completo a la plataforma, simulaciones de entrevista (5 en plan de 6 meses, 10 en plan de 12 meses), optimización de CV y LinkedIn con herramientas digitales, sesiones grupales de empleabilidad cada 2 semanas, acompañamiento por WhatsApp con un Career Coach, acceso al tablero de vacantes para seguimiento de todos tus procesos y acceso a servicios adicionales on demand a precio preferente."
+    },
+    {
+      question: "¿Puedo contratar servicios adicionales dentro de la plataforma?",
+      answer: "Sí. Además del programa de empleabilidad, tendrás acceso a servicios on demand que puedes contratar de manera opcional y con precio preferente por ser parte del programa.\n\nEntre ellos:\n- Asesoría general de empleabilidad para resolver dudas específicas.\n- Entrevistas personalizadas con un Career Coach para preparar mejor tus procesos.\n- 20 vacantes personalizadas, seleccionadas según tu perfil y objetivos.\n\nDe esta forma, puedes complementar tu plan según tu avance, eligiendo los apoyos puntuales que más valor te den en tu búsqueda laboral."
+    },
+    {
+      question: "¿Cómo funciona el soporte técnico de la plataforma?",
+      answer: "El soporte es rápido y sencillo: basta con escribirnos un mensaje vía WhatsApp y nuestro equipo te ayudará con cualquier duda técnica o de uso."
+    },
+    {
+      question: "¿Qué pasa si no alcanzo el precio de introducción?",
+      answer: "El precio de introducción es exclusivo para los primeros usuarios que se unan a la lista de espera. Si no alcanzas esta oferta, podrás acceder al programa con el precio regular."
+    },
+    {
+      question: "¿Puedo acceder desde cualquier país?",
+      answer: "Sí. Aunque nuestra base está en México, parte importante de nuestro objetivo al volver el programa 100% digital es que pueda ser accesible desde cualquier país de Latinoamérica o el mundo."
+    }
+  ];
 
   const features = [
     {
@@ -541,9 +586,9 @@ export function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20">
+      <section className="py-20 bg-muted/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-foreground mb-4">
               Preguntas Frecuentes
             </h3>
@@ -551,133 +596,27 @@ export function LandingPage() {
               Resolvemos las dudas más comunes sobre nuestro programa
             </p>
           </div>
-
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Qué es el Programa de Empleabilidad 360 de Academy by LaPieza?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Es un programa integral en donde encontrarás todas las principales herramientas que hemos desarrollado durante los últimos 5 años para ayudar a cientos de personas a encontrar empleo en un sólo lugar. Combina e-learning, simulaciones de entrevistas con IA, optimización de CV y LinkedIn con IA, seguimiento personalizado con un Career Coach a través de WhatsApp y sesiones en comunidad. Para que gestiones tu búsqueda de empleo de forma estratégica, autónoma y organizada.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Cuánto dura el programa y cómo funciona?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  El programa está pensado para que lo hagas a tu propio ritmo, así que depende mucho de ti. En nuestra experiencia, recomendamos aplicar todos los conocimientos del programa sin pausas en los primeros 2 a 3 meses. Pero cómo entendemos que muchas cosas pueden pasar en ese inter, por eso te damos las opciones de más tiempo en las herramientas para poder hacerlo sin prisa; en las siguientes dos modalidades:
-                </p>
-                <ul className="list-disc list-inside text-muted-foreground space-y-2">
-                  <li>6 meses</li>
-                  <li>12 meses</li>
-                </ul>
-                <p className="text-muted-foreground mt-4">
-                  Durante este tiempo tendrás acceso completo a la plataforma, materiales, sesiones grupales de empleabilidad y acompañamiento a través de WhatsApp. Tú marcas el ritmo: puedes avanzar de forma autónoma en los recursos digitales y pedir apoyo de tu Career Coach cuando lo necesites.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Qué diferencia hay con otros programas de empleabilidad?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  A diferencia de cursos genéricos, aquí combinas aprendizaje práctico + herramientas digitales + acompañamiento humano. Desde el 2020 hemos acompañado a más de 450 personas en Latinoamérica, logrando que más del 70% consiguiera entrevistas en menos de 3 meses.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Puedo pagar en mensualidades o parcialidades?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Actualmente no ofrecemos pagos en mensualidades. El pago se realiza en una sola exhibición al momento de contratar el programa.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Qué pasa si no consigo trabajo durante el programa?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  El programa está diseñado para darte todas las herramientas y el acompañamiento necesario, pero el éxito depende de tu compromiso con las actividades. En caso de no lograr el resultado esperado, lo que te llevas son habilidades, metodologías y herramientas que podrás aplicar por tu cuenta en cualquier momento de tu carrera profesional.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Qué incluye exactamente mi plan?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Ambos planes incluyen acceso completo a la plataforma, simulaciones de entrevista (5 en plan de 6 meses, 10 en plan de 12 meses), optimización de CV y LinkedIn con herramientas digitales, sesiones grupales de empleabilidad cada 2 semanas, acompañamiento por WhatsApp con un Career Coach, acceso al tablero de vacantes para seguimiento de todos tus procesos y acceso a servicios adicionales on demand a precio preferente.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Puedo contratar servicios adicionales dentro de la plataforma?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Sí. Además del programa de empleabilidad, tendrás acceso a servicios on demand que puedes contratar de manera opcional y con precio preferente por ser parte del programa.
-                </p>
-                <p className="text-muted-foreground mb-2">Entre ellos:</p>
-                <ul className="list-disc list-inside text-muted-foreground space-y-1 mb-4">
-                  <li>Asesoría general de empleabilidad para resolver dudas específicas.</li>
-                  <li>Entrevistas personalizadas con un Career Coach para preparar mejor tus procesos.</li>
-                  <li>20 vacantes personalizadas, seleccionadas según tu perfil y objetivos.</li>
-                </ul>
-                <p className="text-muted-foreground">
-                  De esta forma, puedes complementar tu plan según tu avance, eligiendo los apoyos puntuales que más valor te den en tu búsqueda laboral.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Cómo funciona el soporte técnico de la plataforma?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  El soporte es rápido y sencillo: basta con escribirnos un mensaje vía WhatsApp y nuestro equipo te ayudará con cualquier duda técnica o de uso.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Qué pasa si no alcanzo el precio de introducción?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  El precio de introducción es exclusivo para los primeros usuarios que se unan a la lista de espera. Si no alcanzas esta oferta, podrás acceder al programa con el precio regular.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">¿Puedo acceder desde cualquier país?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Sí. Aunque nuestra base está en México, parte importante de nuestro objetivo al volver el programa 100% digital es que pueda ser accesible desde cualquier país de Latinoamérica o el mundo.
-                </p>
-              </CardContent>
-            </Card>
+          
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <Collapsible key={index} className="bg-background rounded-lg shadow-sm">
+                <CollapsibleTrigger className="w-full p-6 text-left hover:bg-muted/50 transition-colors">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold text-foreground pr-4">
+                      {faq.question}
+                    </h4>
+                    <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="px-6 pb-6 animate-accordion-down">
+                  <div className="text-muted-foreground leading-relaxed space-y-2 pt-2 border-t border-muted">
+                    {faq.answer.split('\n\n').map((paragraph, pIndex) => (
+                      <p key={pIndex}>{paragraph}</p>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
           </div>
         </div>
       </section>
