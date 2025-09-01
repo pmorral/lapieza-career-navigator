@@ -133,102 +133,108 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header with Logo */}
-      <header className="absolute top-0 left-0 right-0 z-50 p-6 bg-white/95 backdrop-blur-sm shadow-lg">
+      <header className="absolute top-0 left-0 right-0 z-50 p-4 md:p-6 bg-white/95 backdrop-blur-sm shadow-lg">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <img
             src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
             alt="Academy by LaPieza"
-            className="h-12"
+            className="h-8 md:h-12"
           />
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4">
             <Button
               variant="outline"
               onClick={() =>
                 user ? navigate("/dashboard") : navigate("/login")
               }
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground text-sm md:text-base px-3 md:px-4 py-2 md:py-2"
             >
-              <User className="w-4 h-4 mr-2" />
-              {user ? "Abrir Dashboard" : "Iniciar Sesión"}
+              <User className="w-4 h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">
+                {user ? "Abrir Dashboard" : "Iniciar Sesión"}
+              </span>
+              <span className="sm:hidden">{user ? "Dashboard" : "Entrar"}</span>
             </Button>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-32">
-        `
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-24 md:pt-32">
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="text-foreground">
             <Badge
               variant="secondary"
-              className="mb-6 bg-primary/10 text-primary border-primary/20 w-fit mx-auto"
+              className="mb-4 md:mb-6 bg-primary/10 text-primary border-primary/20 w-fit mx-auto text-xs md:text-sm"
             >
-              <Heart className="w-4 h-4 mr-2" />
+              <Heart className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
               Más de 320 casos de éxito
             </Badge>
 
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900">
+            <h1 className="text-2xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 text-gray-900">
               Impulsa tu carrera con nuestro
               <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 programa 360° de empleabilidad
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl mb-8 text-gray-700 max-w-3xl mx-auto">
+            <p className="text-base md:text-xl lg:text-2xl mb-6 md:mb-8 text-gray-700 max-w-3xl mx-auto">
               Conviértete en el candidato ideal. Domina tu búsqueda laboral con
               IA, sesiones grupales, templates profesionales y seguimiento con
               un Career Coach.
             </p>
 
-            <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center">
-              <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-4 py-3 border">
-                <Clock className="w-6 h-6 text-primary" />
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 mb-6 md:mb-8 justify-center">
+              <div className="flex items-center gap-2 md:gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-3 md:px-4 py-2 md:py-3 border">
+                <Clock className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                 <div className="text-left">
-                  <div className="font-bold text-xl text-foreground">
+                  <div className="font-bold text-lg md:text-xl text-foreground">
                     2.5 meses
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-xs md:text-sm text-muted-foreground">
                     promedio de colocación
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-4 py-3 border">
-                <TrendingUp className="w-6 h-6 text-primary" />
+              <div className="flex items-center gap-2 md:gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-3 md:px-4 py-2 md:py-3 border">
+                <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                 <div className="text-left">
-                  <div className="font-bold text-xl text-foreground">+320</div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="font-bold text-lg md:text-xl text-foreground">
+                    +320
+                  </div>
+                  <div className="text-xs md:text-sm text-muted-foreground">
                     casos de éxito
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-4 py-3 border">
-                <Award className="w-6 h-6 text-primary" />
+              <div className="flex items-center gap-2 md:gap-3 bg-card/80 backdrop-blur-sm rounded-lg px-3 md:px-4 py-2 md:py-3 border">
+                <Award className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                 <div className="text-left">
-                  <div className="font-bold text-xl text-foreground">4.7/5</div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="font-bold text-lg md:text-xl text-foreground">
+                    4.7/5
+                  </div>
+                  <div className="text-xs md:text-sm text-muted-foreground">
                     satisfacción
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
               <Button
                 size="lg"
-                className="text-lg px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90"
+                className="text-base md:text-lg px-6 md:px-8 py-3 md:py-4 bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => {
                   const trialSection = document.getElementById("trial-section");
                   trialSection?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
                 Prueba gratis
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-4 text-lg font-semibold"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold"
                 onClick={() => navigate("/login")}
               >
                 Regístrate
@@ -239,19 +245,19 @@ export function LandingPage() {
       </section>
 
       {/* Company Logos Carousel */}
-      <section className="py-12 bg-background border-b">
+      <section className="py-8 md:py-12 bg-background border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-muted-foreground mb-8 font-medium">
+          <p className="text-center text-muted-foreground mb-6 md:mb-8 font-medium text-sm md:text-base">
             Nuestros usuarios han sido contratados por empresas líderes
           </p>
           <div className="relative overflow-hidden">
-            <div className="flex animate-scroll gap-16 items-center justify-center">
+            <div className="flex animate-scroll gap-8 md:gap-16 items-center justify-center">
               {[...companyLogos, ...companyLogos].map((logo, index) => (
                 <div key={index} className="flex-shrink-0">
                   <img
                     src={logo.src}
                     alt={logo.name}
-                    className="h-12 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
+                    className="h-8 md:h-12 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
                   />
                 </div>
               ))}
@@ -261,34 +267,36 @@ export function LandingPage() {
       </section>
 
       {/* Platform Video Section */}
-      <section className="py-20 bg-card/50">
+      <section className="py-12 md:py-20 bg-card/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
+          <div className="text-center mb-8 md:mb-12">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               Conoce nuestra plataforma
             </h3>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base md:text-lg text-muted-foreground">
               Descubre el valor agregado de nuestro programa a través de este
               video
             </p>
           </div>
 
           <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer max-w-2xl mx-auto">
-            <CardHeader className="pb-4">
+            <CardHeader className="pb-4 p-4 md:p-6">
               <div className="relative mb-4">
-                <div className="w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
-                  <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
-                    <Play className="w-10 h-10 text-primary ml-2" />
+                <div className="w-full h-48 md:h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
+                  <div className="w-16 h-16 md:w-20 md:h-20 bg-primary/20 rounded-full flex items-center justify-center">
+                    <Play className="w-8 h-8 md:w-10 md:h-10 text-primary ml-1 md:ml-2" />
                   </div>
                 </div>
-                <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">
+                <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs">
                   Video Demo
                 </Badge>
               </div>
-              <CardTitle className="text-xl">Demo de la Plataforma</CardTitle>
+              <CardTitle className="text-lg md:text-xl">
+                Demo de la Plataforma
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <CardDescription className="mb-6 text-base">
+            <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
+              <CardDescription className="mb-6 text-sm md:text-base">
                 Conoce todas las herramientas y funcionalidades que tendrás
                 disponibles en Academy by LaPieza para impulsar tu carrera
                 profesional.
@@ -299,32 +307,34 @@ export function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
+      <section className="py-12 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="mb-12">
-              <h3 className="text-3xl font-bold text-foreground mb-4">
+            <div className="mb-8 md:mb-12">
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
                 Herramientas que transforman tu búsqueda laboral
               </h3>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base md:text-lg text-muted-foreground">
                 Tecnología avanzada y metodología comprobada diseñada por
                 expertos en reclutamiento y empleabilidad
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {features.map((feature, index) => (
                 <Card
                   key={index}
                   className="text-center hover:shadow-lg transition-shadow"
                 >
-                  <CardHeader className="pb-4">
+                  <CardHeader className="pb-4 p-4 md:p-6">
                     <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3">
                       <feature.icon className="w-6 h-6 text-primary" />
                     </div>
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                    <CardTitle className="text-base md:text-lg">
+                      {feature.title}
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  <CardContent className="pt-0 px-4 md:px-6 pb-4 md:pb-6">
                     <CardDescription className="text-sm">
                       {feature.description}
                     </CardDescription>
@@ -336,13 +346,13 @@ export function LandingPage() {
         </div>
       </section>
       {/* Trial AI Interview Section */}
-      <section id="trial-section" className="py-20 bg-card/50">
+      <section id="trial-section" className="py-12 md:py-20 bg-card/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
+          <div className="text-center mb-8 md:mb-12">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               Experimenta el poder de la IA
             </h3>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base md:text-lg text-muted-foreground">
               Prueba nuestra tecnología antes de unirte al programa completo
             </p>
           </div>
@@ -354,23 +364,25 @@ export function LandingPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20">
+      <section className="py-12 md:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
+          <div className="text-center mb-8 md:mb-16">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               ¿Qué incluye tu membresía?
             </h3>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base md:text-lg text-muted-foreground">
               Acceso completo a todas nuestras herramientas y beneficios
               exclusivos
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-start gap-3">
                 <Check className="w-5 h-5 text-success mt-0.5 flex-shrink-0" />
-                <span className="text-foreground">{benefit}</span>
+                <span className="text-foreground text-sm md:text-base">
+                  {benefit}
+                </span>
               </div>
             ))}
           </div>
@@ -378,21 +390,21 @@ export function LandingPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20">
+      <section className="py-12 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
+          <div className="text-center mb-8 md:mb-16">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               Lo que dicen nuestros usuarios
             </h3>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base md:text-lg text-muted-foreground">
               Historias reales de profesionales que transformaron su carrera
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {testimonials.map((testimonial, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
+                <CardHeader className="p-4 md:p-6">
                   <div className="flex items-center gap-1 mb-2">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star
@@ -401,11 +413,15 @@ export function LandingPage() {
                       />
                     ))}
                   </div>
-                  <CardTitle className="text-lg">{testimonial.name}</CardTitle>
-                  <CardDescription>{testimonial.role}</CardDescription>
+                  <CardTitle className="text-base md:text-lg">
+                    {testimonial.name}
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    {testimonial.role}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground italic">
+                <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
+                  <p className="text-muted-foreground italic text-sm">
                     "{testimonial.content}"
                   </p>
                 </CardContent>

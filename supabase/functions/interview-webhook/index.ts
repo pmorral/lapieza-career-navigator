@@ -230,19 +230,20 @@ serve(async (req) => {
       const sendable = {
         email: candidateEmail, // Email from the profiles table
         templateID: "d-598226c9e4d645ceb04979cfaeda952e",
-        bcc: [],
-        replyTo: [],
-        isHTML: false,
         attachments: [],
-        variables: {
+        data: {
           link: url,
+        },
+        fromLocal: {
+          name: "Academy by LaPieza",
+          email: "tulia.valdez@lapieza.io",
         },
       };
 
       console.log("📤 Email payload:", {
         email: sendable.email,
         templateID: sendable.templateID,
-        url: sendable.variables.link,
+        url: sendable.data.link,
       });
 
       await fetch(

@@ -30,6 +30,7 @@ import {
   History,
   MessageCircle,
   PanelLeft,
+  Menu,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,14 @@ import { AutomatedMessages } from "./AutomatedMessages";
 import { CVBoost } from "./CVBoost";
 import { PaymentSettings } from "./PaymentSettings";
 import { JobSuccess } from "./JobSuccess";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 // Import template preview images
 import templateExecutivePreview from "@/assets/executive-resume.png";
@@ -86,10 +95,12 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   // Sincronizar la sección activa con la URL
   useEffect(() => {
@@ -293,70 +304,128 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
     }
   };
 
+  const renderSidebar = () => {
+    const sidebarContent = (
+      <div className="flex flex-col h-full">
+        <div className={`p-6 ${sidebarCollapsed ? "px-2" : "px-6"}`}>
+          <div className="flex justify-center mb-2">
+            <img
+              src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
+              alt="Academy by LaPieza"
+              className={`h-8 ${sidebarCollapsed ? "scale-90" : ""}`}
+            />
+          </div>
+          {!sidebarCollapsed && (
+            <p className="text-sm text-muted-foreground text-center">
+              Impulsa tu potencial profesional
+            </p>
+          )}
+        </div>
+
+        <nav className="flex-1 px-2 space-y-2">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                handleSectionChange(item.id);
+                if (isMobile) {
+                  setMobileSidebarOpen(false);
+                }
+              }}
+              className={`w-full flex items-center gap-3 ${
+                sidebarCollapsed ? "px-3 justify-center" : "px-4"
+              } py-3 rounded-lg text-left transition-all duration-200 ${
+                activeSection === item.id
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              }`}
+              title={sidebarCollapsed ? item.label : undefined}
+            >
+              <item.icon className="w-5 h-5" />
+              {!sidebarCollapsed && <span>{item.label}</span>}
+            </button>
+          ))}
+        </nav>
+      </div>
+    );
+
+    if (isMobile) {
+      return (
+        <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+          <SheetContent side="left" className="w-80 p-0">
+            <SheetHeader className="p-6 pb-4">
+              <SheetTitle className="text-left">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
+                    alt="Academy by LaPieza"
+                    className="h-8"
+                  />
+                  <span className="text-lg font-semibold">
+                    Academy by LaPieza
+                  </span>
+                </div>
+              </SheetTitle>
+            </SheetHeader>
+            {sidebarContent}
+          </SheetContent>
+        </Sheet>
+      );
+    }
+
+    return (
+      <div
+        className={`fixed inset-y-0 left-0 ${
+          sidebarCollapsed ? "w-14" : "w-64"
+        } bg-card border-r border-border shadow-card transition-all duration-200 z-20`}
+      >
+        {sidebarContent}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
         {/* Sidebar */}
-        <div
-          className={`fixed inset-y-0 left-0 ${
-            sidebarCollapsed ? "w-14" : "w-64"
-          } bg-card border-r border-border shadow-card transition-all duration-200`}
-        >
-          <div className="flex flex-col h-full">
-            <div className={`p-6 ${sidebarCollapsed ? "px-2" : "px-6"}`}>
-              <div className="flex justify-center mb-2">
-                <img
-                  src="/lovable-uploads/01b87ef7-8706-4ed0-a34b-a79798c17337.png"
-                  alt="Academy by LaPieza"
-                  className={`h-8 ${sidebarCollapsed ? "scale-90" : ""}`}
-                />
-              </div>
-              {!sidebarCollapsed && (
-                <p className="text-sm text-muted-foreground text-center">
-                  Impulsa tu potencial profesional
-                </p>
-              )}
-            </div>
-
-            <nav className="flex-1 px-2 space-y-2">
-              {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleSectionChange(item.id)}
-                  className={`w-full flex items-center gap-3 ${
-                    sidebarCollapsed ? "px-3 justify-center" : "px-4"
-                  } py-3 rounded-lg text-left transition-all duration-200 ${
-                    activeSection === item.id
-                      ? "bg-primary/10 text-primary border border-primary/20"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  }`}
-                  title={sidebarCollapsed ? item.label : undefined}
-                >
-                  <item.icon className="w-5 h-5" />
-                  {!sidebarCollapsed && <span>{item.label}</span>}
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
+        {renderSidebar()}
 
         {/* Main Content */}
         <div
           className={`flex-1 ${
-            sidebarCollapsed ? "ml-14" : "ml-64"
+            isMobile ? "ml-0" : sidebarCollapsed ? "ml-14" : "ml-64"
           } transition-all duration-200`}
         >
           <header className="bg-card border-b border-border px-4 md:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Colapsar menú"
-                  onClick={() => setSidebarCollapsed((v) => !v)}
-                >
-                  <PanelLeft className="w-5 h-5" />
-                </Button>
+                {isMobile ? (
+                  <Sheet
+                    open={mobileSidebarOpen}
+                    onOpenChange={setMobileSidebarOpen}
+                  >
+                    <SheetTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Abrir menú"
+                        className="md:hidden"
+                      >
+                        <Menu className="w-5 h-5" />
+                      </Button>
+                    </SheetTrigger>
+                  </Sheet>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Colapsar menú"
+                    onClick={() => setSidebarCollapsed((v) => !v)}
+                    className="hidden md:flex"
+                  >
+                    <PanelLeft className="w-5 h-5" />
+                  </Button>
+                )}
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Button
@@ -391,7 +460,7 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
                     <User className="w-4 h-4 mr-2" />
-                    Mi Perfil
+                    <span className="hidden sm:inline">Mi Perfil</span>
                     <ChevronDown className="w-4 h-4 ml-2" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -421,7 +490,7 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
             </div>
           </header>
 
-          <main className="p-6">{renderContent()}</main>
+          <main className="p-4 md:p-6">{renderContent()}</main>
         </div>
       </div>
 
@@ -447,76 +516,84 @@ function DashboardOverview({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-4 md:space-y-6">
+      <div className="grid grid-cols-1 gap-4 md:gap-6">
         {/* Acciones Rápidas centrado */}
-        <div className="lg:col-span-2 flex justify-center">
+        <div className="flex justify-center">
           <Card className="shadow-card w-full max-w-xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                 <Target className="w-5 h-5 text-primary" />
                 Acciones Rápidas
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm md:text-base">
                 Comienza tu desarrollo profesional
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 p-4 md:p-6">
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start h-12 md:h-10"
                 onClick={() => setActiveSection("cv-boost")}
               >
                 <Upload className="w-4 h-4 mr-2" />
-                CV Boost
+                <span className="text-sm md:text-base">CV Boost</span>
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start h-12 md:h-10"
                 onClick={() => setActiveSection("linkedin")}
               >
                 <Users className="w-4 h-4 mr-2" />
-                Optimizar Perfil LinkedIn
+                <span className="text-sm md:text-base">
+                  Optimizar Perfil LinkedIn
+                </span>
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start h-12 md:h-10"
                 onClick={() => setActiveSection("job-tracker")}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Agregar Aplicación Laboral
+                <span className="text-sm md:text-base">
+                  Agregar Aplicación Laboral
+                </span>
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start h-12 md:h-10"
                 onClick={() => setActiveSection("interviews")}
               >
                 <Play className="w-4 h-4 mr-2" />
-                Iniciar Entrevista Simulada
+                <span className="text-sm md:text-base">
+                  Iniciar Entrevista Simulada
+                </span>
               </Button>
             </CardContent>
           </Card>
         </div>
 
         {/* WhatsApp Coach Highlight */}
-        <Card className="shadow-card border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-800">
+        <Card className="shadow-card border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-green-800 text-lg md:text-xl">
               <MessageCircle className="w-5 h-5" />
               Chatea con tu Career Coach
             </CardTitle>
-            <CardDescription className="text-green-700">
+            <CardDescription className="text-green-700 text-sm md:text-base">
               Escríbenos de Lunes a Viernes de 9:00 am - 6:00pm hora CDMX
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 md:p-6">
             <Button
               size="lg"
-              className="w-full"
+              className="w-full h-12 md:h-10"
               onClick={() => window.open(coachInfo.whatsappLink, "_blank")}
             >
               <MessageCircle className="w-4 h-4 mr-2" />
-              Enviar mensaje por WhatsApp
+              <span className="text-sm md:text-base">
+                Enviar mensaje por WhatsApp
+              </span>
             </Button>
           </CardContent>
         </Card>
