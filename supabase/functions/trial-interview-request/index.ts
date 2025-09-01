@@ -258,7 +258,7 @@ serve(async (req) => {
     console.log("📦 API payload:", apiPayload);
 
     const apiResponse = await fetch(
-      "https://interview-api-dev.lapieza.io/api/v1/interview",
+      "https://interview-api.lapieza.io/api/v1/interview",
       {
         method: "POST",
         headers: {

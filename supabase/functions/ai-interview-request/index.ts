@@ -171,7 +171,7 @@ serve(async (req) => {
 
     // Send to LaPieza API
     const response = await fetch(
-      "https://interview-api-dev.lapieza.io/api/v1/interview",
+      "https://interview-api.lapieza.io/api/v1/interview",
       {
         method: "POST",
         headers: {

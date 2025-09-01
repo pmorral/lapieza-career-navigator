@@ -72,6 +72,7 @@ export function MockInterviews() {
   const [isLoadingInterviews, setIsLoadingInterviews] = useState(false);
   const [interviewResponses, setInterviewResponses] = useState<any[]>([]);
   const [isLoadingResponses, setIsLoadingResponses] = useState(false);
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const { toast } = useToast();
   const [interviews, setInterviews] = useState<InterviewSession[]>([
     {
@@ -166,6 +167,41 @@ export function MockInterviews() {
     }
   }, [user]);
 
+  // Auto-refresh when interview is being analyzed
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (
+      pendingInterview &&
+      pendingInterview.status === "analyzing-interview" &&
+      autoRefreshEnabled
+    ) {
+      // Check every 30 seconds when analyzing
+      interval = setInterval(() => {
+        console.log("🔄 Auto-refreshing analyzing interview status...");
+        checkPendingInterviews();
+      }, 30000); // 30 seconds
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [pendingInterview?.status, autoRefreshEnabled]);
+
+  // Notify when interview analysis is completed
+  useEffect(() => {
+    if (pendingInterview && pendingInterview.status === "completed") {
+      toast({
+        title: "🎉 ¡Análisis Completado!",
+        description:
+          "Tu entrevista ha sido analizada. Revisa los resultados y feedback.",
+        duration: 5000,
+      });
+    }
+  }, [pendingInterview?.status, toast]);
+
   const checkPendingInterviews = async () => {
     if (!user) return;
 
@@ -177,7 +213,13 @@ export function MockInterviews() {
         .from("interviews" as any)
         .select("*")
         .eq("user_id", user.id)
-        .in("status", ["creating", "processing", "pending", "created-pending"])
+        .in("status", [
+          "creating",
+          "processing",
+          "pending",
+          "created-pending",
+          "analyzing-interview",
+        ])
         .order("created_at", { ascending: false })
         .limit(1);
 
@@ -252,9 +294,9 @@ export function MockInterviews() {
       }
 
       // Get candidate IDs from user interviews
-      const candidateIds = userInterviews.map(
-        (interview: any) => interview.candidate_id
-      ).filter(Boolean);
+      const candidateIds = userInterviews
+        .map((interview: any) => interview.candidate_id)
+        .filter(Boolean);
 
       // Fetch responses for these candidate IDs
       const { data: responses, error: responsesError } = await supabase
@@ -431,16 +473,51 @@ export function MockInterviews() {
 
       {/* Pending Interview Alert */}
       {pendingInterview && (
-        <Card className="shadow-card border-orange-200 bg-orange-50">
+        <Card
+          className={`shadow-card ${
+            pendingInterview.status === "analyzing-interview"
+              ? "border-blue-200 bg-blue-50"
+              : pendingInterview.status === "created-pending"
+              ? "border-green-200 bg-green-50"
+              : "border-orange-200 bg-orange-50"
+          }`}
+        >
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-orange-800">
-              <Clock className="w-5 h-5" />
-              {pendingInterview.status === "created-pending"
-                ? "Entrevista lista para completar"
-                : "Entrevista en proceso"}
+            <CardTitle
+              className={`flex items-center gap-2 ${
+                pendingInterview.status === "analyzing-interview"
+                  ? "text-blue-800"
+                  : pendingInterview.status === "created-pending"
+                  ? "text-green-800"
+                  : "text-orange-800"
+              }`}
+            >
+              {pendingInterview.status === "analyzing-interview" ? (
+                <>Entrevista siendo analizada</>
+              ) : pendingInterview.status === "created-pending" ? (
+                <>
+                  <Play className="w-5 h-5" />
+                  Entrevista lista para completar
+                </>
+              ) : (
+                <>
+                  <Clock className="w-5 h-5" />
+                  Entrevista en proceso
+                </>
+              )}
             </CardTitle>
-            <CardDescription className="text-orange-700">
-              {pendingInterview.status === "created-pending"
+            <CardDescription
+              className={
+                pendingInterview.status === "analyzing-interview"
+                  ? "text-blue-700"
+                  : pendingInterview.status === "created-pending"
+                  ? "text-green-700"
+                  : "text-orange-700"
+              }
+            >
+              {pendingInterview.status === "analyzing-interview"
+                ? "Tu entrevista está siendo analizada por nuestra IA. Esto puede tomar unos minutos."
+                : pendingInterview.status === "created-pending"
                 ? "Tu entrevista AI está lista. Haz clic en el enlace para comenzar."
                 : "Tienes una entrevista AI siendo creada. Por favor espera a que se complete."}
             </CardDescription>
@@ -449,19 +526,43 @@ export function MockInterviews() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-orange-800">
-                    {pendingInterview.job_title}
+                  <p
+                    className={`font-medium ${
+                      pendingInterview.status === "analyzing-interview"
+                        ? "text-blue-800"
+                        : pendingInterview.status === "created-pending"
+                        ? "text-green-800"
+                        : "text-orange-800"
+                    }`}
+                  >
+                    {pendingInterview.job_title || "Entrevista AI"}
                   </p>
-                  <p className="text-sm text-orange-600">
+                  <p
+                    className={`text-sm ${
+                      pendingInterview.status === "analyzing-interview"
+                        ? "text-blue-600"
+                        : pendingInterview.status === "created-pending"
+                        ? "text-green-600"
+                        : "text-orange-600"
+                    }`}
+                  >
                     Creada el{" "}
                     {new Date(pendingInterview.created_at).toLocaleString()}
                   </p>
                 </div>
                 <Badge
                   variant="outline"
-                  className="border-orange-300 text-orange-700"
+                  className={`${
+                    pendingInterview.status === "analyzing-interview"
+                      ? "border-blue-300 text-blue-700 bg-blue-100"
+                      : pendingInterview.status === "created-pending"
+                      ? "border-green-300 text-green-700 bg-green-100"
+                      : "border-orange-300 text-orange-700 bg-orange-100"
+                  }`}
                 >
-                  {pendingInterview.status === "creating"
+                  {pendingInterview.status === "analyzing-interview"
+                    ? "Analizando..."
+                    : pendingInterview.status === "creating"
                     ? "Creando..."
                     : pendingInterview.status === "processing"
                     ? "Procesando..."
@@ -471,6 +572,76 @@ export function MockInterviews() {
                 </Badge>
               </div>
 
+              {/* Vista específica para entrevista siendo analizada */}
+              {pendingInterview.status === "analyzing-interview" && (
+                <div className="bg-blue-100 p-4 rounded-lg border border-blue-300">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div>
+                      <p className="text-sm font-medium text-blue-800">
+                        🧠 IA Analizando tu Entrevista
+                      </p>
+                      <p className="text-xs text-blue-600">
+                        Procesando respuestas y generando feedback
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-xs text-blue-700">
+                      <span>• Analizando respuestas de audio</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-blue-700">
+                      <span>• Generando feedback personalizado</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-blue-700">
+                      <span>• Preparando recomendaciones</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 p-2 bg-blue-200 rounded text-xs text-blue-800">
+                    <strong>⏱️ Tiempo estimado:</strong> Máximo 25 minutos
+                  </div>
+
+                  {/* Información adicional */}
+                  <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                    <p>
+                      <strong>💡 ¿Qué está pasando?</strong>
+                    </p>
+                    <p className="mt-1">
+                      Nuestra IA está procesando tu entrevista para:
+                    </p>
+                    <ul className="mt-1 ml-3 space-y-1">
+                      <li>• Evaluar la claridad de tus respuestas</li>
+                      <li>• Identificar áreas de mejora</li>
+                      <li>• Generar feedback personalizado</li>
+                      <li>• Crear un plan de desarrollo</li>
+                    </ul>
+                  </div>
+
+                  {/* Toggle de auto-refresh */}
+                  <div className="mt-3 flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="auto-refresh"
+                        checked={autoRefreshEnabled}
+                        onChange={(e) =>
+                          setAutoRefreshEnabled(e.target.checked)
+                        }
+                        className="w-3 h-3 text-blue-600 bg-blue-100 border-blue-300 rounded focus:ring-blue-500"
+                      />
+                      <label htmlFor="auto-refresh" className="text-blue-700">
+                        Actualización automática cada 30s
+                      </label>
+                    </div>
+                    <span className="text-blue-600">
+                      {autoRefreshEnabled ? "🔄 Activado" : "⏸️ Pausado"}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Vista para entrevista lista */}
               {pendingInterview.status === "created-pending" &&
                 pendingInterview.interview_url && (
                   <div className="bg-green-100 p-4 rounded-lg border border-green-300">
@@ -496,24 +667,32 @@ export function MockInterviews() {
                   </div>
                 )}
 
-              {pendingInterview.status !== "created-pending" && (
-                <div className="bg-orange-100 p-3 rounded-lg">
-                  <p className="text-sm text-orange-800">
-                    <strong>Estado:</strong>{" "}
-                    {pendingInterview.api_message || "Entrevista en proceso"}
-                  </p>
-                  <p className="text-xs text-orange-600 mt-1">
-                    Recibirás un email cuando esté lista para completar.
-                  </p>
-                </div>
-              )}
+              {/* Vista para otros estados */}
+              {pendingInterview.status !== "created-pending" &&
+                pendingInterview.status !== "analyzing-interview" && (
+                  <div className="bg-orange-100 p-3 rounded-lg">
+                    <p className="text-sm text-orange-800">
+                      <strong>Estado:</strong>{" "}
+                      {pendingInterview.api_message || "Entrevista en proceso"}
+                    </p>
+                    <p className="text-xs text-orange-600 mt-1">
+                      Recibirás un email cuando esté lista para completar.
+                    </p>
+                  </div>
+                )}
 
               <Button
                 variant="outline"
                 size="sm"
                 onClick={checkPendingInterviews}
                 disabled={isLoadingPending}
-                className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                className={`${
+                  pendingInterview.status === "analyzing-interview"
+                    ? "border-blue-300 text-blue-700 hover:bg-blue-100"
+                    : pendingInterview.status === "created-pending"
+                    ? "border-green-300 text-green-700 hover:bg-green-100"
+                    : "border-orange-300 text-orange-700 hover:bg-orange-100"
+                }`}
               >
                 {isLoadingPending ? (
                   <>

@@ -269,7 +269,7 @@ serve(async (req) => {
 
         // Now call the CV analysis API with the URL
         const cvAnalysisResponse = await axios.post(
-          "https://interview-api-dev.lapieza.io/api/v1/analize/cv",
+          "https://interview-api.lapieza.io/api/v1/analize/cv",
           {
             cv_url: signedUrlData.signedUrl,
             mode: "file",

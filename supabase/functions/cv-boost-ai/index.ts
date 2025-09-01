@@ -52,118 +52,118 @@ serve(async (req) => {
     console.log("Processing request for user:", userId);
 
     // For CV Boost, we always analyze the new CV to avoid reusing previous data
-    console.log("CV Boost: Always analyzing new CV data to ensure fresh results");
-    
+    console.log(
+      "CV Boost: Always analyzing new CV data to ensure fresh results"
+    );
+
     let cvContent;
     let shouldAnalyzeCV = true;
-      try {
-        console.log("Uploading CV to Supabase storage...");
+    try {
+      console.log("Uploading CV to Supabase storage...");
 
-        // Convert base64 to Uint8Array
-        const pdfBuffer = Uint8Array.from(atob(pdfBase64), (c) =>
+      // Convert base64 to Uint8Array
+      const pdfBuffer = Uint8Array.from(atob(pdfBase64), (c) =>
+        c.charCodeAt(0)
+      );
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const fileName = `cv-boost-${timestamp}-${randomId}.pdf`;
+
+      // Upload to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("cv-interview")
+        .upload(fileName, pdfBuffer, {
+          contentType: "application/pdf",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        throw new Error(`Upload error: ${uploadError.message}`);
+      }
+
+      console.log("CV uploaded successfully:", uploadData.path);
+
+      // Create a signed URL (valid for 1 hour)
+      const { data: signedUrlData, error: signedUrlError } =
+        await supabase.storage
+          .from("cv-interview")
+          .createSignedUrl(fileName, 3600); // 1 hour expiration
+
+      if (signedUrlError) {
+        throw new Error(`Signed URL error: ${signedUrlError.message}`);
+      }
+
+      console.log("Signed URL created, analyzing CV using CV analysis API...");
+
+      // Now call the CV analysis API with the URL
+      const cvAnalysisResponse = await axios.post(
+        "https://interview-api.lapieza.io/api/v1/analize/cv",
+        {
+          cv_url: signedUrlData.signedUrl,
+          mode: "file",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (cvAnalysisResponse.data && cvAnalysisResponse.data.result) {
+        cvContent = cvAnalysisResponse.data.result;
+        console.log(
+          "CV analysis successful, content length:",
+          cvContent.length
+        );
+
+        // CV Boost: Skip caching to ensure fresh analysis for each CV
+        console.log("CV Boost: Skipping cache to ensure fresh results");
+      } else {
+        throw new Error("No result from CV analysis API");
+      }
+
+      // Clean up: delete the temporary file after analysis
+      try {
+        await supabase.storage.from("cv-interview").remove([fileName]);
+        console.log("Temporary CV file deleted successfully");
+      } catch (deleteError) {
+        console.warn("Failed to delete temporary CV file:", deleteError);
+      }
+    } catch (cvAnalysisError) {
+      console.error("CV analysis API error:", cvAnalysisError);
+
+      // Fallback to basic PDF text extraction
+      try {
+        const personalPdfBuffer = Uint8Array.from(atob(pdfBase64), (c) =>
           c.charCodeAt(0)
         );
+        console.log("Personal PDF buffer size:", personalPdfBuffer.length);
 
-        // Generate unique filename
-        const timestamp = Date.now();
-        const randomId = Math.random().toString(36).substring(2, 15);
-        const fileName = `cv-boost-${timestamp}-${randomId}.pdf`;
+        // Extract text from PDF
+        const pdfString = new TextDecoder("utf-8", {
+          ignoreBOM: true,
+          fatal: false,
+        }).decode(personalPdfBuffer);
+        const textMatches = pdfString.match(/\((.*?)\)/g) || [];
+        const extractedLines = textMatches
+          .map((match) => match.slice(1, -1))
+          .filter((text) => text.length > 2 && /[a-zA-Z]/.test(text))
+          .join(" ");
 
-        // Upload to Supabase storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("cv-interview")
-          .upload(fileName, pdfBuffer, {
-            contentType: "application/pdf",
-            upsert: false,
-          });
-
-        if (uploadError) {
-          throw new Error(`Upload error: ${uploadError.message}`);
-        }
-
-        console.log("CV uploaded successfully:", uploadData.path);
-
-        // Create a signed URL (valid for 1 hour)
-        const { data: signedUrlData, error: signedUrlError } =
-          await supabase.storage
-            .from("cv-interview")
-            .createSignedUrl(fileName, 3600); // 1 hour expiration
-
-        if (signedUrlError) {
-          throw new Error(`Signed URL error: ${signedUrlError.message}`);
-        }
-
-        console.log(
-          "Signed URL created, analyzing CV using CV analysis API..."
-        );
-
-        // Now call the CV analysis API with the URL
-        const cvAnalysisResponse = await axios.post(
-          "https://interview-api-dev.lapieza.io/api/v1/analize/cv",
-          {
-            cv_url: signedUrlData.signedUrl,
-            mode: "file",
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (cvAnalysisResponse.data && cvAnalysisResponse.data.result) {
-          cvContent = cvAnalysisResponse.data.result;
-          console.log(
-            "CV analysis successful, content length:",
-            cvContent.length
-          );
-
-          // CV Boost: Skip caching to ensure fresh analysis for each CV
-          console.log("CV Boost: Skipping cache to ensure fresh results");
-        } else {
-          throw new Error("No result from CV analysis API");
-        }
-
-        // Clean up: delete the temporary file after analysis
-        try {
-          await supabase.storage.from("cv-interview").remove([fileName]);
-          console.log("Temporary CV file deleted successfully");
-        } catch (deleteError) {
-          console.warn("Failed to delete temporary CV file:", deleteError);
-        }
-      } catch (cvAnalysisError) {
-        console.error("CV analysis API error:", cvAnalysisError);
-
-        // Fallback to basic PDF text extraction
-        try {
-          const personalPdfBuffer = Uint8Array.from(atob(pdfBase64), (c) =>
-            c.charCodeAt(0)
-          );
-          console.log("Personal PDF buffer size:", personalPdfBuffer.length);
-
-          // Extract text from PDF
-          const pdfString = new TextDecoder("utf-8", {
-            ignoreBOM: true,
-            fatal: false,
-          }).decode(personalPdfBuffer);
-          const textMatches = pdfString.match(/\((.*?)\)/g) || [];
-          const extractedLines = textMatches
-            .map((match) => match.slice(1, -1))
-            .filter((text) => text.length > 2 && /[a-zA-Z]/.test(text))
-            .join(" ");
-
-          cvContent =
-            extractedLines.length > 50
-              ? extractedLines
-              : `CV profesional con experiencia relevante. Documento PDF procesado correctamente con ${Math.round(
-                  personalPdfBuffer.length / 1024
-                )}KB de contenido.`;
-        } catch (pdfError) {
-          console.error("Personal PDF parsing error:", pdfError);
-          cvContent =
-            "CV content from uploaded PDF file - Error in extraction, using fallback processing";
-        }
+        cvContent =
+          extractedLines.length > 50
+            ? extractedLines
+            : `CV profesional con experiencia relevante. Documento PDF procesado correctamente con ${Math.round(
+                personalPdfBuffer.length / 1024
+              )}KB de contenido.`;
+      } catch (pdfError) {
+        console.error("Personal PDF parsing error:", pdfError);
+        cvContent =
+          "CV content from uploaded PDF file - Error in extraction, using fallback processing";
       }
+    }
 
     // Ensure we have CV content
     if (!cvContent) {
