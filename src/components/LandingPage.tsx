@@ -541,14 +541,14 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
-                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden">
                   <img
-                    src="/lovable-uploads/bd0a9499-f9c9-4e55-8098-281b435f6fa7.png"
+                    src="/lovable-uploads/mariana-osuna.png"
                     alt="Mariana Osuna"
-                    className="w-full h-full object-cover filter sepia contrast-125 brightness-110"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <h4 className="font-semibold text-foreground mb-1">Mariana Osuna</h4>
@@ -558,11 +558,11 @@ export function LandingPage() {
 
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
-                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden">
                   <img
-                    src="/lovable-uploads/ae54c6eb-237c-4bec-acec-80f9b7244947.png"
+                    src="/lovable-uploads/tulia-valdez.png"
                     alt="Tulia Valdez"
-                    className="w-full h-full object-cover filter sepia contrast-125 brightness-110"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <h4 className="font-semibold text-foreground mb-1">Tulia Valdez</h4>
@@ -572,11 +572,11 @@ export function LandingPage() {
 
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
-                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden">
                   <img
-                    src="/lovable-uploads/32d710f3-6703-48bd-ba91-3aaf054fa3fb.png"
+                    src="/lovable-uploads/alejandra-isosorbe.png"
                     alt="Alejandra Isosorbe"
-                    className="w-full h-full object-cover filter sepia contrast-125 brightness-110"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <h4 className="font-semibold text-foreground mb-1">Alejandra Isosorbe</h4>
@@ -586,15 +586,29 @@ export function LandingPage() {
 
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
-                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden">
                   <img
-                    src="/lovable-uploads/302b18c9-f921-4a7f-a50a-bef4ee92bb1c.png"
+                    src="/lovable-uploads/jossette-garcia.png"
                     alt="Jossette García"
-                    className="w-full h-full object-cover filter sepia contrast-125 brightness-110"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <h4 className="font-semibold text-foreground mb-1">Jossette García</h4>
                 <p className="text-sm text-muted-foreground">Sr. Career Coach</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden">
+                  <img
+                    src="/lovable-uploads/fernanda-lopez.png"
+                    alt="Fernanda Lopez"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h4 className="font-semibold text-foreground mb-1">Fernanda Lopez</h4>
+                <p className="text-sm text-muted-foreground">Marketing & Brand Intern</p>
               </CardContent>
             </Card>
           </div>
@@ -602,10 +616,10 @@ export function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-muted/30">
+      <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
+            <h3 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
               Preguntas Frecuentes
             </h3>
             <p className="text-lg text-muted-foreground">
@@ -615,17 +629,17 @@ export function LandingPage() {
           
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <Collapsible key={index} className="bg-background rounded-lg shadow-sm">
-                <CollapsibleTrigger className="w-full p-6 text-left hover:bg-muted/50 transition-colors">
+              <Collapsible key={index} className="bg-background rounded-xl shadow-md border border-primary/10 hover:border-primary/20 transition-all duration-300">
+                <CollapsibleTrigger className="w-full p-6 text-left hover:bg-gradient-to-r hover:from-primary/5 hover:to-secondary/5 transition-all duration-300 rounded-xl group">
                   <div className="flex justify-between items-center">
-                    <h4 className="font-semibold text-foreground pr-4">
+                    <h4 className="font-semibold text-foreground pr-4 group-hover:text-primary transition-colors">
                       {faq.question}
                     </h4>
-                    <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                    <ChevronDown className="h-5 w-5 text-primary transition-transform duration-200 group-data-[state=open]:rotate-180" />
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="px-6 pb-6 animate-accordion-down">
-                  <div className="text-muted-foreground leading-relaxed space-y-2 pt-2 border-t border-muted">
+                  <div className="text-muted-foreground leading-relaxed space-y-2 pt-2 border-t border-gradient-to-r from-primary/20 to-secondary/20">
                     {faq.answer.split('\n\n').map((paragraph, pIndex) => (
                       <p key={pIndex}>{paragraph}</p>
                     ))}
