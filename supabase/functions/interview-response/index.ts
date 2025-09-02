@@ -227,6 +227,65 @@ serve(async (req) => {
       console.log("✅ Interview linked to response:", responseRecord.id);
     }
 
+    // Get user email to send feedback completion notification
+    console.log("📧 Getting user email for feedback notification...");
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles" as any)
+      .select("email, full_name")
+      .eq("user_id", interview.user_id)
+      .single();
+
+    if (profileError) {
+      console.error("❌ Error getting user profile:", profileError);
+      // Don't fail the request, just log the error
+    } else if (profileData?.email) {
+      console.log(
+        "📨 Sending feedback completion email to:",
+        profileData.email
+      );
+
+      try {
+        // Prepare email data for SendGrid
+        const sendable = {
+          email: profileData.email,
+          templateID: "d-1a77707a26874cd197b22f48e16b37f0",
+          attachments: [],
+          data: {
+            // Template doesn't need variables according to the user
+          },
+          fromLocal: {
+            name: "Academy by LaPieza",
+            email: "tulia.valdez@lapieza.io",
+          },
+        };
+
+        // Send email via SendGrid
+        const emailResponse = await fetch(
+          "https://us-central1-pieza-development.cloudfunctions.net/onlySendEmailSendgrid",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sendable),
+          }
+        );
+
+        if (emailResponse.ok) {
+          console.log("✅ Feedback completion email sent successfully");
+        } else {
+          console.error(
+            "❌ Error sending feedback email:",
+            await emailResponse.text()
+          );
+        }
+      } catch (emailError) {
+        console.error("❌ Exception sending feedback email:", emailError);
+      }
+    } else {
+      console.log("⚠️ No email found for user, skipping notification");
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
