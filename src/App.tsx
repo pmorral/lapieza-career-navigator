@@ -47,6 +47,9 @@ const AppRoutes = () => {
         element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />}
       />
 
+      {/* Ruta específica para landing - siempre accesible */}
+      <Route path="/landing" element={<LandingPage />} />
+
       {/* Rutas públicas - solo para usuarios no autenticados */}
       <Route
         path="/login"
