@@ -81,6 +81,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async () => {
     try {
+      setLoading(true);
       // Limpiar todos los estados antes de cerrar sesión
       setUser(null);
       setSession(null);
@@ -92,6 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Redirigir a la landing page
       window.location.href = "/";
+      setLoading(false);
     } catch (error) {
       console.error("Error during sign out:", error);
       // En caso de error, forzar redirección

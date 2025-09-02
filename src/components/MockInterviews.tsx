@@ -899,11 +899,6 @@ export function MockInterviews() {
                         <Badge variant="outline" className="text-xs">
                           {response.status || "Completada"}
                         </Badge>
-                        {response.cost && (
-                          <span className="text-xs text-muted-foreground">
-                            Costo: ${response.cost}
-                          </span>
-                        )}
                       </div>
                     </div>
 
@@ -995,22 +990,6 @@ export function MockInterviews() {
                           >
                             🎧 Escuchar grabación
                           </a>
-                        </Button>
-                      )}
-                      {response.stereo_recording_url && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a
-                            href={response.stereo_recording_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            🎧 Grabación estéreo
-                          </a>
-                        </Button>
-                      )}
-                      {response.transcript && (
-                        <Button variant="outline" size="sm">
-                          📝 Ver transcripción
                         </Button>
                       )}
                     </div>

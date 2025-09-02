@@ -33,12 +33,17 @@ export function LoginPage() {
   const [whatsapp, setWhatsapp] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Obtener la ruta de donde vino el usuario para redirigir después del login
   const from = location.state?.from?.pathname || "/dashboard";
+
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -297,6 +302,7 @@ export function LoginPage() {
                 <div className="flex justify-end">
                   <button
                     type="button"
+                    onClick={handleForgotPassword}
                     className="text-sm text-primary hover:underline"
                   >
                     ¿Olvidaste tu contraseña?
@@ -311,7 +317,7 @@ export function LoginPage() {
                   className="w-full"
                   onClick={() =>
                     window.open(
-                      "https://wa.me/+525555555555?text=Hola%20equipo%20de%20Academy%2C%20tengo%20dudas%20sobre%20mi%20registro%20y%20membres%C3%ADa",
+                      "https://wa.me/+523337872943?text=Hola%20equipo%20de%20Academy%2C%20tengo%20dudas%20sobre%20mi%20registro%20y%20membres%C3%ADa",
                       "_blank"
                     )
                   }
