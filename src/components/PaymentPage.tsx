@@ -21,6 +21,7 @@ import { TrialAIInterview } from "./TrialAIInterview";
 // Tipado mínimo para el cupón aplicado
 type AppliedCoupon = {
   id: string;
+  code: string;
   discount_type: "free" | "percentage" | "fixed";
   current_uses: number;
   description?: string | null;
@@ -255,6 +256,8 @@ export const PaymentPage = () => {
               cancel_url: `${window.location.origin}/payment`,
               membership_type:
                 selectedPlan === "premium-6" ? "6months" : "12months",
+              // No enviar código de cupón - el usuario lo ingresará en Stripe checkout
+              // coupon_code: undefined,
             },
           }
         );
@@ -293,6 +296,11 @@ export const PaymentPage = () => {
 
           // Mostrar mensaje al usuario
           toast.success("Redirigiendo a Stripe para completar tu pago...");
+          if (appliedCoupon && appliedCoupon.discount_type !== "free") {
+            toast.info(
+              "💡 Puedes ingresar tu código de cupón en la página de pago de Stripe"
+            );
+          }
 
           // Redirigir a Stripe checkout
           window.location.href = data.checkout_url;

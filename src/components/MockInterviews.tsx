@@ -73,6 +73,7 @@ export function MockInterviews() {
   const [interviewResponses, setInterviewResponses] = useState<any[]>([]);
   const [isLoadingResponses, setIsLoadingResponses] = useState(false);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [isAnalyzingExpanded, setIsAnalyzingExpanded] = useState(true);
   const { toast } = useToast();
   const [interviews, setInterviews] = useState<InterviewSession[]>([
     {
@@ -330,8 +331,9 @@ export function MockInterviews() {
       return;
     }
 
-    // Check if user has available interviews
-    if (totalInterviews >= interviewCredits) {
+    // Check if user has available interview credits (not total interviews)
+    const availableCredits = interviewCredits - totalInterviews;
+    if (availableCredits <= 0) {
       setShowCreditsDialog(true);
       return;
     }
@@ -448,7 +450,7 @@ export function MockInterviews() {
                 ? "Cargando..."
                 : `${
                     interviewCredits - totalInterviews
-                  } de ${interviewCredits} entrevistas disponibles`}
+                  } de ${interviewCredits} créditos disponibles`}
             </Badge>
             {totalInterviews >= interviewCredits && (
               <Button
@@ -461,15 +463,165 @@ export function MockInterviews() {
               </Button>
             )}
           </div>
-        </div>
 
-        {!pendingInterview && totalInterviews < interviewCredits && (
-          <Button variant="professional">
-            <Play className="w-4 h-4 mr-2" />
-            Start New Interview
-          </Button>
-        )}
+          {/* Mostrar estado de entrevistas */}
+          {!isLoadingInterviews && totalInterviews > 0 && (
+            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+              <span>📊 Total creadas: {totalInterviews}</span>
+              {pendingInterview && (
+                <span className="text-blue-600">🔄 En proceso: 1</span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Interview Setup - Show when user has available credits */}
+      {totalInterviews < interviewCredits && (
+        <Card id="interview-setup" className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-primary" />
+              Start AI Interview
+            </CardTitle>
+            <CardDescription>
+              Puedes crear múltiples entrevistas simultáneamente. Cada una
+              contará como un crédito de tu plan.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label className="text-base font-medium">
+                Idioma de la entrevista *
+              </Label>
+              <RadioGroup
+                value={language}
+                onValueChange={setLanguage}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="spanish" id="spanish" />
+                  <Label htmlFor="spanish">Español</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="english" id="english" />
+                  <Label htmlFor="english">Inglés</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label htmlFor="cv-upload">Subir CV (Opcional)</Label>
+              <div className="mt-2 space-y-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="cv-upload"
+                />
+
+                {!uploadedCV ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full h-20 border-dashed"
+                  >
+                    <div className="text-center">
+                      <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        Haz clic para subir tu CV (PDF, máximo 2MB)
+                      </p>
+                    </div>
+                  </Button>
+                ) : (
+                  <div className="flex items-center justify-between p-3 bg-accent rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-medium">
+                        {uploadedCV.name}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={removeCV}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="job-title">Título del puesto *</Label>
+              <Textarea
+                id="job-title"
+                placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                rows={1}
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="job-description">Job Description *</Label>
+              <Textarea
+                id="job-description"
+                placeholder="Paste the job description here..."
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                rows={6}
+                className="mt-2"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={startInterview}
+                disabled={
+                  !jobTitle.trim() ||
+                  !jobDescription.trim() ||
+                  !language ||
+                  !uploadedCV ||
+                  !user ||
+                  isSubmitting
+                }
+                variant="professional"
+                className="flex-1"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                {isSubmitting
+                  ? "Enviando solicitud..."
+                  : usedInterviews >= interviewCredits
+                  ? "Comprar créditos"
+                  : "Solicitar entrevista AI"}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setJobTitle("");
+                  setJobDescription("");
+                  setLanguage("");
+                  setUploadedCV(null);
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                  }
+                }}
+                disabled={isSubmitting}
+              >
+                Clear
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Pending Interview Alert */}
       {pendingInterview && (
@@ -575,7 +727,7 @@ export function MockInterviews() {
               {/* Vista específica para entrevista siendo analizada */}
               {pendingInterview.status === "analyzing-interview" && (
                 <div className="bg-blue-100 p-4 rounded-lg border border-blue-300">
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="text-sm font-medium text-blue-800">
                         🧠 IA Analizando tu Entrevista
@@ -584,60 +736,77 @@ export function MockInterviews() {
                         Procesando respuestas y generando feedback
                       </p>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setIsAnalyzingExpanded(!isAnalyzingExpanded)
+                      }
+                      className="h-6 w-6 p-0 text-blue-600 hover:bg-blue-200"
+                    >
+                      {isAnalyzingExpanded ? "−" : "+"}
+                    </Button>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-blue-700">
-                      <span>• Analizando respuestas de audio</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-blue-700">
-                      <span>• Generando feedback personalizado</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-blue-700">
-                      <span>• Preparando recomendaciones</span>
-                    </div>
-                  </div>
+                  {isAnalyzingExpanded && (
+                    <>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs text-blue-700">
+                          <span>• Analizando respuestas de audio</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-blue-700">
+                          <span>• Generando feedback personalizado</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-blue-700">
+                          <span>• Preparando recomendaciones</span>
+                        </div>
+                      </div>
 
-                  <div className="mt-3 p-2 bg-blue-200 rounded text-xs text-blue-800">
-                    <strong>⏱️ Tiempo estimado:</strong> Máximo 25 minutos
-                  </div>
+                      <div className="mt-3 p-2 bg-blue-200 rounded text-xs text-blue-800">
+                        <strong>⏱️ Tiempo estimado:</strong> Máximo 25 minutos
+                      </div>
 
-                  {/* Información adicional */}
-                  <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
-                    <p>
-                      <strong>💡 ¿Qué está pasando?</strong>
-                    </p>
-                    <p className="mt-1">
-                      Nuestra IA está procesando tu entrevista para:
-                    </p>
-                    <ul className="mt-1 ml-3 space-y-1">
-                      <li>• Evaluar la claridad de tus respuestas</li>
-                      <li>• Identificar áreas de mejora</li>
-                      <li>• Generar feedback personalizado</li>
-                      <li>• Crear un plan de desarrollo</li>
-                    </ul>
-                  </div>
+                      {/* Información adicional */}
+                      <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                        <p>
+                          <strong>💡 ¿Qué está pasando?</strong>
+                        </p>
+                        <p className="mt-1">
+                          Nuestra IA está procesando tu entrevista para:
+                        </p>
+                        <ul className="mt-1 ml-3 space-y-1">
+                          <li>• Evaluar la claridad de tus respuestas</li>
+                          <li>• Identificar áreas de mejora</li>
+                          <li>• Generar feedback personalizado</li>
+                          <li>• Crear un plan de desarrollo</li>
+                        </ul>
+                      </div>
 
-                  {/* Toggle de auto-refresh */}
-                  <div className="mt-3 flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="auto-refresh"
-                        checked={autoRefreshEnabled}
-                        onChange={(e) =>
-                          setAutoRefreshEnabled(e.target.checked)
-                        }
-                        className="w-3 h-3 text-blue-600 bg-blue-100 border-blue-300 rounded focus:ring-blue-500"
-                      />
-                      <label htmlFor="auto-refresh" className="text-blue-700">
-                        Actualización automática cada 30s
-                      </label>
-                    </div>
-                    <span className="text-blue-600">
-                      {autoRefreshEnabled ? "🔄 Activado" : "⏸️ Pausado"}
-                    </span>
-                  </div>
+                      {/* Toggle de auto-refresh */}
+                      <div className="mt-3 flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="auto-refresh"
+                            checked={autoRefreshEnabled}
+                            onChange={(e) =>
+                              setAutoRefreshEnabled(e.target.checked)
+                            }
+                            className="w-3 h-3 text-blue-600 bg-blue-100 border-blue-300 rounded focus:ring-blue-500"
+                          />
+                          <label
+                            htmlFor="auto-refresh"
+                            className="text-blue-700"
+                          >
+                            Actualización automática cada 30s
+                          </label>
+                        </div>
+                        <span className="text-blue-600">
+                          {autoRefreshEnabled ? "🔄 Activado" : "⏸️ Pausado"}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -705,154 +874,6 @@ export function MockInterviews() {
                     Actualizar estado
                   </>
                 )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Interview Setup - Only show when no pending interviews and user has credits */}
-      {!pendingInterview && totalInterviews < interviewCredits && (
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-primary" />
-              Start AI Interview
-            </CardTitle>
-            <CardDescription>
-              Paste the job description to generate personalized interview
-              questions
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="text-base font-medium">
-                Idioma de la entrevista *
-              </Label>
-              <RadioGroup
-                value={language}
-                onValueChange={setLanguage}
-                className="mt-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="spanish" id="spanish" />
-                  <Label htmlFor="spanish">Español</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="english" id="english" />
-                  <Label htmlFor="english">Inglés</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div>
-              <Label htmlFor="cv-upload">Subir CV (Opcional)</Label>
-              <div className="mt-2 space-y-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="cv-upload"
-                />
-
-                {!uploadedCV ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-20 border-dashed"
-                  >
-                    <div className="text-center">
-                      <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        Haz clic para subir tu CV (PDF, máximo 2MB)
-                      </p>
-                    </div>
-                  </Button>
-                ) : (
-                  <div className="flex items-center justify-between p-3 bg-accent rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-medium">
-                        {uploadedCV.name}
-                      </span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={removeCV}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="job-title">Título del puesto *</Label>
-              <Textarea
-                id="job-title"
-                placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                rows={1}
-                className="mt-2"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="job-description">Job Description *</Label>
-              <Textarea
-                id="job-description"
-                placeholder="Paste the job description here..."
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                rows={6}
-                className="mt-2"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                onClick={startInterview}
-                disabled={
-                  !jobTitle.trim() ||
-                  !jobDescription.trim() ||
-                  !language ||
-                  !uploadedCV ||
-                  !user ||
-                  isSubmitting ||
-                  !!pendingInterview
-                }
-                variant="professional"
-                className="flex-1"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                {isSubmitting
-                  ? "Enviando solicitud..."
-                  : usedInterviews >= interviewCredits
-                  ? "Comprar créditos"
-                  : "Solicitar entrevista AI"}
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setJobTitle("");
-                  setJobDescription("");
-                  setLanguage("");
-                  setUploadedCV(null);
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = "";
-                  }
-                }}
-                disabled={isSubmitting}
-              >
-                Clear
               </Button>
             </div>
           </CardContent>

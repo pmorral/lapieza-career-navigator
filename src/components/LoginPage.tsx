@@ -33,6 +33,7 @@ export function LoginPage() {
   const [whatsapp, setWhatsapp] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -62,14 +63,19 @@ export function LoginPage() {
             description: error.message,
             variant: "destructive",
           });
+          setLoading(false);
         } else {
-          window.location.reload();
+          setIsAuthenticating(true);
           toast({
             title: "¡Bienvenido!",
             description: "Has iniciado sesión correctamente",
           });
-          // Redirigir a la página de donde vino o al dashboard
-          navigate(from, { replace: true });
+
+          // Esperar un momento para mostrar el loader y luego recargar
+          setTimeout(() => {
+            // Recargar la página para que el AuthContext se actualice correctamente
+            window.location.href = from;
+          }, 1500);
         }
       } else {
         if (password !== confirmPassword) {
@@ -146,6 +152,38 @@ export function LoginPage() {
       setLoading(false);
     }
   };
+
+  // Mostrar loader de autenticación
+  if (isAuthenticating) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex items-center justify-center p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="flex justify-center mb-4">
+            <img
+              src="/lovable-uploads/38bdff76-1a8c-4d71-a975-9058214f7ab1.png"
+              alt="Academy by LaPieza"
+              className="h-16"
+            />
+          </div>
+          <Card className="shadow-card">
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Autenticando...</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Preparando tu sesión
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex items-center justify-center p-4">

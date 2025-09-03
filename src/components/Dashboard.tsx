@@ -512,7 +512,7 @@ function DashboardOverview({
     name: "María González",
     photo: "/lovable-uploads/team-collaboration.png",
     whatsappLink:
-      "https://wa.me/+523337872943?text=Hola%20María,%20necesito%20ayuda%20con%20mi%20desarrollo%20profesional",
+      "https://wa.me/+523337872943?text=Hola%20,%20necesito%20ayuda%20con%20mi%20desarrollo%20profesional",
     availability: "Disponible",
     specialties: ["Entrevistas", "CV", "LinkedIn", "Networking"],
   };
