@@ -767,6 +767,11 @@ export function CVBoost() {
                   {point}
                 </li>
               ))}
+              {/* Feedback por defecto que siempre aparece */}
+              <li className="flex items-start gap-2 text-sm">
+                <span className="text-orange-500 mt-1">•</span>
+                Aunque ajustes tu CV en formato Word, es importante que lo guardes en PDF como "Nombre_Perfil Profesional" para mantener el formato y asegurar compatibilidad con sistemas ATS.
+              </li>
             </ul>
           </CardContent>
         </Card>
