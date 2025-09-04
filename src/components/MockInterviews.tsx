@@ -967,7 +967,7 @@ export function MockInterviews() {
                         )}
 
                         {/* Recomendación Final */}
-                        {response.ai_summary.finalRecommendation && (
+                        {response?.ai_summary?.finalRecommendation && (
                           <div>
                             <h4 className="font-medium text-primary mb-2">
                               🎯 Recomendación Final
@@ -977,45 +977,46 @@ export function MockInterviews() {
                                 Decisión:{" "}
                                 <span
                                   className={`px-2 py-1 rounded text-xs ${
-                                    response.ai_summary.finalRecommendation
-                                      .decision === "YES"
+                                    response?.ai_summary?.finalRecommendation
+                                      ?.decision === "YES"
                                       ? "bg-green-100 text-green-800"
-                                      : response.ai_summary.finalRecommendation
-                                          .decision === "NO"
+                                      : response?.ai_summary
+                                          ?.finalRecommendation?.decision ===
+                                        "NO"
                                       ? "bg-red-100 text-red-800"
                                       : "bg-yellow-100 text-yellow-800"
                                   }`}
                                 >
                                   {
-                                    response.ai_summary.finalRecommendation
-                                      .decision
+                                    response?.ai_summary?.finalRecommendation
+                                      ?.decision
                                   }
                                 </span>
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
                                 Confianza:{" "}
                                 {
-                                  response.ai_summary.finalRecommendation
-                                    .confidence
+                                  response?.ai_summary?.finalRecommendation
+                                    ?.confidence
                                 }
                                 /5
                               </p>
                               <p className="mt-2 text-xs">
                                 {
-                                  response.ai_summary.finalRecommendation
-                                    .reasoning
+                                  response?.ai_summary?.finalRecommendation
+                                    ?.reasoning
                                 }
                               </p>
-                              {response.ai_summary.finalRecommendation
-                                .nextSteps && (
+                              {response?.ai_summary?.finalRecommendation
+                                ?.nextSteps && (
                                 <div className="mt-2">
                                   <p className="text-xs font-medium">
                                     Próximos pasos:
                                   </p>
                                   <p className="text-xs">
                                     {
-                                      response.ai_summary.finalRecommendation
-                                        .nextSteps
+                                      response?.ai_summary?.finalRecommendation
+                                        ?.nextSteps
                                     }
                                   </p>
                                 </div>
@@ -1025,121 +1026,121 @@ export function MockInterviews() {
                         )}
 
                         {/* Habilidades Técnicas */}
-                        {response.ai_summary.hardSkills && (
+                        {response?.ai_summary?.hardSkills && (
                           <div>
                             <h4 className="font-medium text-blue-600 mb-2">
                               🔧 Habilidades Técnicas
                             </h4>
                             <div className="text-sm p-3 bg-blue-50 rounded-lg border-l-2 border-blue-600">
                               <p className="text-xs whitespace-pre-line">
-                                {response.ai_summary.hardSkills}
+                                {response?.ai_summary?.hardSkills}
                               </p>
                             </div>
                           </div>
                         )}
 
                         {/* Habilidades Blandas */}
-                        {response.ai_summary.softSkills && (
+                        {response?.ai_summary?.softSkills && (
                           <div>
                             <h4 className="font-medium text-warning mb-2">
                               🤝 Habilidades Blandas
                             </h4>
                             <div className="text-sm p-3 bg-warning/5 rounded-lg border-l-2 border-warning">
                               <p className="text-xs whitespace-pre-line">
-                                {response.ai_summary.softSkills}
+                                {response?.ai_summary?.softSkills}
                               </p>
                             </div>
                           </div>
                         )}
 
                         {/* Nivel de Inglés */}
-                        {response.ai_summary.englishLevel && (
+                        {response?.ai_summary?.englishLevel && (
                           <div>
                             <h4 className="font-medium text-purple-600 mb-2">
                               🌍 Nivel de Inglés
                             </h4>
                             <div className="text-sm p-3 bg-purple-50 rounded-lg border-l-2 border-purple-600">
                               <p className="text-xs">
-                                {response.ai_summary.englishLevel}
+                                {response?.ai_summary?.englishLevel}
                               </p>
                             </div>
                           </div>
                         )}
 
                         {/* Tecnologías Clave */}
-                        {response.ai_summary.keyTechnologies && (
+                        {response?.ai_summary?.keyTechnologies && (
                           <div>
                             <h4 className="font-medium text-indigo-600 mb-2">
                               💻 Tecnologías Clave
                             </h4>
                             <div className="text-sm p-3 bg-indigo-50 rounded-lg border-l-2 border-indigo-600">
                               <p className="text-xs">
-                                {response.ai_summary.keyTechnologies}
+                                {response?.ai_summary?.keyTechnologies}
                               </p>
                             </div>
                           </div>
                         )}
 
                         {/* Experiencia Técnica */}
-                        {response.ai_summary.technicalExperience && (
+                        {response?.ai_summary?.technicalExperience && (
                           <div>
                             <h4 className="font-medium text-cyan-600 mb-2">
                               ⚙️ Experiencia Técnica
                             </h4>
                             <div className="text-sm p-3 bg-cyan-50 rounded-lg border-l-2 border-cyan-600">
                               <p className="text-xs">
-                                {response.ai_summary.technicalExperience}
+                                {response?.ai_summary?.technicalExperience}
                               </p>
                             </div>
                           </div>
                         )}
 
                         {/* Feedback del Candidato */}
-                        {response.ai_summary.candidateFeedback && (
+                        {response?.ai_summary?.candidateFeedback && (
                           <div>
                             <h4 className="font-medium text-green-600 mb-2">
                               💬 Feedback del Candidato
                             </h4>
                             <div className="text-sm p-3 bg-green-50 rounded-lg border-l-2 border-green-600">
                               <div className="space-y-3">
-                                {response.ai_summary.candidateFeedback
-                                  .feedback && (
+                                {response?.ai_summary?.candidateFeedback
+                                  ?.feedback && (
                                   <div>
                                     <p className="text-xs font-medium text-green-800">
                                       📝 Feedback General:
                                     </p>
                                     <p className="text-xs mt-1">
                                       {
-                                        response.ai_summary.candidateFeedback
-                                          .feedback
+                                        response?.ai_summary?.candidateFeedback
+                                          ?.feedback
                                       }
                                     </p>
                                   </div>
                                 )}
 
-                                {response.ai_summary.candidateFeedback
-                                  .starMethodology && (
+                                {response?.ai_summary?.candidateFeedback
+                                  ?.starMethodology && (
                                   <div>
                                     <p className="text-xs font-medium text-green-800">
                                       ⭐ Metodología STAR:
                                     </p>
                                     <p className="text-xs mt-1">
                                       {
-                                        response.ai_summary.candidateFeedback
-                                          .starMethodology
+                                        response?.ai_summary?.candidateFeedback
+                                          ?.starMethodology
                                       }
                                     </p>
                                   </div>
                                 )}
 
-                                {response.ai_summary.candidateFeedback
-                                  .actionableAdvice && (
+                                {response?.ai_summary?.candidateFeedback
+                                  ?.actionableAdvice && (
                                   <div>
                                     <p className="text-xs font-medium text-green-800">
                                       💡 Consejos Accionables:
                                     </p>
                                     <ul className="list-disc list-inside mt-1 space-y-1">
-                                      {response.ai_summary.candidateFeedback.actionableAdvice.map(
+                                      {response?.ai_summary?.candidateFeedback?.actionableAdvice?.map(
                                         (advice: string, index: number) => (
                                           <li key={index} className="text-xs">
                                             {advice}
@@ -1150,14 +1151,14 @@ export function MockInterviews() {
                                   </div>
                                 )}
 
-                                {response.ai_summary.candidateFeedback
-                                  .areasForImprovement && (
+                                {response?.ai_summary?.candidateFeedback
+                                  ?.areasForImprovement && (
                                   <div>
                                     <p className="text-xs font-medium text-green-800">
                                       🎯 Áreas de Mejora:
                                     </p>
                                     <ul className="list-disc list-inside mt-1 space-y-1">
-                                      {response.ai_summary.candidateFeedback.areasForImprovement.map(
+                                      {response?.ai_summary?.candidateFeedback?.areasForImprovement?.map(
                                         (area: string, index: number) => (
                                           <li key={index} className="text-xs">
                                             {area}
@@ -1168,36 +1169,36 @@ export function MockInterviews() {
                                   </div>
                                 )}
 
-                                {response.ai_summary.candidateFeedback
-                                  .salaryRange && (
+                                {response?.ai_summary?.candidateFeedback
+                                  ?.salaryRange && (
                                   <div>
                                     <p className="text-xs font-medium text-green-800">
                                       💰 Expectativas Salariales:
                                     </p>
                                     <p className="text-xs mt-1">
                                       {
-                                        response.ai_summary.candidateFeedback
-                                          .salaryRange
+                                        response?.ai_summary?.candidateFeedback
+                                          ?.salaryRange
                                       }
                                     </p>
                                   </div>
                                 )}
 
-                                {response.ai_summary.candidateFeedback
-                                  .impactMetrics && (
+                                {response?.ai_summary?.candidateFeedback
+                                  ?.impactMetrics && (
                                   <div>
                                     <p className="text-xs font-medium text-green-800">
                                       📊 Métricas de Impacto:
                                     </p>
                                     <div className="mt-1 space-y-1">
-                                      {response.ai_summary.candidateFeedback
-                                        .impactMetrics.strengths && (
+                                      {response?.ai_summary?.candidateFeedback
+                                        ?.impactMetrics?.strengths && (
                                         <div>
                                           <p className="text-xs font-medium">
                                             Fortalezas:
                                           </p>
                                           <ul className="list-disc list-inside ml-2">
-                                            {response.ai_summary.candidateFeedback.impactMetrics.strengths.map(
+                                            {response?.ai_summary?.candidateFeedback?.impactMetrics?.strengths?.map(
                                               (
                                                 strength: string,
                                                 index: number
@@ -1213,14 +1214,14 @@ export function MockInterviews() {
                                           </ul>
                                         </div>
                                       )}
-                                      {response.ai_summary.candidateFeedback
-                                        .impactMetrics.achievements && (
+                                      {response?.ai_summary?.candidateFeedback
+                                        ?.impactMetrics?.achievements && (
                                         <div>
                                           <p className="text-xs font-medium">
                                             Logros:
                                           </p>
                                           <ul className="list-disc list-inside ml-2">
-                                            {response.ai_summary.candidateFeedback.impactMetrics.achievements.map(
+                                            {response?.ai_summary?.candidateFeedback?.impactMetrics?.achievements?.map(
                                               (
                                                 achievement: string,
                                                 index: number
@@ -1236,14 +1237,14 @@ export function MockInterviews() {
                                           </ul>
                                         </div>
                                       )}
-                                      {response.ai_summary.candidateFeedback
-                                        .impactMetrics.improvements && (
+                                      {response?.ai_summary?.candidateFeedback
+                                        ?.impactMetrics?.improvements && (
                                         <div>
                                           <p className="text-xs font-medium">
                                             Mejoras:
                                           </p>
                                           <ul className="list-disc list-inside ml-2">
-                                            {response.ai_summary.candidateFeedback.impactMetrics.improvements.map(
+                                            {response?.ai_summary?.candidateFeedback?.impactMetrics?.improvements?.map(
                                               (
                                                 improvement: string,
                                                 index: number
@@ -1263,14 +1264,14 @@ export function MockInterviews() {
                                   </div>
                                 )}
 
-                                {response.ai_summary.candidateFeedback
-                                  .improvementSimulation && (
+                                {response?.ai_summary?.candidateFeedback
+                                  ?.improvementSimulation && (
                                   <div>
                                     <p className="text-xs font-medium text-green-800">
                                       🔄 Simulación de Mejoras:
                                     </p>
                                     <ul className="list-disc list-inside mt-1 space-y-1">
-                                      {response.ai_summary.candidateFeedback.improvementSimulation.map(
+                                      {response?.ai_summary?.candidateFeedback?.improvementSimulation?.map(
                                         (simulation: string, index: number) => (
                                           <li key={index} className="text-xs">
                                             {simulation}
@@ -1286,39 +1287,41 @@ export function MockInterviews() {
                         )}
 
                         {/* Análisis de Comunicación */}
-                        {response.ai_summary.communicationAnalysis && (
+                        {response?.ai_summary?.communicationAnalysis && (
                           <div>
                             <h4 className="font-medium text-pink-600 mb-2">
                               🗣️ Análisis de Comunicación
                             </h4>
                             <div className="text-sm p-3 bg-pink-50 rounded-lg border-l-2 border-pink-600">
                               <div className="space-y-2">
-                                {response.ai_summary.communicationAnalysis
-                                  .communicationStrengths && (
+                                {response?.ai_summary?.communicationAnalysis
+                                  ?.communicationStrengths && (
                                   <p className="text-xs">
                                     <strong>Fortalezas:</strong>{" "}
                                     {
-                                      response.ai_summary.communicationAnalysis
-                                        .communicationStrengths
+                                      response?.ai_summary
+                                        ?.communicationAnalysis
+                                        ?.communicationStrengths
                                     }
                                   </p>
                                 )}
-                                {response.ai_summary.communicationAnalysis
-                                  .communicationWeaknesses && (
+                                {response?.ai_summary?.communicationAnalysis
+                                  ?.communicationWeaknesses && (
                                   <p className="text-xs">
                                     <strong>Debilidades:</strong>{" "}
                                     {
-                                      response.ai_summary.communicationAnalysis
-                                        .communicationWeaknesses
+                                      response?.ai_summary
+                                        ?.communicationAnalysis
+                                        ?.communicationWeaknesses
                                     }
                                   </p>
                                 )}
-                                {response.ai_summary.communicationAnalysis
-                                  .alternativeSuggestions && (
+                                {response?.ai_summary?.communicationAnalysis
+                                  ?.alternativeSuggestions && (
                                   <div className="text-xs">
                                     <strong>Sugerencias alternativas:</strong>
                                     <ul className="list-disc list-inside mt-1">
-                                      {response.ai_summary.communicationAnalysis.alternativeSuggestions.map(
+                                      {response?.ai_summary?.communicationAnalysis?.alternativeSuggestions?.map(
                                         (suggestion: string, index: number) => (
                                           <li key={index}>{suggestion}</li>
                                         )
@@ -1332,40 +1335,40 @@ export function MockInterviews() {
                         )}
 
                         {/* Evaluación de Potencial */}
-                        {response.ai_summary.potentialAssessment && (
+                        {response?.ai_summary?.potentialAssessment && (
                           <div>
                             <h4 className="font-medium text-teal-600 mb-2">
                               🚀 Evaluación de Potencial
                             </h4>
                             <div className="text-sm p-3 bg-teal-50 rounded-lg border-l-2 border-teal-600">
                               <div className="space-y-2">
-                                {response.ai_summary.potentialAssessment
-                                  .growthPotential && (
+                                {response?.ai_summary?.potentialAssessment
+                                  ?.growthPotential && (
                                   <p className="text-xs">
                                     <strong>Potencial de crecimiento:</strong>{" "}
                                     {
-                                      response.ai_summary.potentialAssessment
-                                        .growthPotential
+                                      response?.ai_summary?.potentialAssessment
+                                        ?.growthPotential
                                     }
                                   </p>
                                 )}
-                                {response.ai_summary.potentialAssessment
-                                  .careerTrajectory && (
+                                {response?.ai_summary?.potentialAssessment
+                                  ?.careerTrajectory && (
                                   <p className="text-xs">
                                     <strong>Trayectoria profesional:</strong>{" "}
                                     {
-                                      response.ai_summary.potentialAssessment
-                                        .careerTrajectory
+                                      response?.ai_summary?.potentialAssessment
+                                        ?.careerTrajectory
                                     }
                                   </p>
                                 )}
-                                {response.ai_summary.potentialAssessment
-                                  .leadershipReadiness && (
+                                {response?.ai_summary?.potentialAssessment
+                                  ?.leadershipReadiness && (
                                   <p className="text-xs">
                                     <strong>Preparación para liderazgo:</strong>{" "}
                                     {
-                                      response.ai_summary.potentialAssessment
-                                        .leadershipReadiness
+                                      response?.ai_summary?.potentialAssessment
+                                        ?.leadershipReadiness
                                     }
                                   </p>
                                 )}
@@ -1375,21 +1378,21 @@ export function MockInterviews() {
                         )}
 
                         {/* Filosofía y Enfoque */}
-                        {response.ai_summary.philosophyAndApproach && (
+                        {response?.ai_summary?.philosophyAndApproach && (
                           <div>
                             <h4 className="font-medium text-amber-600 mb-2">
                               🎯 Filosofía y Enfoque
                             </h4>
                             <div className="text-sm p-3 bg-amber-50 rounded-lg border-l-2 border-amber-600">
                               <p className="text-xs">
-                                {response.ai_summary.philosophyAndApproach}
+                                {response?.ai_summary?.philosophyAndApproach}
                               </p>
                             </div>
                           </div>
                         )}
 
                         {/* Puntuación General */}
-                        {response.ai_summary.overallScore && (
+                        {response?.ai_summary?.overallScore && (
                           <div>
                             <h4 className="font-medium text-emerald-600 mb-2">
                               📈 Puntuación General
@@ -1397,13 +1400,13 @@ export function MockInterviews() {
                             <div className="text-sm p-3 bg-emerald-50 rounded-lg border-l-2 border-emerald-600">
                               <div className="flex items-center gap-2">
                                 <span className="text-lg font-bold">
-                                  {response.ai_summary.overallScore}/100
+                                  {response?.ai_summary?.overallScore}/100
                                 </span>
                                 <div className="flex-1 bg-gray-200 rounded-full h-2">
                                   <div
                                     className="bg-emerald-600 h-2 rounded-full"
                                     style={{
-                                      width: `${response.ai_summary.overallScore}%`,
+                                      width: `${response?.ai_summary?.overallScore}%`,
                                     }}
                                   ></div>
                                 </div>
