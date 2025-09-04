@@ -86,7 +86,7 @@ serve(async (req) => {
         cachedProfile.linkedin_profile_data &&
         cachedProfile.last_linkedin_scrape
       ) {
-        const lastScrape = new Date(cachedProfile.last_linkedin_scrape);
+        const lastScrape = new Date(cachedProfile?.last_linkedin_scrape);
         const threeMonthsAgo = new Date();
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
@@ -121,13 +121,14 @@ serve(async (req) => {
             }
           );
 
-          const linkedinData = linkedinResponse.data;
+          const linkedinData = linkedinResponse?.data;
           console.log("LinkedIn profile fetched successfully");
 
           // Extract relevant information from the LinkedIn profile API response
-          if (linkedinData && linkedinData.data) {
-            const profile = linkedinData.data;
+          if (linkedinData && linkedinData?.data) {
+            const profile = linkedinData?.data;
             const profileSections = [];
+            console.log("Profile:", profile);
 
             if (profile.full_name)
               profileSections.push(`Nombre: ${profile.full_name}`);
@@ -167,7 +168,10 @@ serve(async (req) => {
             }
 
             linkedinProfileContent = profileSections.join("\n");
-            console.log("LinkedIn profile content extracted successfully");
+            console.log(
+              "LinkedIn profile content extracted successfully",
+              linkedinProfileContent
+            );
 
             // Update cache with new LinkedIn data
             const cacheData = {
@@ -269,10 +273,10 @@ serve(async (req) => {
 
         // Now call the CV analysis API with the URL
         const cvAnalysisResponse = await axios.post(
-          "https://interview-api.lapieza.io/api/v1/analize/cv",
+          "https://interview-api-dev.lapieza.io/api/v1/analize/cv",
           {
             cv_url: signedUrlData.signedUrl,
-            mode: "file",
+            mode: "text",
           },
           {
             headers: {
@@ -485,17 +489,26 @@ Content must be specific to the analyzed profile, not generic. Infer the profess
     // Limpiar etiquetas ```json ... ``` si las trae
     text = text.replace(/```json|```/g, "").trim();
 
-    // Convertir a objeto
-    const data = JSON.parse(text);
+    // Limpiar caracteres de escape dobles que causan problemas en JSON
+    text = text.replace(/\\\\n/g, "\\n");
+    text = text.replace(/\\\\t/g, "\\t");
+    text = text.replace(/\\\\r/g, "\\r");
+    text = text.replace(/\\\\"/g, '\\"');
+    text = text.replace(/\\\\\\\\/g, "\\\\");
+
+    console.log("Cleaned text for JSON parsing:", text);
 
     // Parse JSON response
     let result;
 
     try {
+      // Convertir a objeto
+      const data = JSON.parse(text);
       result = data;
       console.log("result", result);
     } catch (e) {
       console.error("JSON parsing error:", e);
+      console.error("Problematic text:", text);
       // Fallback if JSON parsing fails
       result = {
         spanish: {
