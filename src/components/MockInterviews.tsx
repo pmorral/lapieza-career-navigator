@@ -120,6 +120,14 @@ export function MockInterviews() {
     },
   ]);
 
+  const getSumaryEs = (summary: any): string => {
+    return (
+      summary?.summary_translations?.find(
+        (translation: any) => translation.lang === "es"
+      )?.text || summary
+    );
+  };
+
   // Get user data from Supabase on component mount
   useEffect(() => {
     const getUser = async () => {
@@ -142,7 +150,6 @@ export function MockInterviews() {
 
         if (user) {
           setUser(user);
-          console.log("User loaded:", user);
         } else {
           toast({
             title: "Usuario no encontrado",
@@ -179,7 +186,6 @@ export function MockInterviews() {
     ) {
       // Check every 30 seconds when analyzing
       interval = setInterval(() => {
-        console.log("🔄 Auto-refreshing analyzing interview status...");
         checkPendingInterviews();
       }, 30000); // 30 seconds
     }
@@ -208,8 +214,6 @@ export function MockInterviews() {
 
     setIsLoadingPending(true);
     try {
-      console.log("🔍 Checking for pending interviews for user:", user.id);
-
       const { data: pendingInterviews, error } = await supabase
         .from("interviews" as any)
         .select("*")
@@ -230,10 +234,8 @@ export function MockInterviews() {
       }
 
       if (pendingInterviews && pendingInterviews.length > 0) {
-        console.log("📋 Found pending interview:", pendingInterviews[0]);
         setPendingInterview(pendingInterviews[0]);
       } else {
-        console.log("✅ No pending interviews found");
         setPendingInterview(null);
       }
     } catch (error) {
@@ -248,8 +250,6 @@ export function MockInterviews() {
 
     setIsLoadingInterviews(true);
     try {
-      console.log("🔢 Counting total interviews for user:", user.id);
-
       const { count, error } = await supabase
         .from("interviews" as any)
         .select("*", { count: "exact", head: true })
@@ -275,8 +275,6 @@ export function MockInterviews() {
 
     setIsLoadingResponses(true);
     try {
-      console.log("📋 Fetching interview responses for user:", user.id);
-
       // First get all interviews for the user
       const { data: userInterviews, error: interviewsError } = await supabase
         .from("interviews" as any)
@@ -311,10 +309,6 @@ export function MockInterviews() {
         return;
       }
 
-      console.log(
-        "📊 Found interview responses:",
-        JSON.stringify(responses[0]) || []
-      );
       setInterviewResponses(responses || []);
     } catch (error) {
       console.error("Error in fetchInterviewResponses:", error);
@@ -951,21 +945,23 @@ export function MockInterviews() {
                           Resumen de la Entrevista
                         </h4>
                         <div className="text-sm whitespace-pre-line p-3 bg-accent rounded-lg">
-                          {response.summary}
+                          {getSumaryEs(response)}
                         </div>
                       </div>
                     )}
 
-                    {response.ai_summary && (
+                    {response?.ai_summary && (
                       <div className="space-y-6 mb-4">
                         {/* Resumen General */}
-                        {response.ai_summary.summary && (
+                        {response.ai_summary.summary_translations && (
                           <div>
                             <h4 className="font-medium text-success mb-2">
                               📋 Resumen General
                             </h4>
                             <div className="text-sm p-3 bg-accent rounded-lg">
-                              {response.ai_summary.summary}
+                              {response?.ai_summary?.summary_translations?.find(
+                                (translation: any) => translation.lang === "es"
+                              )?.text || response?.ai_summary.summary}
                             </div>
                           </div>
                         )}
@@ -977,7 +973,25 @@ export function MockInterviews() {
                               🎯 Recomendación Final
                             </h4>
                             <div className="text-sm p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
-                              <p className="font-medium">Decisión: </p>
+                              <p className="font-medium">
+                                Decisión:{" "}
+                                <span
+                                  className={`px-2 py-1 rounded text-xs ${
+                                    response.ai_summary.finalRecommendation
+                                      .decision === "YES"
+                                      ? "bg-green-100 text-green-800"
+                                      : response.ai_summary.finalRecommendation
+                                          .decision === "NO"
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-yellow-100 text-yellow-800"
+                                  }`}
+                                >
+                                  {
+                                    response.ai_summary.finalRecommendation
+                                      .decision
+                                  }
+                                </span>
+                              </p>
                               <p className="text-xs text-muted-foreground mt-1">
                                 Confianza:{" "}
                                 {
@@ -1087,48 +1101,180 @@ export function MockInterviews() {
                               💬 Feedback del Candidato
                             </h4>
                             <div className="text-sm p-3 bg-green-50 rounded-lg border-l-2 border-green-600">
-                              <div className="space-y-2">
+                              <div className="space-y-3">
                                 {response.ai_summary.candidateFeedback
                                   .feedback && (
-                                  <p className="text-xs">
-                                    <strong>Feedback:</strong>{" "}
-                                    {
-                                      response.ai_summary.candidateFeedback
-                                        .feedback
-                                    }
-                                  </p>
+                                  <div>
+                                    <p className="text-xs font-medium text-green-800">
+                                      📝 Feedback General:
+                                    </p>
+                                    <p className="text-xs mt-1">
+                                      {
+                                        response.ai_summary.candidateFeedback
+                                          .feedback
+                                      }
+                                    </p>
+                                  </div>
                                 )}
+
                                 {response.ai_summary.candidateFeedback
                                   .starMethodology && (
-                                  <p className="text-xs">
-                                    <strong>Metodología STAR:</strong>{" "}
-                                    {
-                                      response.ai_summary.candidateFeedback
-                                        .starMethodology
-                                    }
-                                  </p>
+                                  <div>
+                                    <p className="text-xs font-medium text-green-800">
+                                      ⭐ Metodología STAR:
+                                    </p>
+                                    <p className="text-xs mt-1">
+                                      {
+                                        response.ai_summary.candidateFeedback
+                                          .starMethodology
+                                      }
+                                    </p>
+                                  </div>
                                 )}
+
                                 {response.ai_summary.candidateFeedback
                                   .actionableAdvice && (
-                                  <div className="text-xs">
-                                    <strong>Consejos accionables:</strong>
-                                    <ul className="list-disc list-inside mt-1">
+                                  <div>
+                                    <p className="text-xs font-medium text-green-800">
+                                      💡 Consejos Accionables:
+                                    </p>
+                                    <ul className="list-disc list-inside mt-1 space-y-1">
                                       {response.ai_summary.candidateFeedback.actionableAdvice.map(
                                         (advice: string, index: number) => (
-                                          <li key={index}>{advice}</li>
+                                          <li key={index} className="text-xs">
+                                            {advice}
+                                          </li>
                                         )
                                       )}
                                     </ul>
                                   </div>
                                 )}
+
                                 {response.ai_summary.candidateFeedback
                                   .areasForImprovement && (
-                                  <div className="text-xs">
-                                    <strong>Áreas de mejora:</strong>
-                                    <ul className="list-disc list-inside mt-1">
+                                  <div>
+                                    <p className="text-xs font-medium text-green-800">
+                                      🎯 Áreas de Mejora:
+                                    </p>
+                                    <ul className="list-disc list-inside mt-1 space-y-1">
                                       {response.ai_summary.candidateFeedback.areasForImprovement.map(
                                         (area: string, index: number) => (
-                                          <li key={index}>{area}</li>
+                                          <li key={index} className="text-xs">
+                                            {area}
+                                          </li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+
+                                {response.ai_summary.candidateFeedback
+                                  .salaryRange && (
+                                  <div>
+                                    <p className="text-xs font-medium text-green-800">
+                                      💰 Expectativas Salariales:
+                                    </p>
+                                    <p className="text-xs mt-1">
+                                      {
+                                        response.ai_summary.candidateFeedback
+                                          .salaryRange
+                                      }
+                                    </p>
+                                  </div>
+                                )}
+
+                                {response.ai_summary.candidateFeedback
+                                  .impactMetrics && (
+                                  <div>
+                                    <p className="text-xs font-medium text-green-800">
+                                      📊 Métricas de Impacto:
+                                    </p>
+                                    <div className="mt-1 space-y-1">
+                                      {response.ai_summary.candidateFeedback
+                                        .impactMetrics.strengths && (
+                                        <div>
+                                          <p className="text-xs font-medium">
+                                            Fortalezas:
+                                          </p>
+                                          <ul className="list-disc list-inside ml-2">
+                                            {response.ai_summary.candidateFeedback.impactMetrics.strengths.map(
+                                              (
+                                                strength: string,
+                                                index: number
+                                              ) => (
+                                                <li
+                                                  key={index}
+                                                  className="text-xs"
+                                                >
+                                                  {strength}
+                                                </li>
+                                              )
+                                            )}
+                                          </ul>
+                                        </div>
+                                      )}
+                                      {response.ai_summary.candidateFeedback
+                                        .impactMetrics.achievements && (
+                                        <div>
+                                          <p className="text-xs font-medium">
+                                            Logros:
+                                          </p>
+                                          <ul className="list-disc list-inside ml-2">
+                                            {response.ai_summary.candidateFeedback.impactMetrics.achievements.map(
+                                              (
+                                                achievement: string,
+                                                index: number
+                                              ) => (
+                                                <li
+                                                  key={index}
+                                                  className="text-xs"
+                                                >
+                                                  {achievement}
+                                                </li>
+                                              )
+                                            )}
+                                          </ul>
+                                        </div>
+                                      )}
+                                      {response.ai_summary.candidateFeedback
+                                        .impactMetrics.improvements && (
+                                        <div>
+                                          <p className="text-xs font-medium">
+                                            Mejoras:
+                                          </p>
+                                          <ul className="list-disc list-inside ml-2">
+                                            {response.ai_summary.candidateFeedback.impactMetrics.improvements.map(
+                                              (
+                                                improvement: string,
+                                                index: number
+                                              ) => (
+                                                <li
+                                                  key={index}
+                                                  className="text-xs"
+                                                >
+                                                  {improvement}
+                                                </li>
+                                              )
+                                            )}
+                                          </ul>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {response.ai_summary.candidateFeedback
+                                  .improvementSimulation && (
+                                  <div>
+                                    <p className="text-xs font-medium text-green-800">
+                                      🔄 Simulación de Mejoras:
+                                    </p>
+                                    <ul className="list-disc list-inside mt-1 space-y-1">
+                                      {response.ai_summary.candidateFeedback.improvementSimulation.map(
+                                        (simulation: string, index: number) => (
+                                          <li key={index} className="text-xs">
+                                            {simulation}
+                                          </li>
                                         )
                                       )}
                                     </ul>
