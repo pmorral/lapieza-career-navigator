@@ -311,7 +311,10 @@ export function MockInterviews() {
         return;
       }
 
-      console.log("📊 Found interview responses:", responses?.length || 0);
+      console.log(
+        "📊 Found interview responses:",
+        JSON.stringify(responses[0]) || []
+      );
       setInterviewResponses(responses || []);
     } catch (error) {
       console.error("Error in fetchInterviewResponses:", error);
@@ -883,7 +886,7 @@ export function MockInterviews() {
       {/* Removed Interview in Progress - now handled by LaPieza URL */}
 
       {/* Interview History */}
-      {interviewResponses.length > 0 && (
+      {interviewResponses?.length > 0 && (
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -954,20 +957,27 @@ export function MockInterviews() {
                     )}
 
                     {response.ai_summary && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="space-y-6 mb-4">
+                        {/* Resumen General */}
+                        {response.ai_summary.summary && (
+                          <div>
+                            <h4 className="font-medium text-success mb-2">
+                              📋 Resumen General
+                            </h4>
+                            <div className="text-sm p-3 bg-accent rounded-lg">
+                              {response.ai_summary.summary}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Recomendación Final */}
                         {response.ai_summary.finalRecommendation && (
                           <div>
                             <h4 className="font-medium text-primary mb-2">
-                              Recomendación Final
+                              🎯 Recomendación Final
                             </h4>
                             <div className="text-sm p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
-                              <p className="font-medium">
-                                Decisión:{" "}
-                                {
-                                  response.ai_summary.finalRecommendation
-                                    .decision
-                                }
-                              </p>
+                              <p className="font-medium">Decisión: </p>
                               <p className="text-xs text-muted-foreground mt-1">
                                 Confianza:{" "}
                                 {
@@ -982,19 +992,276 @@ export function MockInterviews() {
                                     .reasoning
                                 }
                               </p>
+                              {response.ai_summary.finalRecommendation
+                                .nextSteps && (
+                                <div className="mt-2">
+                                  <p className="text-xs font-medium">
+                                    Próximos pasos:
+                                  </p>
+                                  <p className="text-xs">
+                                    {
+                                      response.ai_summary.finalRecommendation
+                                        .nextSteps
+                                    }
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
 
+                        {/* Habilidades Técnicas */}
+                        {response.ai_summary.hardSkills && (
+                          <div>
+                            <h4 className="font-medium text-blue-600 mb-2">
+                              🔧 Habilidades Técnicas
+                            </h4>
+                            <div className="text-sm p-3 bg-blue-50 rounded-lg border-l-2 border-blue-600">
+                              <p className="text-xs whitespace-pre-line">
+                                {response.ai_summary.hardSkills}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Habilidades Blandas */}
                         {response.ai_summary.softSkills && (
                           <div>
                             <h4 className="font-medium text-warning mb-2">
-                              Habilidades Blandas
+                              🤝 Habilidades Blandas
                             </h4>
                             <div className="text-sm p-3 bg-warning/5 rounded-lg border-l-2 border-warning">
                               <p className="text-xs whitespace-pre-line">
                                 {response.ai_summary.softSkills}
                               </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Nivel de Inglés */}
+                        {response.ai_summary.englishLevel && (
+                          <div>
+                            <h4 className="font-medium text-purple-600 mb-2">
+                              🌍 Nivel de Inglés
+                            </h4>
+                            <div className="text-sm p-3 bg-purple-50 rounded-lg border-l-2 border-purple-600">
+                              <p className="text-xs">
+                                {response.ai_summary.englishLevel}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Tecnologías Clave */}
+                        {response.ai_summary.keyTechnologies && (
+                          <div>
+                            <h4 className="font-medium text-indigo-600 mb-2">
+                              💻 Tecnologías Clave
+                            </h4>
+                            <div className="text-sm p-3 bg-indigo-50 rounded-lg border-l-2 border-indigo-600">
+                              <p className="text-xs">
+                                {response.ai_summary.keyTechnologies}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Experiencia Técnica */}
+                        {response.ai_summary.technicalExperience && (
+                          <div>
+                            <h4 className="font-medium text-cyan-600 mb-2">
+                              ⚙️ Experiencia Técnica
+                            </h4>
+                            <div className="text-sm p-3 bg-cyan-50 rounded-lg border-l-2 border-cyan-600">
+                              <p className="text-xs">
+                                {response.ai_summary.technicalExperience}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Feedback del Candidato */}
+                        {response.ai_summary.candidateFeedback && (
+                          <div>
+                            <h4 className="font-medium text-green-600 mb-2">
+                              💬 Feedback del Candidato
+                            </h4>
+                            <div className="text-sm p-3 bg-green-50 rounded-lg border-l-2 border-green-600">
+                              <div className="space-y-2">
+                                {response.ai_summary.candidateFeedback
+                                  .feedback && (
+                                  <p className="text-xs">
+                                    <strong>Feedback:</strong>{" "}
+                                    {
+                                      response.ai_summary.candidateFeedback
+                                        .feedback
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.candidateFeedback
+                                  .starMethodology && (
+                                  <p className="text-xs">
+                                    <strong>Metodología STAR:</strong>{" "}
+                                    {
+                                      response.ai_summary.candidateFeedback
+                                        .starMethodology
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.candidateFeedback
+                                  .actionableAdvice && (
+                                  <div className="text-xs">
+                                    <strong>Consejos accionables:</strong>
+                                    <ul className="list-disc list-inside mt-1">
+                                      {response.ai_summary.candidateFeedback.actionableAdvice.map(
+                                        (advice: string, index: number) => (
+                                          <li key={index}>{advice}</li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+                                {response.ai_summary.candidateFeedback
+                                  .areasForImprovement && (
+                                  <div className="text-xs">
+                                    <strong>Áreas de mejora:</strong>
+                                    <ul className="list-disc list-inside mt-1">
+                                      {response.ai_summary.candidateFeedback.areasForImprovement.map(
+                                        (area: string, index: number) => (
+                                          <li key={index}>{area}</li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Análisis de Comunicación */}
+                        {response.ai_summary.communicationAnalysis && (
+                          <div>
+                            <h4 className="font-medium text-pink-600 mb-2">
+                              🗣️ Análisis de Comunicación
+                            </h4>
+                            <div className="text-sm p-3 bg-pink-50 rounded-lg border-l-2 border-pink-600">
+                              <div className="space-y-2">
+                                {response.ai_summary.communicationAnalysis
+                                  .communicationStrengths && (
+                                  <p className="text-xs">
+                                    <strong>Fortalezas:</strong>{" "}
+                                    {
+                                      response.ai_summary.communicationAnalysis
+                                        .communicationStrengths
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.communicationAnalysis
+                                  .communicationWeaknesses && (
+                                  <p className="text-xs">
+                                    <strong>Debilidades:</strong>{" "}
+                                    {
+                                      response.ai_summary.communicationAnalysis
+                                        .communicationWeaknesses
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.communicationAnalysis
+                                  .alternativeSuggestions && (
+                                  <div className="text-xs">
+                                    <strong>Sugerencias alternativas:</strong>
+                                    <ul className="list-disc list-inside mt-1">
+                                      {response.ai_summary.communicationAnalysis.alternativeSuggestions.map(
+                                        (suggestion: string, index: number) => (
+                                          <li key={index}>{suggestion}</li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Evaluación de Potencial */}
+                        {response.ai_summary.potentialAssessment && (
+                          <div>
+                            <h4 className="font-medium text-teal-600 mb-2">
+                              🚀 Evaluación de Potencial
+                            </h4>
+                            <div className="text-sm p-3 bg-teal-50 rounded-lg border-l-2 border-teal-600">
+                              <div className="space-y-2">
+                                {response.ai_summary.potentialAssessment
+                                  .growthPotential && (
+                                  <p className="text-xs">
+                                    <strong>Potencial de crecimiento:</strong>{" "}
+                                    {
+                                      response.ai_summary.potentialAssessment
+                                        .growthPotential
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.potentialAssessment
+                                  .careerTrajectory && (
+                                  <p className="text-xs">
+                                    <strong>Trayectoria profesional:</strong>{" "}
+                                    {
+                                      response.ai_summary.potentialAssessment
+                                        .careerTrajectory
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.potentialAssessment
+                                  .leadershipReadiness && (
+                                  <p className="text-xs">
+                                    <strong>Preparación para liderazgo:</strong>{" "}
+                                    {
+                                      response.ai_summary.potentialAssessment
+                                        .leadershipReadiness
+                                    }
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Filosofía y Enfoque */}
+                        {response.ai_summary.philosophyAndApproach && (
+                          <div>
+                            <h4 className="font-medium text-amber-600 mb-2">
+                              🎯 Filosofía y Enfoque
+                            </h4>
+                            <div className="text-sm p-3 bg-amber-50 rounded-lg border-l-2 border-amber-600">
+                              <p className="text-xs">
+                                {response.ai_summary.philosophyAndApproach}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Puntuación General */}
+                        {response.ai_summary.overallScore && (
+                          <div>
+                            <h4 className="font-medium text-emerald-600 mb-2">
+                              📈 Puntuación General
+                            </h4>
+                            <div className="text-sm p-3 bg-emerald-50 rounded-lg border-l-2 border-emerald-600">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold">
+                                  {response.ai_summary.overallScore}/100
+                                </span>
+                                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className="bg-emerald-600 h-2 rounded-full"
+                                    style={{
+                                      width: `${response.ai_summary.overallScore}%`,
+                                    }}
+                                  ></div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
