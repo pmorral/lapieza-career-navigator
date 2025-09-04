@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Star, CreditCard, Lock } from "lucide-react";
+import { Star, CreditCard, Lock, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { CouponInput } from "./CouponInput";
@@ -21,6 +21,7 @@ import { TrialAIInterview } from "./TrialAIInterview";
 // Tipado mínimo para el cupón aplicado
 type AppliedCoupon = {
   id: string;
+  code: string;
   discount_type: "free" | "percentage" | "fixed";
   current_uses: number;
   description?: string | null;
@@ -255,6 +256,8 @@ export const PaymentPage = () => {
               cancel_url: `${window.location.origin}/payment`,
               membership_type:
                 selectedPlan === "premium-6" ? "6months" : "12months",
+              // No enviar código de cupón - el usuario lo ingresará en Stripe checkout
+              // coupon_code: undefined,
             },
           }
         );
@@ -293,6 +296,11 @@ export const PaymentPage = () => {
 
           // Mostrar mensaje al usuario
           toast.success("Redirigiendo a Stripe para completar tu pago...");
+          if (appliedCoupon && appliedCoupon.discount_type !== "free") {
+            toast.info(
+              "💡 Puedes ingresar tu código de cupón en la página de pago de Stripe"
+            );
+          }
 
           // Redirigir a Stripe checkout
           window.location.href = data.checkout_url;
@@ -322,7 +330,19 @@ export const PaymentPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
+          {/* Botón Regresar */}
+          <div className="absolute left-0 top-0">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/landing")}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Regresar
+            </Button>
+          </div>
+
           <h1 className="text-3xl font-bold text-foreground mb-2">
             Adquiere tu membresía en Academy by LaPieza
           </h1>

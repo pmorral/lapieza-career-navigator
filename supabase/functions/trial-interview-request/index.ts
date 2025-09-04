@@ -182,28 +182,22 @@ serve(async (req) => {
     const cvUrl = signedUrlData.signedUrl;
     console.log("✅ CV uploaded and URL generated:", cvUrl);
 
-    // Create user account
-    console.log("👤 Creating user account...");
+    // Check if user already exists in Auth or create new user
+    console.log("👤 Checking if user exists in Auth...");
     const fullName = `${firstName} ${lastName}`;
-    const { data: authData, error: authError } =
-      await supabase.auth.admin.createUser({
-        email,
-        password: uuidv4(), // Generate random password
-        email_confirm: true,
-        user_metadata: {
-          full_name: fullName,
-          first_name: firstName,
-          last_name: lastName,
-          whatsapp,
-          is_trial_user: true,
-        },
-      });
 
-    if (authError) {
-      console.error("❌ Error creating user:", authError);
+    // First, try to get existing user by email
+    const { data: existingUsers, error: listError } =
+      await supabase.auth.admin.listUsers();
+
+    let userId: string;
+    let authData: any;
+
+    if (listError) {
+      console.error("❌ Error listing users:", listError);
       return new Response(
         JSON.stringify({
-          error: "Error creando la cuenta de usuario",
+          error: "Error verificando usuarios existentes",
         }),
         {
           status: 500,
@@ -212,23 +206,88 @@ serve(async (req) => {
       );
     }
 
-    const userId = authData.user.id;
-    console.log("✅ User created:", userId);
+    // Check if user with this email already exists
+    const existingUser = existingUsers.users.find(
+      (user) => user.email === email
+    );
 
-    // Update profile with trial information
-    console.log("📝 Updating profile with trial info...");
+    if (existingUser) {
+      console.log("✅ User already exists in Auth:", existingUser.id);
+      userId = existingUser.id;
+      authData = { user: existingUser };
+
+      // Update user metadata if needed
+      const { error: updateError } = await supabase.auth.admin.updateUserById(
+        userId,
+        {
+          user_metadata: {
+            full_name: fullName,
+            first_name: firstName,
+            last_name: lastName,
+            whatsapp,
+            is_trial_user: true,
+          },
+        }
+      );
+
+      if (updateError) {
+        console.warn("⚠️ Warning updating user metadata:", updateError);
+        // Continue anyway, this is not critical
+      }
+    } else {
+      // Create new user account
+      console.log("👤 Creating new user account...");
+      const { data: newAuthData, error: authError } =
+        await supabase.auth.admin.createUser({
+          email,
+          password: uuidv4(), // Generate random password
+          email_confirm: true,
+          user_metadata: {
+            full_name: fullName,
+            first_name: firstName,
+            last_name: lastName,
+            whatsapp,
+            is_trial_user: true,
+          },
+        });
+
+      if (authError) {
+        console.error("❌ Error creating user:", authError);
+        return new Response(
+          JSON.stringify({
+            error: "Error creando la cuenta de usuario",
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      userId = newAuthData.user.id;
+      authData = newAuthData;
+      console.log("✅ New user created:", userId);
+    }
+
+    // Update or create profile with trial information
+    console.log("📝 Updating/creating profile with trial info...");
     const { error: profileError } = await supabase
       .from("profiles" as any)
-      .update({
-        full_name: fullName,
-        email,
-        whatsapp,
-        is_new_user: true,
-        trial_interview_used: true,
-        trial_interview_date: new Date().toISOString(),
-        interview_credits: 0, // Trial users start with 0 credits
-      })
-      .eq("user_id", userId);
+      .upsert(
+        {
+          user_id: userId,
+          full_name: fullName,
+          email,
+          whatsapp,
+          is_new_user: true,
+          trial_interview_used: true,
+          trial_interview_date: new Date().toISOString(),
+          interview_credits: 0, // Trial users start with 0 credits
+        },
+        {
+          onConflict: "user_id",
+        }
+      );
 
     if (profileError) {
       console.error("❌ Error updating profile:", profileError);

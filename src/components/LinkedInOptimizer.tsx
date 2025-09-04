@@ -401,115 +401,188 @@ export function LinkedInOptimizer() {
       {/* Form Section - Only show when showForm is true */}
       {showForm && (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* LinkedIn URL Section */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Linkedin className="w-5 h-5 text-primary" />
-                  Obtener Perfil de LinkedIn
-                </CardTitle>
-                <CardDescription>
-                  Ingresa la URL de tu perfil de LinkedIn para obtener la
-                  información
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label
-                    htmlFor="linkedin-url"
-                    className="text-sm font-medium mb-2 block"
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" />
+                Optimizar mi perfil de LinkedIn
+              </CardTitle>
+              <CardDescription>
+                Necesitamos tu perfil de LinkedIn y tu CV para generar contenido
+                optimizado que mejore tu visibilidad profesional
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Progress Indicator */}
+              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`flex items-center gap-2 ${
+                      linkedinUrl && validateLinkedInUrl(linkedinUrl)
+                        ? "text-green-600"
+                        : "text-muted-foreground"
+                    }`}
                   >
-                    URL de tu perfil de LinkedIn
-                  </Label>
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                        linkedinUrl && validateLinkedInUrl(linkedinUrl)
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-300"
+                      }`}
+                    >
+                      {linkedinUrl && validateLinkedInUrl(linkedinUrl)
+                        ? "✓"
+                        : "1"}
+                    </div>
+                    <span className="text-sm font-medium">LinkedIn</span>
+                  </div>
+                  <div
+                    className={`flex items-center gap-2 ${
+                      personalCV ? "text-green-600" : "text-muted-foreground"
+                    }`}
+                  >
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                        personalCV ? "bg-green-500 text-white" : "bg-gray-300"
+                      }`}
+                    >
+                      {personalCV ? "✓" : "2"}
+                    </div>
+                    <span className="text-sm font-medium">CV Personal</span>
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {linkedinUrl && validateLinkedInUrl(linkedinUrl) && personalCV
+                    ? "Listo para optimizar"
+                    : "Completa ambos pasos"}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* LinkedIn URL Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Linkedin className="w-4 h-4 text-primary" />
+                    <Label
+                      htmlFor="linkedin-url"
+                      className="text-sm font-medium"
+                    >
+                      URL de tu perfil de LinkedIn *
+                    </Label>
+                    {linkedinUrl && validateLinkedInUrl(linkedinUrl) && (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    )}
+                  </div>
                   <Input
                     id="linkedin-url"
                     type="url"
                     placeholder="https://linkedin.com/in/tu-perfil"
                     value={linkedinUrl}
                     onChange={(e) => setLinkedinUrl(e.target.value)}
-                    className="w-full"
+                    className={`w-full h-10 ${
+                      linkedinUrl && validateLinkedInUrl(linkedinUrl)
+                        ? "border-green-500"
+                        : ""
+                    }`}
                   />
                   {linkedinUrl && !validateLinkedInUrl(linkedinUrl) && (
-                    <p className="text-xs text-red-500 mt-1">
+                    <p className="text-xs text-red-500">
                       Por favor ingresa una URL válida de LinkedIn
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    El perfil se obtendrá automáticamente durante la
-                    optimización
+                  <p className="text-xs text-muted-foreground">
+                    Para obtener tu información actual y crear contenido
+                    optimizado
                   </p>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Personal CV Upload Section */}
-            <Card className="shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Upload className="w-5 h-5 text-primary" />
-                  CV Personal para Comparación
-                </CardTitle>
-                <CardDescription>
-                  Sube tu CV personal para comparar y generar contenido
-                  optimizado
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    onChange={handlePersonalCVUpload}
-                    className="hidden"
-                    id="personal-cv-upload"
-                  />
-                  <label
-                    htmlFor="personal-cv-upload"
-                    className="cursor-pointer flex flex-col items-center gap-2"
-                  >
-                    <Upload className="w-8 h-8 text-muted-foreground" />
-                    <p className="text-sm font-medium">
-                      Subir CV Personal (PDF)
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Tu CV actualizado para comparar
-                    </p>
-                  </label>
-                </div>
-
-                {personalCV && (
-                  <div className="flex items-center gap-2 p-3 bg-accent rounded-lg">
+                {/* Personal CV Upload Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
                     <Upload className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium">
-                      {personalCV.name}
-                    </span>
-                    <Badge variant="secondary">Listo</Badge>
+                    <Label className="text-sm font-medium">
+                      CV Personal (PDF) *
+                    </Label>
+                    {personalCV && (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    )}
                   </div>
-                )}
-
-                <Button
-                  onClick={optimizeProfile}
-                  disabled={!personalCV || !linkedinUrl || isOptimizing}
-                  className="w-full"
-                  variant="default"
-                >
-                  {isOptimizing ? (
-                    <>
-                      <Users className="w-4 h-4 mr-2 animate-spin" />
-                      Generando contenido para LinkedIn... (puede tardar más de
-                      1 minuto)
-                    </>
-                  ) : (
-                    <>
-                      <Users className="w-4 h-4 mr-2" />
-                      Generar Contenido LinkedIn
-                    </>
+                  <div
+                    className={`border-2 border-dashed rounded-lg h-10 flex items-center justify-center transition-colors ${
+                      personalCV
+                        ? "border-green-300 bg-green-50"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={handlePersonalCVUpload}
+                      className="hidden"
+                      id="personal-cv-upload"
+                    />
+                    <label
+                      htmlFor="personal-cv-upload"
+                      className="cursor-pointer flex items-center gap-2 w-full h-full px-3"
+                    >
+                      <Upload
+                        className={`w-4 h-4 ${
+                          personalCV
+                            ? "text-green-500"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                      <span className="text-sm font-medium">
+                        {personalCV ? "CV Subido" : "Subir CV"}
+                      </span>
+                    </label>
+                  </div>
+                  {personalCV && (
+                    <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="font-medium">{personalCV.name}</span>
+                    </div>
                   )}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                  <p className="text-xs text-muted-foreground">
+                    Para comparar y generar contenido que destaque tus logros
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <Button
+                onClick={optimizeProfile}
+                disabled={!personalCV || !linkedinUrl || isOptimizing}
+                className="w-full"
+                variant="default"
+                size="lg"
+              >
+                {isOptimizing ? (
+                  <>
+                    <Users className="w-4 h-4 mr-2 animate-spin" />
+                    Generando contenido... (puede tardar más de 1 minuto)
+                  </>
+                ) : (
+                  <>
+                    <Users className="w-4 h-4 mr-2" />
+                    {!personalCV || !linkedinUrl
+                      ? "Completa ambos pasos para continuar"
+                      : "Generar Contenido LinkedIn"}
+                  </>
+                )}
+              </Button>
+
+              {/* Quick Info */}
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>💡 ¿Por qué ambos archivos?</strong> Tu LinkedIn nos
+                  muestra tu presencia actual, tu CV nos ayuda a identificar
+                  logros específicos. Juntos creamos contenido optimizado para
+                  reclutadores.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* How to get LinkedIn URL */}
           <Card className="shadow-card">
@@ -834,8 +907,8 @@ export function LinkedInOptimizer() {
                   )}
 
                 {/* Interests Español */}
-                {optimizedContent.spanish.interests &&
-                  optimizedContent.spanish.interests.trim() && (
+                {optimizedContent?.spanish?.interests &&
+                  optimizedContent?.spanish?.interests.trim() && (
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-medium">Intereses</h3>

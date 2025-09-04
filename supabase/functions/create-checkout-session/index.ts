@@ -18,7 +18,7 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL");
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Product configuration - using production products
+// Product configuration - using existing products
 const PRODUCTS = {
   // Membresías
   "6months": {

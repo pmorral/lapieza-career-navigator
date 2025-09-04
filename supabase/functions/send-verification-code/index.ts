@@ -34,15 +34,25 @@ serve(async (req) => {
     // Set expiration to 10 minutes from now
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
+    console.log("📝 Generated code:", {
+      email,
+      code,
+      type,
+      expiresAt: expiresAt.toISOString(),
+    });
+
     // Store verification code in database
-    const { error: dbError } = await supabase
+    const { data: insertData, error: dbError } = await supabase
       .from("verification_codes")
       .insert({
         email,
         code,
         type,
         expires_at: expiresAt.toISOString(),
-      });
+      })
+      .select();
+
+    console.log("💾 Database insert result:", { insertData, dbError });
 
     if (dbError) {
       console.error("❌ Database error:", dbError);

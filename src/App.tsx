@@ -13,6 +13,7 @@ import { LandingPage } from "./components/LandingPage";
 import { Dashboard } from "./components/Dashboard";
 import { PaymentPage } from "./components/PaymentPage";
 import { LoginPage } from "./components/LoginPage";
+import { ForgotPassword } from "./components/ForgotPassword";
 import { ResetPassword } from "./components/ResetPassword";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
@@ -46,6 +47,9 @@ const AppRoutes = () => {
         element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />}
       />
 
+      {/* Ruta específica para landing - siempre accesible */}
+      <Route path="/landing" element={<LandingPage />} />
+
       {/* Rutas públicas - solo para usuarios no autenticados */}
       <Route
         path="/login"
@@ -55,6 +59,9 @@ const AppRoutes = () => {
           </PublicRoute>
         }
       />
+
+      {/* Ruta para olvidar contraseña - pública */}
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Ruta para restablecer contraseña - pública */}
       <Route path="/reset-password" element={<ResetPassword />} />

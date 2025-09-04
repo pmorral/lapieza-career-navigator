@@ -73,6 +73,7 @@ export function MockInterviews() {
   const [interviewResponses, setInterviewResponses] = useState<any[]>([]);
   const [isLoadingResponses, setIsLoadingResponses] = useState(false);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [isAnalyzingExpanded, setIsAnalyzingExpanded] = useState(true);
   const { toast } = useToast();
   const [interviews, setInterviews] = useState<InterviewSession[]>([
     {
@@ -310,7 +311,10 @@ export function MockInterviews() {
         return;
       }
 
-      console.log("📊 Found interview responses:", responses?.length || 0);
+      console.log(
+        "📊 Found interview responses:",
+        JSON.stringify(responses[0]) || []
+      );
       setInterviewResponses(responses || []);
     } catch (error) {
       console.error("Error in fetchInterviewResponses:", error);
@@ -330,8 +334,9 @@ export function MockInterviews() {
       return;
     }
 
-    // Check if user has available interviews
-    if (totalInterviews >= interviewCredits) {
+    // Check if user has available interview credits (not total interviews)
+    const availableCredits = interviewCredits - totalInterviews;
+    if (availableCredits <= 0) {
       setShowCreditsDialog(true);
       return;
     }
@@ -448,7 +453,7 @@ export function MockInterviews() {
                 ? "Cargando..."
                 : `${
                     interviewCredits - totalInterviews
-                  } de ${interviewCredits} entrevistas disponibles`}
+                  } de ${interviewCredits} créditos disponibles`}
             </Badge>
             {totalInterviews >= interviewCredits && (
               <Button
@@ -461,15 +466,165 @@ export function MockInterviews() {
               </Button>
             )}
           </div>
-        </div>
 
-        {!pendingInterview && totalInterviews < interviewCredits && (
-          <Button variant="professional">
-            <Play className="w-4 h-4 mr-2" />
-            Start New Interview
-          </Button>
-        )}
+          {/* Mostrar estado de entrevistas */}
+          {!isLoadingInterviews && totalInterviews > 0 && (
+            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+              <span>📊 Total creadas: {totalInterviews}</span>
+              {pendingInterview && (
+                <span className="text-blue-600">🔄 En proceso: 1</span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Interview Setup - Show when user has available credits */}
+      {totalInterviews < interviewCredits && (
+        <Card id="interview-setup" className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-primary" />
+              Start AI Interview
+            </CardTitle>
+            <CardDescription>
+              Puedes crear múltiples entrevistas simultáneamente. Cada una
+              contará como un crédito de tu plan.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label className="text-base font-medium">
+                Idioma de la entrevista *
+              </Label>
+              <RadioGroup
+                value={language}
+                onValueChange={setLanguage}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="spanish" id="spanish" />
+                  <Label htmlFor="spanish">Español</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="english" id="english" />
+                  <Label htmlFor="english">Inglés</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label htmlFor="cv-upload">Subir CV (Opcional)</Label>
+              <div className="mt-2 space-y-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="cv-upload"
+                />
+
+                {!uploadedCV ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full h-20 border-dashed"
+                  >
+                    <div className="text-center">
+                      <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        Haz clic para subir tu CV (PDF, máximo 2MB)
+                      </p>
+                    </div>
+                  </Button>
+                ) : (
+                  <div className="flex items-center justify-between p-3 bg-accent rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-medium">
+                        {uploadedCV.name}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={removeCV}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="job-title">Título del puesto *</Label>
+              <Textarea
+                id="job-title"
+                placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                rows={1}
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="job-description">Job Description *</Label>
+              <Textarea
+                id="job-description"
+                placeholder="Paste the job description here..."
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                rows={6}
+                className="mt-2"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={startInterview}
+                disabled={
+                  !jobTitle.trim() ||
+                  !jobDescription.trim() ||
+                  !language ||
+                  !uploadedCV ||
+                  !user ||
+                  isSubmitting
+                }
+                variant="professional"
+                className="flex-1"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                {isSubmitting
+                  ? "Enviando solicitud..."
+                  : usedInterviews >= interviewCredits
+                  ? "Comprar créditos"
+                  : "Solicitar entrevista AI"}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setJobTitle("");
+                  setJobDescription("");
+                  setLanguage("");
+                  setUploadedCV(null);
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                  }
+                }}
+                disabled={isSubmitting}
+              >
+                Clear
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Pending Interview Alert */}
       {pendingInterview && (
@@ -575,7 +730,7 @@ export function MockInterviews() {
               {/* Vista específica para entrevista siendo analizada */}
               {pendingInterview.status === "analyzing-interview" && (
                 <div className="bg-blue-100 p-4 rounded-lg border border-blue-300">
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="text-sm font-medium text-blue-800">
                         🧠 IA Analizando tu Entrevista
@@ -584,60 +739,77 @@ export function MockInterviews() {
                         Procesando respuestas y generando feedback
                       </p>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setIsAnalyzingExpanded(!isAnalyzingExpanded)
+                      }
+                      className="h-6 w-6 p-0 text-blue-600 hover:bg-blue-200"
+                    >
+                      {isAnalyzingExpanded ? "−" : "+"}
+                    </Button>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-blue-700">
-                      <span>• Analizando respuestas de audio</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-blue-700">
-                      <span>• Generando feedback personalizado</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-blue-700">
-                      <span>• Preparando recomendaciones</span>
-                    </div>
-                  </div>
+                  {isAnalyzingExpanded && (
+                    <>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs text-blue-700">
+                          <span>• Analizando respuestas de audio</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-blue-700">
+                          <span>• Generando feedback personalizado</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-blue-700">
+                          <span>• Preparando recomendaciones</span>
+                        </div>
+                      </div>
 
-                  <div className="mt-3 p-2 bg-blue-200 rounded text-xs text-blue-800">
-                    <strong>⏱️ Tiempo estimado:</strong> Máximo 25 minutos
-                  </div>
+                      <div className="mt-3 p-2 bg-blue-200 rounded text-xs text-blue-800">
+                        <strong>⏱️ Tiempo estimado:</strong> Máximo 25 minutos
+                      </div>
 
-                  {/* Información adicional */}
-                  <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
-                    <p>
-                      <strong>💡 ¿Qué está pasando?</strong>
-                    </p>
-                    <p className="mt-1">
-                      Nuestra IA está procesando tu entrevista para:
-                    </p>
-                    <ul className="mt-1 ml-3 space-y-1">
-                      <li>• Evaluar la claridad de tus respuestas</li>
-                      <li>• Identificar áreas de mejora</li>
-                      <li>• Generar feedback personalizado</li>
-                      <li>• Crear un plan de desarrollo</li>
-                    </ul>
-                  </div>
+                      {/* Información adicional */}
+                      <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                        <p>
+                          <strong>💡 ¿Qué está pasando?</strong>
+                        </p>
+                        <p className="mt-1">
+                          Nuestra IA está procesando tu entrevista para:
+                        </p>
+                        <ul className="mt-1 ml-3 space-y-1">
+                          <li>• Evaluar la claridad de tus respuestas</li>
+                          <li>• Identificar áreas de mejora</li>
+                          <li>• Generar feedback personalizado</li>
+                          <li>• Crear un plan de desarrollo</li>
+                        </ul>
+                      </div>
 
-                  {/* Toggle de auto-refresh */}
-                  <div className="mt-3 flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="auto-refresh"
-                        checked={autoRefreshEnabled}
-                        onChange={(e) =>
-                          setAutoRefreshEnabled(e.target.checked)
-                        }
-                        className="w-3 h-3 text-blue-600 bg-blue-100 border-blue-300 rounded focus:ring-blue-500"
-                      />
-                      <label htmlFor="auto-refresh" className="text-blue-700">
-                        Actualización automática cada 30s
-                      </label>
-                    </div>
-                    <span className="text-blue-600">
-                      {autoRefreshEnabled ? "🔄 Activado" : "⏸️ Pausado"}
-                    </span>
-                  </div>
+                      {/* Toggle de auto-refresh */}
+                      <div className="mt-3 flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="auto-refresh"
+                            checked={autoRefreshEnabled}
+                            onChange={(e) =>
+                              setAutoRefreshEnabled(e.target.checked)
+                            }
+                            className="w-3 h-3 text-blue-600 bg-blue-100 border-blue-300 rounded focus:ring-blue-500"
+                          />
+                          <label
+                            htmlFor="auto-refresh"
+                            className="text-blue-700"
+                          >
+                            Actualización automática cada 30s
+                          </label>
+                        </div>
+                        <span className="text-blue-600">
+                          {autoRefreshEnabled ? "🔄 Activado" : "⏸️ Pausado"}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -711,158 +883,10 @@ export function MockInterviews() {
         </Card>
       )}
 
-      {/* Interview Setup - Only show when no pending interviews and user has credits */}
-      {!pendingInterview && totalInterviews < interviewCredits && (
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-primary" />
-              Start AI Interview
-            </CardTitle>
-            <CardDescription>
-              Paste the job description to generate personalized interview
-              questions
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="text-base font-medium">
-                Idioma de la entrevista *
-              </Label>
-              <RadioGroup
-                value={language}
-                onValueChange={setLanguage}
-                className="mt-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="spanish" id="spanish" />
-                  <Label htmlFor="spanish">Español</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="english" id="english" />
-                  <Label htmlFor="english">Inglés</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div>
-              <Label htmlFor="cv-upload">Subir CV (Opcional)</Label>
-              <div className="mt-2 space-y-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="cv-upload"
-                />
-
-                {!uploadedCV ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-20 border-dashed"
-                  >
-                    <div className="text-center">
-                      <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        Haz clic para subir tu CV (PDF, máximo 2MB)
-                      </p>
-                    </div>
-                  </Button>
-                ) : (
-                  <div className="flex items-center justify-between p-3 bg-accent rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-medium">
-                        {uploadedCV.name}
-                      </span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={removeCV}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="job-title">Título del puesto *</Label>
-              <Textarea
-                id="job-title"
-                placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                rows={1}
-                className="mt-2"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="job-description">Job Description *</Label>
-              <Textarea
-                id="job-description"
-                placeholder="Paste the job description here..."
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                rows={6}
-                className="mt-2"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                onClick={startInterview}
-                disabled={
-                  !jobTitle.trim() ||
-                  !jobDescription.trim() ||
-                  !language ||
-                  !uploadedCV ||
-                  !user ||
-                  isSubmitting ||
-                  !!pendingInterview
-                }
-                variant="professional"
-                className="flex-1"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                {isSubmitting
-                  ? "Enviando solicitud..."
-                  : usedInterviews >= interviewCredits
-                  ? "Comprar créditos"
-                  : "Solicitar entrevista AI"}
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setJobTitle("");
-                  setJobDescription("");
-                  setLanguage("");
-                  setUploadedCV(null);
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = "";
-                  }
-                }}
-                disabled={isSubmitting}
-              >
-                Clear
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Removed Interview in Progress - now handled by LaPieza URL */}
 
       {/* Interview History */}
-      {interviewResponses.length > 0 && (
+      {interviewResponses?.length > 0 && (
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -899,11 +923,6 @@ export function MockInterviews() {
                         <Badge variant="outline" className="text-xs">
                           {response.status || "Completada"}
                         </Badge>
-                        {response.cost && (
-                          <span className="text-xs text-muted-foreground">
-                            Costo: ${response.cost}
-                          </span>
-                        )}
                       </div>
                     </div>
 
@@ -938,20 +957,27 @@ export function MockInterviews() {
                     )}
 
                     {response.ai_summary && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="space-y-6 mb-4">
+                        {/* Resumen General */}
+                        {response.ai_summary.summary && (
+                          <div>
+                            <h4 className="font-medium text-success mb-2">
+                              📋 Resumen General
+                            </h4>
+                            <div className="text-sm p-3 bg-accent rounded-lg">
+                              {response.ai_summary.summary}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Recomendación Final */}
                         {response.ai_summary.finalRecommendation && (
                           <div>
                             <h4 className="font-medium text-primary mb-2">
-                              Recomendación Final
+                              🎯 Recomendación Final
                             </h4>
                             <div className="text-sm p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
-                              <p className="font-medium">
-                                Decisión:{" "}
-                                {
-                                  response.ai_summary.finalRecommendation
-                                    .decision
-                                }
-                              </p>
+                              <p className="font-medium">Decisión: </p>
                               <p className="text-xs text-muted-foreground mt-1">
                                 Confianza:{" "}
                                 {
@@ -966,19 +992,276 @@ export function MockInterviews() {
                                     .reasoning
                                 }
                               </p>
+                              {response.ai_summary.finalRecommendation
+                                .nextSteps && (
+                                <div className="mt-2">
+                                  <p className="text-xs font-medium">
+                                    Próximos pasos:
+                                  </p>
+                                  <p className="text-xs">
+                                    {
+                                      response.ai_summary.finalRecommendation
+                                        .nextSteps
+                                    }
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
 
+                        {/* Habilidades Técnicas */}
+                        {response.ai_summary.hardSkills && (
+                          <div>
+                            <h4 className="font-medium text-blue-600 mb-2">
+                              🔧 Habilidades Técnicas
+                            </h4>
+                            <div className="text-sm p-3 bg-blue-50 rounded-lg border-l-2 border-blue-600">
+                              <p className="text-xs whitespace-pre-line">
+                                {response.ai_summary.hardSkills}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Habilidades Blandas */}
                         {response.ai_summary.softSkills && (
                           <div>
                             <h4 className="font-medium text-warning mb-2">
-                              Habilidades Blandas
+                              🤝 Habilidades Blandas
                             </h4>
                             <div className="text-sm p-3 bg-warning/5 rounded-lg border-l-2 border-warning">
                               <p className="text-xs whitespace-pre-line">
                                 {response.ai_summary.softSkills}
                               </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Nivel de Inglés */}
+                        {response.ai_summary.englishLevel && (
+                          <div>
+                            <h4 className="font-medium text-purple-600 mb-2">
+                              🌍 Nivel de Inglés
+                            </h4>
+                            <div className="text-sm p-3 bg-purple-50 rounded-lg border-l-2 border-purple-600">
+                              <p className="text-xs">
+                                {response.ai_summary.englishLevel}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Tecnologías Clave */}
+                        {response.ai_summary.keyTechnologies && (
+                          <div>
+                            <h4 className="font-medium text-indigo-600 mb-2">
+                              💻 Tecnologías Clave
+                            </h4>
+                            <div className="text-sm p-3 bg-indigo-50 rounded-lg border-l-2 border-indigo-600">
+                              <p className="text-xs">
+                                {response.ai_summary.keyTechnologies}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Experiencia Técnica */}
+                        {response.ai_summary.technicalExperience && (
+                          <div>
+                            <h4 className="font-medium text-cyan-600 mb-2">
+                              ⚙️ Experiencia Técnica
+                            </h4>
+                            <div className="text-sm p-3 bg-cyan-50 rounded-lg border-l-2 border-cyan-600">
+                              <p className="text-xs">
+                                {response.ai_summary.technicalExperience}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Feedback del Candidato */}
+                        {response.ai_summary.candidateFeedback && (
+                          <div>
+                            <h4 className="font-medium text-green-600 mb-2">
+                              💬 Feedback del Candidato
+                            </h4>
+                            <div className="text-sm p-3 bg-green-50 rounded-lg border-l-2 border-green-600">
+                              <div className="space-y-2">
+                                {response.ai_summary.candidateFeedback
+                                  .feedback && (
+                                  <p className="text-xs">
+                                    <strong>Feedback:</strong>{" "}
+                                    {
+                                      response.ai_summary.candidateFeedback
+                                        .feedback
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.candidateFeedback
+                                  .starMethodology && (
+                                  <p className="text-xs">
+                                    <strong>Metodología STAR:</strong>{" "}
+                                    {
+                                      response.ai_summary.candidateFeedback
+                                        .starMethodology
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.candidateFeedback
+                                  .actionableAdvice && (
+                                  <div className="text-xs">
+                                    <strong>Consejos accionables:</strong>
+                                    <ul className="list-disc list-inside mt-1">
+                                      {response.ai_summary.candidateFeedback.actionableAdvice.map(
+                                        (advice: string, index: number) => (
+                                          <li key={index}>{advice}</li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+                                {response.ai_summary.candidateFeedback
+                                  .areasForImprovement && (
+                                  <div className="text-xs">
+                                    <strong>Áreas de mejora:</strong>
+                                    <ul className="list-disc list-inside mt-1">
+                                      {response.ai_summary.candidateFeedback.areasForImprovement.map(
+                                        (area: string, index: number) => (
+                                          <li key={index}>{area}</li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Análisis de Comunicación */}
+                        {response.ai_summary.communicationAnalysis && (
+                          <div>
+                            <h4 className="font-medium text-pink-600 mb-2">
+                              🗣️ Análisis de Comunicación
+                            </h4>
+                            <div className="text-sm p-3 bg-pink-50 rounded-lg border-l-2 border-pink-600">
+                              <div className="space-y-2">
+                                {response.ai_summary.communicationAnalysis
+                                  .communicationStrengths && (
+                                  <p className="text-xs">
+                                    <strong>Fortalezas:</strong>{" "}
+                                    {
+                                      response.ai_summary.communicationAnalysis
+                                        .communicationStrengths
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.communicationAnalysis
+                                  .communicationWeaknesses && (
+                                  <p className="text-xs">
+                                    <strong>Debilidades:</strong>{" "}
+                                    {
+                                      response.ai_summary.communicationAnalysis
+                                        .communicationWeaknesses
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.communicationAnalysis
+                                  .alternativeSuggestions && (
+                                  <div className="text-xs">
+                                    <strong>Sugerencias alternativas:</strong>
+                                    <ul className="list-disc list-inside mt-1">
+                                      {response.ai_summary.communicationAnalysis.alternativeSuggestions.map(
+                                        (suggestion: string, index: number) => (
+                                          <li key={index}>{suggestion}</li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Evaluación de Potencial */}
+                        {response.ai_summary.potentialAssessment && (
+                          <div>
+                            <h4 className="font-medium text-teal-600 mb-2">
+                              🚀 Evaluación de Potencial
+                            </h4>
+                            <div className="text-sm p-3 bg-teal-50 rounded-lg border-l-2 border-teal-600">
+                              <div className="space-y-2">
+                                {response.ai_summary.potentialAssessment
+                                  .growthPotential && (
+                                  <p className="text-xs">
+                                    <strong>Potencial de crecimiento:</strong>{" "}
+                                    {
+                                      response.ai_summary.potentialAssessment
+                                        .growthPotential
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.potentialAssessment
+                                  .careerTrajectory && (
+                                  <p className="text-xs">
+                                    <strong>Trayectoria profesional:</strong>{" "}
+                                    {
+                                      response.ai_summary.potentialAssessment
+                                        .careerTrajectory
+                                    }
+                                  </p>
+                                )}
+                                {response.ai_summary.potentialAssessment
+                                  .leadershipReadiness && (
+                                  <p className="text-xs">
+                                    <strong>Preparación para liderazgo:</strong>{" "}
+                                    {
+                                      response.ai_summary.potentialAssessment
+                                        .leadershipReadiness
+                                    }
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Filosofía y Enfoque */}
+                        {response.ai_summary.philosophyAndApproach && (
+                          <div>
+                            <h4 className="font-medium text-amber-600 mb-2">
+                              🎯 Filosofía y Enfoque
+                            </h4>
+                            <div className="text-sm p-3 bg-amber-50 rounded-lg border-l-2 border-amber-600">
+                              <p className="text-xs">
+                                {response.ai_summary.philosophyAndApproach}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Puntuación General */}
+                        {response.ai_summary.overallScore && (
+                          <div>
+                            <h4 className="font-medium text-emerald-600 mb-2">
+                              📈 Puntuación General
+                            </h4>
+                            <div className="text-sm p-3 bg-emerald-50 rounded-lg border-l-2 border-emerald-600">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold">
+                                  {response.ai_summary.overallScore}/100
+                                </span>
+                                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                  <div
+                                    className="bg-emerald-600 h-2 rounded-full"
+                                    style={{
+                                      width: `${response.ai_summary.overallScore}%`,
+                                    }}
+                                  ></div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -995,22 +1278,6 @@ export function MockInterviews() {
                           >
                             🎧 Escuchar grabación
                           </a>
-                        </Button>
-                      )}
-                      {response.stereo_recording_url && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a
-                            href={response.stereo_recording_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            🎧 Grabación estéreo
-                          </a>
-                        </Button>
-                      )}
-                      {response.transcript && (
-                        <Button variant="outline" size="sm">
-                          📝 Ver transcripción
                         </Button>
                       )}
                     </div>
