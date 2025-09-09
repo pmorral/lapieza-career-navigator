@@ -232,16 +232,11 @@ export function LandingPage() {
             </Badge>
 
             <h1 className="text-2xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 text-gray-900">
-              Impulsa tu carrera con nuestro
-              <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                programa 360° de empleabilidad
-              </span>
+              👉 "Convierte tu búsqueda en tu mejor oportunidad"
             </h1>
 
             <p className="text-base md:text-xl lg:text-2xl mb-6 md:mb-8 text-gray-700 max-w-3xl mx-auto">
-              Conviértete en el candidato ideal. Domina tu búsqueda laboral con
-              IA, sesiones grupales, templates profesionales y seguimiento con
-              un Career Coach.
+              El mercado laboral cambió. Tú también puedes hacerlo. Con el Programa 360 de Academy by LaPieza tendrás la estrategia, acompañamiento y herramientas para destacar donde otros se quedan atrás.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 md:gap-6 mb-6 md:mb-8 justify-center">
@@ -289,7 +284,7 @@ export function LandingPage() {
                   trialSection?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
-                Prueba gratis
+                Regístrate
                 <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2" />
               </Button>
               <Button
@@ -364,6 +359,85 @@ export function LandingPage() {
               </CardDescription>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* Before and After Section */}
+      <section className="py-12 md:py-20 bg-gradient-to-br from-destructive/5 to-success/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 md:mb-12">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+              De frustración a claridad: así es el antes y el después
+            </h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <Card className="border-destructive/20 bg-destructive/5">
+              <CardHeader>
+                <CardTitle className="text-destructive flex items-center gap-2">
+                  <span className="text-2xl">😔</span>
+                  Antes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Enviar decenas de CVs sin respuesta, entrevistas poco claras, ansiedad y falta de dirección.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-success/20 bg-success/5">
+              <CardHeader>
+                <CardTitle className="text-success flex items-center gap-2">
+                  <span className="text-2xl">✨</span>
+                  Después
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Un método probado para diseñar tu perfil, encontrar vacantes ocultas, avanzar en entrevistas y negociar mejores ofertas.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Experience Section */}
+      <section className="py-12 md:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="mb-8 md:mb-12">
+              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                No es teoría, es experiencia real
+              </h3>
+              <p className="text-base md:text-lg text-muted-foreground mb-8">
+                Desde 2020 hemos acompañado a +450 profesionales en Latinoamérica.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                <div className="flex items-center gap-3 bg-primary/10 rounded-lg p-4">
+                  <span className="text-2xl">👉</span>
+                  <div className="text-left">
+                    <div className="font-bold text-lg text-foreground">70%</div>
+                    <div className="text-sm text-muted-foreground">
+                      consiguió entrevistas en menos de 3 meses
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-primary/10 rounded-lg p-4">
+                  <span className="text-2xl">👉</span>
+                  <div className="text-left">
+                    <div className="font-bold text-lg text-foreground">Muchos</div>
+                    <div className="text-sm text-muted-foreground">
+                      accedieron a empleos mejor pagados y alineados con sus metas
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -497,11 +571,16 @@ export function LandingPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="text-3xl font-bold text-foreground mb-4">
-              Inversión en tu futuro profesional
+              Qué lograrás con el programa
             </h3>
-            <p className="text-lg text-muted-foreground">
-              Un solo plan, acceso completo
+            <p className="text-lg text-muted-foreground mb-6">
+              El Programa 360 no termina cuando aceptas una oferta: tendrás un sistema y herramientas que podrás usar a lo largo de tu carrera. Desde crear un CV que supera filtros, hasta practicar entrevistas, negociar ofertas y mantenerte competitivo.
             </p>
+            <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 mb-8">
+              <p className="text-xl font-semibold text-foreground flex items-center justify-center gap-2">
+                💼 "Un programa que cambia tu presente para diseñar tu futuro."
+              </p>
+            </div>
           </div>
 
           <Card className="relative overflow-hidden border-2 border-primary shadow-xl">
