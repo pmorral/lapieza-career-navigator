@@ -844,13 +844,18 @@ function MembershipDetails() {
                    Academy - 6 Meses
                  </h4>
                  <div className="mb-2">
-                   <p className="text-2xl font-bold text-primary">
-                     $149<span className="text-base"> USD</span>
-                   </p>
-                   <p className="text-sm text-muted-foreground">
-                     <span className="line-through">Precio regular: $297 USD</span>
-                     <span className="text-green-600 font-medium ml-2">50% descuento</span>
-                   </p>
+                   <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold text-center mb-2 animate-pulse">
+                     ¡AHORRA $148!
+                   </div>
+                   <div className="flex items-center gap-2 justify-center">
+                     <span className="text-lg text-muted-foreground line-through">$297</span>
+                     <p className="text-3xl font-bold text-primary">
+                       $149<span className="text-base"> USD</span>
+                     </p>
+                   </div>
+                   <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold text-center mt-1">
+                     50% DESCUENTO LIMITADO
+                   </div>
                  </div>
                  <p className="text-sm text-muted-foreground mb-4">
                    6 meses de acceso completo
@@ -874,13 +879,18 @@ function MembershipDetails() {
                    Academy - 12 Meses
                  </h4>
                  <div className="mb-2">
-                   <p className="text-2xl font-bold text-primary">
-                     $199<span className="text-base"> USD</span>
-                   </p>
-                   <p className="text-sm text-muted-foreground">
-                     <span className="line-through">Precio regular: $397 USD</span>
-                     <span className="text-green-600 font-medium ml-2">50% descuento</span>
-                   </p>
+                   <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold text-center mb-2 animate-pulse">
+                     ¡AHORRA $198!
+                   </div>
+                   <div className="flex items-center gap-2 justify-center">
+                     <span className="text-lg text-muted-foreground line-through">$397</span>
+                     <p className="text-3xl font-bold text-primary">
+                       $199<span className="text-base"> USD</span>
+                     </p>
+                   </div>
+                   <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold text-center mt-1">
+                     50% DESCUENTO LIMITADO
+                   </div>
                  </div>
                  <p className="text-sm text-muted-foreground mb-4">
                    12 meses de acceso completo

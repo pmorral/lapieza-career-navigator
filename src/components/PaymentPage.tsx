@@ -381,12 +381,19 @@ export const PaymentPage = () => {
                     setSelectedPlan(plan.id);
                   }}
                 >
-                  {plan.popular && plan.id !== "trial" && (
-                    <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground">
+                {plan.popular && plan.id !== "trial" && (
+                  <div className="absolute -top-3 left-4 right-4 flex gap-2">
+                    <Badge className="bg-primary text-primary-foreground flex-1 text-center">
                       <Star className="w-3 h-3 mr-1" />
                       Más Popular
                     </Badge>
-                  )}
+                    {plan.originalPrice > plan.price && (
+                      <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-bounce">
+                        OFERTA LIMITADA
+                      </Badge>
+                    )}
+                  </div>
+                )}
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div>
@@ -421,20 +428,31 @@ export const PaymentPage = () => {
                             GRATIS
                           </div>
                         ) : (
-                          <>
-                            <div className="text-2xl font-bold text-primary">
-                              ${plan.price}
+                          <div className="space-y-1">
+                            {plan.originalPrice > plan.price && (
+                              <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold text-center animate-pulse">
+                                ¡AHORRA ${plan.originalPrice - plan.price}!
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                              {plan.originalPrice > plan.price && (
+                                <div className="text-lg text-muted-foreground line-through">
+                                  ${plan.originalPrice}
+                                </div>
+                              )}
+                              <div className="text-3xl font-bold text-primary">
+                                ${plan.price}
+                              </div>
                             </div>
                             <div className="text-sm text-muted-foreground">
                               USD
                             </div>
                             {plan.originalPrice > plan.price && (
-                              <div className="text-xs text-muted-foreground">
-                                <span className="line-through">${plan.originalPrice} USD</span>
-                                <span className="text-green-600 font-medium ml-1">50% OFF</span>
+                              <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold text-center">
+                                50% DESCUENTO
                               </div>
                             )}
-                          </>
+                          </div>
                         )}
                       </div>
                     </div>
