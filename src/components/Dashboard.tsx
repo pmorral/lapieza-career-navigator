@@ -833,58 +833,70 @@ function MembershipDetails() {
               Planes Disponibles
             </CardTitle>
             <CardDescription>
-              Elige el plan que mejor se adapte a tus necesidades
+              Elige el plan que mejor se adapte a tus necesidades profesionales y comienza tu transformación
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Plan de 6 meses */}
-              <div className="border border-border rounded-lg p-4">
-                <h4 className="font-semibold text-lg mb-2">
-                  Academy - 6 Meses
-                </h4>
-                <p className="text-2xl font-bold text-primary mb-2">
-                  $149<span className="text-base">149 USD</span>
-                </p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  6 meses de acceso completo
-                </p>
-                <ul className="space-y-2 text-sm mb-4">
-                  <li>• CV Boost con AI</li>
-                  <li>• LinkedIn Optimizer</li>
-                  <li>• 5 Entrevistas AI</li>
-                  <li>• E-learning Hub</li>
-                  <li>• Job Tracker</li>
-                </ul>
-                <Button onClick={handleRenewal} className="w-full">
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Activar Plan
-                </Button>
-              </div>
+               {/* Plan de 6 meses */}
+               <div className="border border-border rounded-lg p-4">
+                 <h4 className="font-semibold text-lg mb-2">
+                   Academy - 6 Meses
+                 </h4>
+                 <div className="mb-2">
+                   <p className="text-2xl font-bold text-primary">
+                     $149<span className="text-base"> USD</span>
+                   </p>
+                   <p className="text-sm text-muted-foreground">
+                     <span className="line-through">Precio regular: $297 USD</span>
+                     <span className="text-green-600 font-medium ml-2">50% descuento</span>
+                   </p>
+                 </div>
+                 <p className="text-sm text-muted-foreground mb-4">
+                   6 meses de acceso completo
+                 </p>
+                 <ul className="space-y-2 text-sm mb-4">
+                   <li>• CV Boost con AI</li>
+                   <li>• LinkedIn Optimizer</li>
+                   <li>• 5 Entrevistas AI</li>
+                   <li>• E-learning Hub</li>
+                   <li>• Job Tracker</li>
+                 </ul>
+                 <Button onClick={handleRenewal} className="w-full">
+                   <CreditCard className="w-4 h-4 mr-2" />
+                   Activar Plan
+                 </Button>
+               </div>
 
-              {/* Plan de 12 meses */}
-              <div className="border border-border rounded-lg p-4">
-                <h4 className="font-semibold text-lg mb-2">
-                  Academy - 12 Meses
-                </h4>
-                <p className="text-2xl font-bold text-primary mb-2">
-                  $199<span className="text-base"> USD</span>
-                </p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  12 meses de acceso completo
-                </p>
-                <ul className="space-y-2 text-sm mb-4">
-                  <li>• CV Boost con AI</li>
-                  <li>• LinkedIn Optimizer</li>
-                  <li>• 5 Entrevistas AI</li>
-                  <li>• E-learning Hub</li>
-                  <li>• Job Tracker</li>
-                </ul>
-                <Button onClick={handleRenewal} className="w-full">
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Activar Plan
-                </Button>
-              </div>
+               {/* Plan de 12 meses */}
+               <div className="border border-border rounded-lg p-4">
+                 <h4 className="font-semibold text-lg mb-2">
+                   Academy - 12 Meses
+                 </h4>
+                 <div className="mb-2">
+                   <p className="text-2xl font-bold text-primary">
+                     $199<span className="text-base"> USD</span>
+                   </p>
+                   <p className="text-sm text-muted-foreground">
+                     <span className="line-through">Precio regular: $397 USD</span>
+                     <span className="text-green-600 font-medium ml-2">50% descuento</span>
+                   </p>
+                 </div>
+                 <p className="text-sm text-muted-foreground mb-4">
+                   12 meses de acceso completo
+                 </p>
+                 <ul className="space-y-2 text-sm mb-4">
+                   <li>• CV Boost con AI</li>
+                   <li>• LinkedIn Optimizer</li>
+                   <li>• 5 Entrevistas AI</li>
+                   <li>• E-learning Hub</li>
+                   <li>• Job Tracker</li>
+                 </ul>
+                 <Button onClick={handleRenewal} className="w-full">
+                   <CreditCard className="w-4 h-4 mr-2" />
+                   Activar Plan
+                 </Button>
+               </div>
             </div>
           </CardContent>
         </Card>

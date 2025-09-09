@@ -232,7 +232,7 @@ export function LandingPage() {
             </Badge>
 
             <h1 className="text-2xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 text-gray-900">
-              👉 "Convierte tu búsqueda en tu mejor oportunidad"
+              👉 Convierte tu búsqueda en tu mejor oportunidad
             </h1>
 
             <p className="text-base md:text-xl lg:text-2xl mb-6 md:mb-8 text-gray-700 max-w-3xl mx-auto">
@@ -284,7 +284,7 @@ export function LandingPage() {
                   trialSection?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
-                Regístrate
+                 Prueba Gratis
                 <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2" />
               </Button>
               <Button
@@ -578,7 +578,7 @@ export function LandingPage() {
             </p>
             <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 mb-8">
               <p className="text-xl font-semibold text-foreground flex items-center justify-center gap-2">
-                💼 "Un programa que cambia tu presente para diseñar tu futuro."
+                 💼 Un programa que cambia tu presente para diseñar tu futuro.
               </p>
             </div>
           </div>
