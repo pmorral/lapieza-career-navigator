@@ -137,6 +137,7 @@ export const PaymentPage = () => {
       id: "trial",
       name: "Entrevista AI de prueba",
       price: 0,
+      originalPrice: 0,
       description: "Prueba gratuita del simulador de entrevistas con IA",
       features: [
         "Resultados por email",
@@ -150,6 +151,7 @@ export const PaymentPage = () => {
       id: "premium-6",
       name: "Academy Premium - 6 Meses",
       price: 149,
+      originalPrice: 297,
       description: "Programa completo de empleabilidad por 6 meses",
       features: [
         "Acceso completo a todas las herramientas por 6 meses",
@@ -166,6 +168,7 @@ export const PaymentPage = () => {
       id: "premium-12",
       name: "Academy Premium - 12 Meses",
       price: 199,
+      originalPrice: 397,
       description: "Programa completo de empleabilidad por 12 meses",
       features: [
         "Acceso completo a todas las herramientas por 12 meses",
@@ -174,6 +177,7 @@ export const PaymentPage = () => {
         "Actualizaciones gratuitas",
         "Soporte prioritario",
         "Comunidad exclusiva",
+        "2 meses adicionales gratis",
       ],
       popular: false,
       months: 12,
@@ -419,11 +423,17 @@ export const PaymentPage = () => {
                         ) : (
                           <>
                             <div className="text-2xl font-bold text-primary">
-                              {plan.price}
+                              ${plan.price}
                             </div>
                             <div className="text-sm text-muted-foreground">
                               USD
                             </div>
+                            {plan.originalPrice > plan.price && (
+                              <div className="text-xs text-muted-foreground">
+                                <span className="line-through">${plan.originalPrice} USD</span>
+                                <span className="text-green-600 font-medium ml-1">50% OFF</span>
+                              </div>
+                            )}
                           </>
                         )}
                       </div>
