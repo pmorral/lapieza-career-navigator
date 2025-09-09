@@ -11,6 +11,7 @@ import {
   Trash2,
   Globe,
   ExternalLink,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -98,13 +99,13 @@ interface OptimizedContent {
 interface HistoryItem {
   id: string;
   personal_cv_filename: string;
-  linkedin_url?: string;
+  linkedin_cv_filename?: string;
   optimized_content: OptimizedContent;
   created_at: string;
 }
 
 export function LinkedInOptimizer() {
-  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [linkedinCV, setLinkedinCV] = useState<File | null>(null);
   const [personalCV, setPersonalCV] = useState<File | null>(null);
   const [optimizedContent, setOptimizedContent] =
     useState<OptimizedContent | null>(null);
@@ -139,13 +140,13 @@ export function LinkedInOptimizer() {
           (item: {
             id: string;
             personal_cv_filename: string;
-            linkedin_url?: string;
+            linkedin_cv_filename?: string;
             optimized_content: unknown;
             created_at: string;
           }) => ({
             id: item.id,
             personal_cv_filename: item.personal_cv_filename,
-            linkedin_url: item.linkedin_url,
+            linkedin_cv_filename: item.linkedin_cv_filename,
             optimized_content: item.optimized_content as OptimizedContent,
             created_at: item.created_at,
           })
@@ -212,10 +213,10 @@ export function LinkedInOptimizer() {
   };
 
   const optimizeProfile = async () => {
-    if (!personalCV || !linkedinUrl) {
+    if (!personalCV && !linkedinCV) {
       toast({
         title: "Error",
-        description: "Por favor completa todos los campos requeridos",
+        description: "Por favor sube al menos un CV (Personal o de LinkedIn)",
         variant: "destructive",
       });
       return;
@@ -226,37 +227,68 @@ export function LinkedInOptimizer() {
     try {
       console.log("Processing LinkedIn optimization with:", {
         personalCV: personalCV?.name,
-        linkedinUrl: linkedinUrl,
+        linkedinCV: linkedinCV?.name,
       });
 
-      // Convert personal CV to base64
-      const reader = new FileReader();
-      const personalCVBase64 = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          const base64Data = result.split(",")[1];
-          console.log(
-            "Personal CV base64 conversion successful, length:",
-            base64Data.length
-          );
-          resolve(base64Data);
-        };
-        reader.onerror = (error) => {
-          console.error("Personal CV file reading error:", error);
-          reject(error);
-        };
-        reader.readAsDataURL(personalCV);
-      });
+      // Convert personal CV to base64 (if provided)
+      let personalCVBase64: string | null = null;
+      if (personalCV) {
+        const reader = new FileReader();
+        personalCVBase64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => {
+            const result = reader.result as string;
+            const base64Data = result.split(",")[1];
+            console.log(
+              "Personal CV base64 conversion successful, length:",
+              base64Data.length
+            );
+            resolve(base64Data);
+          };
+          reader.onerror = (error) => {
+            console.error("Personal CV file reading error:", error);
+            reject(error);
+          };
+          reader.readAsDataURL(personalCV);
+        });
+      }
+
+      // Convert LinkedIn CV to base64 (if provided)
+      let linkedinCVBase64: string | null = null;
+      if (linkedinCV) {
+        const linkedinReader = new FileReader();
+        linkedinCVBase64 = await new Promise<string>((resolve, reject) => {
+          linkedinReader.onload = () => {
+            const result = linkedinReader.result as string;
+            const base64Data = result.split(",")[1];
+            console.log(
+              "LinkedIn CV base64 conversion successful, length:",
+              base64Data.length
+            );
+            resolve(base64Data);
+          };
+          linkedinReader.onerror = (error) => {
+            console.error("LinkedIn CV file reading error:", error);
+            reject(error);
+          };
+          linkedinReader.readAsDataURL(linkedinCV);
+        });
+      }
 
       console.log("Calling linkedin-optimizer-ai function...");
+      console.log("Sending data:", {
+        hasPersonalCV: !!personalCVBase64,
+        hasLinkedInCV: !!linkedinCVBase64,
+        personalCVLength: personalCVBase64?.length || 0,
+        linkedinCVLength: linkedinCVBase64?.length || 0,
+      });
 
       // Call our LinkedIn Optimizer AI function using Supabase
       const { data, error } = await supabase.functions.invoke(
         "linkedin-optimizer-ai",
         {
           body: {
-            personalCVBase64,
-            linkedinUrl: linkedinUrl,
+            personalCVBase64: personalCVBase64 || null,
+            linkedinCVBase64: linkedinCVBase64 || null,
             language: "español",
           },
         }
@@ -279,8 +311,8 @@ export function LinkedInOptimizer() {
           .from("linkedin_optimizations")
           .insert({
             user_id: user.id,
-            personal_cv_filename: personalCV.name,
-            linkedin_url: linkedinUrl,
+            personal_cv_filename: personalCV?.name || null,
+            linkedin_cv_filename: linkedinCV?.name || null,
             optimized_content: data,
           });
 
@@ -308,12 +340,6 @@ export function LinkedInOptimizer() {
       title: "Copiado",
       description: "Contenido copiado al portapapeles",
     });
-  };
-
-  const validateLinkedInUrl = (url: string) => {
-    const linkedinRegex =
-      /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
-    return linkedinRegex.test(url);
   };
 
   return (
@@ -357,10 +383,10 @@ export function LinkedInOptimizer() {
                         <h4 className="font-medium">
                           {item.personal_cv_filename}
                         </h4>
-                        {item.linkedin_url && (
+                        {item.linkedin_cv_filename && (
                           <p className="text-sm text-muted-foreground flex items-center gap-1">
                             <Linkedin className="w-3 h-3" />
-                            {item.linkedin_url}
+                            {item.linkedin_cv_filename}
                           </p>
                         )}
                         <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -418,23 +444,17 @@ export function LinkedInOptimizer() {
                 <div className="flex items-center gap-4">
                   <div
                     className={`flex items-center gap-2 ${
-                      linkedinUrl && validateLinkedInUrl(linkedinUrl)
-                        ? "text-green-600"
-                        : "text-muted-foreground"
+                      linkedinCV ? "text-green-600" : "text-muted-foreground"
                     }`}
                   >
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                        linkedinUrl && validateLinkedInUrl(linkedinUrl)
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-300"
+                        linkedinCV ? "bg-green-500 text-white" : "bg-gray-300"
                       }`}
                     >
-                      {linkedinUrl && validateLinkedInUrl(linkedinUrl)
-                        ? "✓"
-                        : "1"}
+                      {linkedinCV ? "✓" : "1"}
                     </div>
-                    <span className="text-sm font-medium">LinkedIn</span>
+                    <span className="text-sm font-medium">CV de LinkedIn</span>
                   </div>
                   <div
                     className={`flex items-center gap-2 ${
@@ -452,68 +472,104 @@ export function LinkedInOptimizer() {
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {linkedinUrl && validateLinkedInUrl(linkedinUrl) && personalCV
+                  {linkedinCV && personalCV
                     ? "Listo para optimizar"
                     : "Completa ambos pasos"}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* LinkedIn URL Section */}
+                {/* LinkedIn CV Section */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Linkedin className="w-4 h-4 text-primary" />
                     <Label
-                      htmlFor="linkedin-url"
+                      htmlFor="linkedin-cv"
                       className="text-sm font-medium"
                     >
-                      URL de tu perfil de LinkedIn *
+                      CV descargado de LinkedIn
                     </Label>
-                    {linkedinUrl && validateLinkedInUrl(linkedinUrl) && (
+                    {linkedinCV && (
                       <CheckCircle className="w-4 h-4 text-green-500" />
                     )}
                   </div>
-                  <Input
-                    id="linkedin-url"
-                    type="url"
-                    placeholder="https://linkedin.com/in/tu-perfil"
-                    value={linkedinUrl}
-                    onChange={(e) => setLinkedinUrl(e.target.value)}
-                    className={`w-full h-10 ${
-                      linkedinUrl && validateLinkedInUrl(linkedinUrl)
-                        ? "border-green-500"
-                        : ""
-                    }`}
-                  />
-                  {linkedinUrl && !validateLinkedInUrl(linkedinUrl) && (
-                    <p className="text-xs text-red-500">
-                      Por favor ingresa una URL válida de LinkedIn
-                    </p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Para obtener tu información actual y crear contenido
-                    optimizado
-                  </p>
+                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors">
+                    <input
+                      id="linkedin-cv"
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setLinkedinCV(file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="linkedin-cv"
+                      className="cursor-pointer flex flex-col items-center gap-2"
+                    >
+                      <Upload className="w-8 h-8 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">
+                          {linkedinCV
+                            ? linkedinCV.name
+                            : "Subir CV de LinkedIn"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Solo archivos PDF
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Instrucciones de descarga */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-blue-900">
+                          ¿Cómo descargar tu CV de LinkedIn?
+                        </p>
+                        <div className="space-y-1 text-xs text-blue-800">
+                          <div className="flex items-start gap-2">
+                            <span className="font-medium">1.</span>
+                            <span>Ve a tu perfil de LinkedIn</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="font-medium">2.</span>
+                            <span>Busca el botón "Más" debajo de tu foto</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="font-medium">3.</span>
+                            <span>Selecciona "Guardar en PDF"</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="font-medium">4.</span>
+                            <span>Sube el archivo PDF descargado aquí</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Personal CV Upload Section */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Upload className="w-4 h-4 text-primary" />
-                    <Label className="text-sm font-medium">
-                      CV Personal (PDF) *
+                    <Label
+                      htmlFor="personal-cv-upload"
+                      className="text-sm font-medium"
+                    >
+                      CV Personal (PDF)
                     </Label>
                     {personalCV && (
                       <CheckCircle className="w-4 h-4 text-green-500" />
                     )}
                   </div>
-                  <div
-                    className={`border-2 border-dashed rounded-lg h-10 flex items-center justify-center transition-colors ${
-                      personalCV
-                        ? "border-green-300 bg-green-50"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
+                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors">
                     <input
                       type="file"
                       accept=".pdf"
@@ -523,36 +579,56 @@ export function LinkedInOptimizer() {
                     />
                     <label
                       htmlFor="personal-cv-upload"
-                      className="cursor-pointer flex items-center gap-2 w-full h-full px-3"
+                      className="cursor-pointer flex flex-col items-center gap-2"
                     >
-                      <Upload
-                        className={`w-4 h-4 ${
-                          personalCV
-                            ? "text-green-500"
-                            : "text-muted-foreground"
-                        }`}
-                      />
-                      <span className="text-sm font-medium">
-                        {personalCV ? "CV Subido" : "Subir CV"}
-                      </span>
+                      <Upload className="w-8 h-8 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">
+                          {personalCV ? personalCV.name : "Subir CV Personal"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Solo archivos PDF
+                        </p>
+                      </div>
                     </label>
                   </div>
-                  {personalCV && (
-                    <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="font-medium">{personalCV.name}</span>
+
+                  {/* Información del CV Personal */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <Upload className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-green-900">
+                          ¿Qué debe incluir tu CV Personal?
+                        </p>
+                        <div className="space-y-1 text-xs text-green-800">
+                          <div className="flex items-start gap-2">
+                            <span className="font-medium">1.</span>
+                            <span>Experiencia laboral detallada</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="font-medium">2.</span>
+                            <span>Educación y certificaciones</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="font-medium">3.</span>
+                            <span>Habilidades técnicas y blandas</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <span className="font-medium">4.</span>
+                            <span>Logros y proyectos destacados</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Para comparar y generar contenido que destaque tus logros
-                  </p>
+                  </div>
                 </div>
               </div>
 
               {/* Action Button */}
               <Button
                 onClick={optimizeProfile}
-                disabled={!personalCV || !linkedinUrl || isOptimizing}
+                disabled={(!personalCV && !linkedinCV) || isOptimizing}
                 className="w-full"
                 variant="default"
                 size="lg"
@@ -565,8 +641,8 @@ export function LinkedInOptimizer() {
                 ) : (
                   <>
                     <Users className="w-4 h-4 mr-2" />
-                    {!personalCV || !linkedinUrl
-                      ? "Completa ambos pasos para continuar"
+                    {!personalCV && !linkedinCV
+                      ? "Sube al menos un CV para continuar"
                       : "Generar Contenido LinkedIn"}
                   </>
                 )}
@@ -575,73 +651,11 @@ export function LinkedInOptimizer() {
               {/* Quick Info */}
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>💡 ¿Por qué ambos archivos?</strong> Tu LinkedIn nos
-                  muestra tu presencia actual, tu CV nos ayuda a identificar
-                  logros específicos. Juntos creamos contenido optimizado para
-                  reclutadores.
+                  <strong>💡 ¿Por qué subir un CV?</strong> Tu CV nos ayuda a
+                  identificar logros específicos y crear contenido optimizado
+                  para reclutadores. Puedes subir tu CV personal, el de
+                  LinkedIn, o ambos para obtener mejores resultados.
                 </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* How to get LinkedIn URL */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-info" />
-                ¿Cómo obtener la URL de tu perfil de LinkedIn?
-              </CardTitle>
-              <CardDescription>
-                Sigue estos pasos para copiar la URL de tu perfil
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">
-                    1
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">
-                      Ve a tu perfil de LinkedIn
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Haz click en "Ver perfil" desde tu página principal
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">
-                    2
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">
-                      Copia la URL del navegador
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      La URL debe verse como: linkedin.com/in/tu-nombre
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium">
-                    3
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">
-                      Pega la URL en el campo superior
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Haz click en "Obtener" para extraer tu información
-                    </p>
-                  </div>
-                </div>
-                <div className="border border-info/20 rounded-lg p-3 mt-4">
-                  <p className="text-xs text-muted-foreground">
-                    💡 Tip: Asegúrate de que tu perfil esté completo y público
-                    para obtener mejores resultados en la optimización.
-                  </p>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -660,7 +674,7 @@ export function LinkedInOptimizer() {
                 setShowForm(true);
                 setOptimizedContent(null);
                 setPersonalCV(null);
-                setLinkedinUrl("");
+                setLinkedinCV(null);
               }}
               variant="outline"
               size="sm"

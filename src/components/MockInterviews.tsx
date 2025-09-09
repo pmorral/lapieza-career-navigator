@@ -317,6 +317,17 @@ export function MockInterviews() {
     }
   };
 
+  // Function to clear the form
+  const clearForm = () => {
+    setJobTitle("");
+    setJobDescription("");
+    setLanguage("");
+    setUploadedCV(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const startInterview = async () => {
     if (!jobTitle.trim() || !jobDescription.trim() || !uploadedCV || !user) {
       toast({
@@ -379,6 +390,9 @@ export function MockInterviews() {
       await countUserInterviews();
       await checkPendingInterviews();
       await fetchInterviewResponses();
+
+      // Clear the form after successful submission
+      clearForm();
 
       // Show email notification popup
       setShowEmailNotification(true);
@@ -602,15 +616,7 @@ export function MockInterviews() {
 
               <Button
                 variant="outline"
-                onClick={() => {
-                  setJobTitle("");
-                  setJobDescription("");
-                  setLanguage("");
-                  setUploadedCV(null);
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = "";
-                  }
-                }}
+                onClick={clearForm}
                 disabled={isSubmitting}
               >
                 Clear

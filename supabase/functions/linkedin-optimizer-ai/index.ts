@@ -21,19 +21,22 @@ serve(async (req) => {
   try {
     const {
       personalCVBase64,
-      linkedinUrl,
+      linkedinCVBase64,
       language = "español",
     } = await req.json();
 
     console.log("Request received:", {
-      hasCV: !!personalCVBase64,
-      hasLinkedIn: !!linkedinUrl,
+      hasPersonalCV: !!personalCVBase64,
+      hasLinkedInCV: !!linkedinCVBase64,
       language,
-      cvLength: personalCVBase64?.length || 0,
+      personalCVLength: personalCVBase64?.length || 0,
+      linkedinCVLength: linkedinCVBase64?.length || 0,
     });
 
-    if (!personalCVBase64) {
-      throw new Error("No personal CV file provided");
+    if (!personalCVBase64 && !linkedinCVBase64) {
+      throw new Error(
+        "At least one CV file (personal or LinkedIn) must be provided"
+      );
     }
 
     // Initialize Supabase client
@@ -56,180 +59,117 @@ serve(async (req) => {
     const userId = userData.user.id;
     console.log("Processing request for user:", userId);
 
-    // Check for cached profile data
-    console.log("Checking for cached profile data...");
-    const { data: cachedProfile, error: cacheError } = await supabase
-      .from("user_profile_cache")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
+    console.log("Processing CVs without cache - analyzing all provided files");
 
-    if (cacheError && cacheError.code !== "PGRST116") {
-      console.warn("Cache query error (non-critical):", cacheError);
-    }
+    let linkedinProfileContent: string | null = null;
 
-    console.log("Cache query result:", {
-      hasCachedProfile: !!cachedProfile,
-      hasError: !!cacheError,
-    });
+    // Process LinkedIn CV if provided
+    if (linkedinCVBase64) {
+      console.log("Processing LinkedIn CV file");
+      try {
+        console.log("Uploading LinkedIn CV to Supabase storage...");
 
-    let linkedinProfileContent = null;
-    let shouldScrapeLinkedIn = false;
-
-    // Process LinkedIn profile if URL provided
-    if (linkedinUrl) {
-      console.log("Processing LinkedIn URL:", linkedinUrl);
-
-      // Check if we have cached LinkedIn data and if it's still valid (< 3 months)
-      if (
-        cachedProfile &&
-        cachedProfile.linkedin_profile_data &&
-        cachedProfile.last_linkedin_scrape
-      ) {
-        const lastScrape = new Date(cachedProfile?.last_linkedin_scrape);
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-        if (
-          lastScrape > threeMonthsAgo &&
-          cachedProfile.linkedin_url === linkedinUrl
-        ) {
-          console.log("Using cached LinkedIn profile data");
-          linkedinProfileContent = cachedProfile.linkedin_profile_data;
-        } else {
-          console.log(
-            "Cached LinkedIn data is older than 3 months or URL changed, scraping new data"
-          );
-          shouldScrapeLinkedIn = true;
-        }
-      } else {
-        console.log("No cached LinkedIn data found, scraping new data");
-        shouldScrapeLinkedIn = true;
-      }
-
-      // Scrape LinkedIn profile if needed
-      if (shouldScrapeLinkedIn) {
-        try {
-          console.log("Fetching LinkedIn profile from:", linkedinUrl);
-          const linkedinResponse = await axios.post(
-            "https://us-central1-lapieza-production.cloudfunctions.net/getLinkedinProfile",
-            { url: linkedinUrl },
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          const linkedinData = linkedinResponse?.data;
-          console.log("LinkedIn profile fetched successfully");
-
-          // Extract relevant information from the LinkedIn profile API response
-          if (linkedinData && linkedinData?.data) {
-            const profile = linkedinData?.data;
-            const profileSections = [];
-            console.log("Profile:", profile);
-
-            if (profile.full_name)
-              profileSections.push(`Nombre: ${profile.full_name}`);
-            if (profile.headline)
-              profileSections.push(`Titular: ${profile.headline}`);
-            if (profile.summary)
-              profileSections.push(`Resumen: ${profile.summary}`);
-            if (profile.location)
-              profileSections.push(`Ubicación: ${profile.location}`);
-            if (profile.industry)
-              profileSections.push(`Industria: ${profile.industry}`);
-
-            if (profile.experience && Array.isArray(profile.experience)) {
-              profile.experience.forEach((exp: any, index: number) => {
-                profileSections.push(
-                  `Experiencia ${index + 1}: ${
-                    exp.title || "Título no especificado"
-                  } en ${exp.company || "Empresa no especificada"}`
-                );
-                if (exp.description)
-                  profileSections.push(`Descripción: ${exp.description}`);
-              });
-            }
-
-            if (profile.education && Array.isArray(profile.education)) {
-              profile.education.forEach((edu: any, index: number) => {
-                profileSections.push(
-                  `Educación ${index + 1}: ${
-                    edu.degree || "Grado no especificado"
-                  } en ${edu.school || "Institución no especificada"}`
-                );
-              });
-            }
-
-            if (profile.skills && Array.isArray(profile.skills)) {
-              profileSections.push(`Habilidades: ${profile.skills.join(", ")}`);
-            }
-
-            linkedinProfileContent = profileSections.join("\n");
-            console.log(
-              "LinkedIn profile content extracted successfully",
-              linkedinProfileContent
-            );
-
-            // Update cache with new LinkedIn data
-            const cacheData = {
-              user_id: userId,
-              linkedin_url: linkedinUrl,
-              linkedin_profile_data: linkedinProfileContent,
-              last_linkedin_scrape: new Date().toISOString(),
-            };
-
-            if (cachedProfile) {
-              await supabase
-                .from("user_profile_cache")
-                .update(cacheData)
-                .eq("user_id", userId);
-            } else {
-              await supabase.from("user_profile_cache").insert(cacheData);
-            }
-            console.log("LinkedIn profile data cached successfully");
-          }
-        } catch (profileError) {
-          console.error("LinkedIn profile fetching error:", profileError);
-          linkedinProfileContent = "LinkedIn profile content from external API";
-        }
-      }
-    } else {
-      console.log("No LinkedIn URL provided, skipping LinkedIn processing");
-    }
-
-    // Check for cached CV analysis data and analyze if needed
-    let personalCVContent;
-    let shouldAnalyzeCV = false;
-
-    // Check if we have cached CV analysis data and if it's still valid (< 3 months)
-    if (
-      cachedProfile &&
-      cachedProfile.cv_analysis_data &&
-      cachedProfile.last_cv_analysis
-    ) {
-      const lastAnalysis = new Date(cachedProfile.last_cv_analysis);
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-      if (lastAnalysis > threeMonthsAgo) {
-        console.log("Using cached CV analysis data");
-        personalCVContent = cachedProfile.cv_analysis_data;
-      } else {
-        console.log(
-          "Cached CV analysis data is older than 3 months, analyzing new data"
+        // Convert base64 to Uint8Array
+        const linkedinPdfBuffer = Uint8Array.from(atob(linkedinCVBase64), (c) =>
+          c.charCodeAt(0)
         );
-        shouldAnalyzeCV = true;
+
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomId = Math.random().toString(36).substring(2, 15);
+        const linkedinFileName = `linkedin-cv-${timestamp}-${randomId}.pdf`;
+
+        // Upload to Supabase storage
+        const { data: linkedinUploadData, error: linkedinUploadError } =
+          await supabase.storage
+            .from("cv-interview")
+            .upload(linkedinFileName, linkedinPdfBuffer, {
+              contentType: "application/pdf",
+            });
+
+        if (linkedinUploadError) {
+          console.error("LinkedIn CV upload error:", linkedinUploadError);
+          throw new Error("Failed to upload LinkedIn CV to storage");
+        }
+
+        console.log(
+          "LinkedIn CV uploaded successfully:",
+          linkedinUploadData.path
+        );
+
+        // Get signed URL for the uploaded file
+        const { data: linkedinSignedUrlData, error: linkedinSignedUrlError } =
+          await supabase.storage
+            .from("cv-interview")
+            .createSignedUrl(linkedinUploadData.path, 3600);
+
+        if (linkedinSignedUrlError) {
+          console.error(
+            "LinkedIn CV signed URL error:",
+            linkedinSignedUrlError
+          );
+          throw new Error("Failed to create signed URL for LinkedIn CV");
+        }
+
+        console.log("LinkedIn CV signed URL created successfully");
+
+        // Now call the CV analysis API with the LinkedIn CV URL
+        const linkedinCvAnalysisResponse = await axios.post(
+          "https://interview-api-dev.lapieza.io/api/v1/analize/cv",
+          {
+            cv_url: linkedinSignedUrlData.signedUrl,
+            mode: "text",
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log(
+          "LinkedIn CV analysis completed successfully",
+          linkedinCvAnalysisResponse.data
+        );
+
+        // Extract the result from the response (same format as personal CV)
+        if (
+          linkedinCvAnalysisResponse.data &&
+          linkedinCvAnalysisResponse.data.result
+        ) {
+          linkedinProfileContent = linkedinCvAnalysisResponse.data.result;
+          console.log(
+            "LinkedIn CV result extracted successfully",
+            linkedinProfileContent
+          );
+        } else {
+          console.warn(
+            "LinkedIn CV analysis response format unexpected:",
+            linkedinCvAnalysisResponse.data
+          );
+          linkedinProfileContent =
+            "LinkedIn CV analysis content from external API";
+        }
+
+        // Clean up uploaded file
+        await supabase.storage
+          .from("cv-interview")
+          .remove([linkedinUploadData.path]);
+        console.log("LinkedIn CV file cleaned up from storage");
+      } catch (linkedinCvError) {
+        console.error("LinkedIn CV analysis error:", linkedinCvError);
+        linkedinProfileContent =
+          "LinkedIn CV analysis content from external API";
       }
     } else {
-      console.log("No cached CV analysis data found, analyzing new data");
-      shouldAnalyzeCV = true;
+      console.log("No LinkedIn CV provided, skipping LinkedIn CV processing");
     }
 
-    // Analyze CV if needed
-    if (shouldAnalyzeCV) {
+    // Process personal CV if provided
+    let personalCVContent: string | null = null;
+
+    if (personalCVBase64) {
+      console.log("Processing personal CV file");
       try {
         console.log("Uploading CV to Supabase storage...");
 
@@ -285,31 +225,12 @@ serve(async (req) => {
           }
         );
 
-        if (cvAnalysisResponse.data && cvAnalysisResponse.data.result) {
+        if (cvAnalysisResponse.data && cvAnalysisResponse?.data?.result) {
           personalCVContent = cvAnalysisResponse.data.result;
           console.log(
             "CV analysis successful, content length:",
-            personalCVContent.length
+            personalCVContent?.length || 0
           );
-
-          // Update cache with new CV analysis data
-          const cacheUpdateData = {
-            cv_analysis_data: personalCVContent,
-            last_cv_analysis: new Date().toISOString(),
-          };
-
-          if (cachedProfile) {
-            await supabase
-              .from("user_profile_cache")
-              .update(cacheUpdateData)
-              .eq("user_id", userId);
-          } else {
-            await supabase.from("user_profile_cache").insert({
-              user_id: userId,
-              ...cacheUpdateData,
-            });
-          }
-          console.log("CV analysis data cached successfully");
         } else {
           throw new Error("No result from CV analysis API");
         }
@@ -352,19 +273,38 @@ serve(async (req) => {
           personalCVContent = "Personal CV content from uploaded PDF file";
         }
       }
+    } else {
+      console.log("No personal CV provided, skipping personal CV processing");
     }
 
     // Ensure we have CV content
-    if (!personalCVContent) {
+    if (!personalCVContent && !linkedinProfileContent) {
       console.error("No CV content available for processing");
-      personalCVContent = "CV content not available";
+      throw new Error("No CV content available for processing");
     }
 
-    console.log("Final CV content length:", personalCVContent?.length || 0);
-    console.log(
-      "Final LinkedIn content length:",
-      linkedinProfileContent?.length || 0
-    );
+    console.log("Final CV content length:", personalCVContent || 0);
+    console.log("Final LinkedIn content length:", linkedinProfileContent || 0);
+
+    // Log sample of content being sent to prompt for debugging
+    if (personalCVContent && typeof personalCVContent === "string") {
+      console.log(
+        "Personal CV content sample (first 500 chars):",
+        personalCVContent.substring(0, 500)
+      );
+    } else if (personalCVContent) {
+      console.log("Personal CV content type:", typeof personalCVContent);
+      console.log("Personal CV content:", personalCVContent);
+    }
+    if (linkedinProfileContent && typeof linkedinProfileContent === "string") {
+      console.log(
+        "LinkedIn CV content sample (first 500 chars):",
+        linkedinProfileContent.substring(0, 500)
+      );
+    } else if (linkedinProfileContent) {
+      console.log("LinkedIn CV content type:", typeof linkedinProfileContent);
+      console.log("LinkedIn CV content:", linkedinProfileContent);
+    }
 
     // Always generate content in both languages
     const primaryLanguage = "Spanish";
@@ -372,23 +312,39 @@ serve(async (req) => {
 
     const prompt = `You are a senior expert in LinkedIn, personal marketing, personal branding, and professional profile optimization.
 
-Analyze the following CV analysis and LinkedIn profile to generate completely optimized content for LinkedIn.
-
-CV Analysis (Real Professional Information):
-${personalCVContent}
+Analyze the following CV analysis data to generate completely optimized content for LinkedIn.
 
 ${
-  linkedinProfileContent
-    ? `Current LinkedIn Profile:\n${linkedinProfileContent}\n`
+  personalCVContent
+    ? `Personal CV Analysis (Real Professional Information):\n${personalCVContent}\n`
     : ""
 }
 
-IMPORTANT: 
-1. Use ONLY the real information from the CV analysis above. Do NOT create fictional content.
-2. Extract specific details like company names, job titles, technologies, education, and achievements.
-3. Create content that accurately reflects the person's real experience and background.
-4. Include specific keywords from their actual professional sector and technologies.
-5. Base all content on the factual information provided in the CV analysis.
+${
+  linkedinProfileContent
+    ? `LinkedIn CV Analysis (Current LinkedIn Profile Data):\n${linkedinProfileContent}\n`
+    : ""
+}
+
+CRITICAL EXTRACTION REQUIREMENTS:
+1. **EXTRACT EVERYTHING**: Read through ALL the CV analysis data thoroughly and extract EVERY piece of professional information available.
+2. **COMPREHENSIVE EXPERIENCE**: Include ALL work experiences, projects, achievements, skills, technologies, and accomplishments mentioned.
+3. **DETAILED ANALYSIS**: Look for specific details like:
+   - **ALL job titles and companies** (even if mentioned briefly or in different sections)
+   - **ALL technologies, tools, and frameworks** used across all experiences
+   - **ALL projects and their outcomes** from every job
+   - **ALL achievements with numbers and metrics** from each position
+   - **ALL education and certifications** mentioned
+   - **ALL skills (technical and soft skills)** listed anywhere
+   - **ALL volunteer work or additional activities**
+4. **EXPERIENCE EXTRACTION**: 
+   - If the CV mentions 3 jobs, create 3 separate experience entries
+   - If the CV mentions 5 jobs, create 5 separate experience entries
+   - If the CV mentions 10 jobs, create 10 separate experience entries
+   - **EVERY SINGLE JOB** mentioned in the CV must have its own entry
+5. **NO INFORMATION LEFT BEHIND**: If the CV mentions 5 jobs, include all 5. If it lists 20 technologies, include all 20.
+6. **COMBINE ALL SOURCES**: If both CVs are provided, merge ALL information from both sources to create the most complete profile possible.
+7. **USE ONLY REAL DATA**: Base everything on the actual information provided - do not create fictional content.
 
 MANDATORY: All sections must have valid and complete content. DO NOT leave any section empty or with generic text.
 
@@ -404,8 +360,9 @@ Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and $
         "description": "detailed description with specific achievements, quantified metrics and industry keywords (minimum 150 characters)"
       }
     ],
+    "note": "Include ALL work experiences found in the CV analysis. If there are multiple jobs, create separate entries for each one.",
     "education": "academic background with relevant context, featured projects and academic achievements (minimum 100 characters)",
-    "skills": ["at least 10 technical and soft skills specific to industry"],
+    "skills": ["ALL technical and soft skills mentioned in the CV analysis - include every technology, tool, framework, and skill mentioned"],
     "certifications": "professional certifications with dates, institutions and industry relevance (minimum 80 characters)",
     "projects": "featured professional projects with measurable results, technologies used and impact (minimum 120 characters)",
     "volunteer": "volunteer experience demonstrating leadership, values and transferable skills (minimum 80 characters)",
@@ -422,8 +379,9 @@ Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and $
         "description": "descripción detallada con logros específicos, métricas cuantificadas y palabras clave del sector (mínimo 150 caracteres)"
       }
     ],
+    "note": "Incluir TODAS las experiencias laborales encontradas en el análisis del CV. Si hay múltiples trabajos, crear entradas separadas para cada uno.",
     "education": "formación académica con contexto relevante, proyectos destacados y logros académicos (mínimo 100 caracteres)",
-    "skills": ["al menos 10 habilidades técnicas y blandas específicas del sector"],
+    "skills": ["TODAS las habilidades técnicas y blandas mencionadas en el análisis del CV - incluir cada tecnología, herramienta, framework y habilidad mencionada"],
     "certifications": "certificaciones profesionales con fechas, instituciones y relevancia para el sector (mínimo 80 caracteres)",
     "projects": "proyectos profesionales destacados con resultados medibles, tecnologías usadas e impacto (mínimo 120 caracteres)",
     "volunteer": "experiencia de voluntariado que demuestre liderazgo, valores y habilidades transferibles (mínimo 80 caracteres)",
@@ -452,11 +410,18 @@ SPECIFIC REQUIREMENTS:
 9. **Current relevance**: Content aligned with current sector trends
 10. **Differentiation**: Highlight unique elements that distinguish from other candidates
 
-Content must be specific to the analyzed profile, not generic. Infer the professional sector and adapt all content accordingly.`;
+FINAL EXTRACTION CHECKLIST:
+- Did I include ALL job experiences mentioned in the CV?
+- Did I include ALL technologies, tools, and frameworks mentioned?
+- Did I include ALL projects and their outcomes?
+- Did I include ALL achievements with specific numbers?
+- Did I include ALL education and certifications?
+- Did I include ALL skills (both technical and soft skills)?
+- Did I include ALL volunteer work or additional activities?
+- Did I combine information from both CVs if both were provided?
 
-    console.log("About to call OpenAI API...");
-    console.log("OpenAI API Key available:", !!openAIApiKey);
-    console.log("Prompt length:", prompt.length);
+Content must be specific to the analyzed profile, not generic. Infer the professional sector and adapt all content accordingly.`;
+    console.log("Prompt length:", prompt);
 
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
@@ -506,6 +471,44 @@ Content must be specific to the analyzed profile, not generic. Infer the profess
       const data = JSON.parse(text);
       result = data;
       console.log("result", result);
+
+      // Save to history after successful processing
+      console.log("Saving to linkedin_optimizations history...");
+
+      // Prepare data for history, ensuring no null values for required fields
+      const historyData: {
+        user_id: string;
+        optimized_content: any;
+        personal_cv_filename?: string;
+        linkedin_cv_filename?: string;
+      } = {
+        user_id: userId,
+        optimized_content: result,
+      };
+
+      // Always include at least one filename to satisfy NOT NULL constraints
+      if (personalCVBase64) {
+        historyData.personal_cv_filename = "personal_cv.pdf";
+      } else {
+        historyData.personal_cv_filename = "no_personal_cv";
+      }
+
+      if (linkedinCVBase64) {
+        historyData.linkedin_cv_filename = "linkedin_cv.pdf";
+      } else {
+        historyData.linkedin_cv_filename = "no_linkedin_cv";
+      }
+
+      const { error: saveError } = await supabase
+        .from("linkedin_optimizations")
+        .insert(historyData);
+
+      if (saveError) {
+        console.error("Error saving to history:", saveError);
+        // Don't fail the request if history save fails
+      } else {
+        console.log("Successfully saved to linkedin_optimizations history");
+      }
     } catch (e) {
       console.error("JSON parsing error:", e);
       console.error("Problematic text:", text);
