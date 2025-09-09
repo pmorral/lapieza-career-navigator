@@ -132,7 +132,7 @@ const formatExperienceSection = (experience: any[]) => {
     .map(
       (exp) =>
         `${exp.position || "Puesto"} en ${exp.company || "Empresa"}\n${
-          exp.description || ""
+          `• ${exp.description || ""}` || ""
         }\n${
           exp.bullets
             ? exp.bullets.map((bullet: string) => `• ${bullet}`).join("\n")
@@ -223,6 +223,8 @@ export function CVBoost() {
   const [currentResult, setCurrentResult] = useState<CVResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  console.log('currentResult', currentResult);
 
   // Load CV history on component mount
   const loadCVHistory = async () => {
