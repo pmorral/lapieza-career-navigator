@@ -434,48 +434,29 @@ export function LinkedInOptimizer() {
                 Optimizar mi perfil de LinkedIn
               </CardTitle>
               <CardDescription>
-                Necesitamos tu perfil de LinkedIn y tu CV para generar contenido
-                optimizado que mejore tu visibilidad profesional
+                Sube cualquiera de tus CVs (LinkedIn o personal) y nuestra IA
+                generará contenido optimizado para tu perfil profesional. ¡Solo
+                necesitas 1 archivo para comenzar!
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Progress Indicator */}
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`flex items-center gap-2 ${
-                      linkedinCV ? "text-green-600" : "text-muted-foreground"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                        linkedinCV ? "bg-green-500 text-white" : "bg-gray-300"
-                      }`}
-                    >
-                      {linkedinCV ? "✓" : "1"}
-                    </div>
-                    <span className="text-sm font-medium">CV de LinkedIn</span>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-700 mb-2">
+                  Solo necesitas{" "}
+                  <span className="font-semibold text-green-600">
+                    1 archivo
+                  </span>{" "}
+                  para comenzar
+                </p>
+                {linkedinCV || personalCV ? (
+                  <div className="flex items-center justify-center gap-2 text-green-600">
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      ¡Listo para optimizar!
+                    </span>
                   </div>
-                  <div
-                    className={`flex items-center gap-2 ${
-                      personalCV ? "text-green-600" : "text-muted-foreground"
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                        personalCV ? "bg-green-500 text-white" : "bg-gray-300"
-                      }`}
-                    >
-                      {personalCV ? "✓" : "2"}
-                    </div>
-                    <span className="text-sm font-medium">CV Personal</span>
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {linkedinCV && personalCV
-                    ? "Listo para optimizar"
-                    : "Completa ambos pasos"}
-                </div>
+                ) : null}
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -650,11 +631,9 @@ export function LinkedInOptimizer() {
 
               {/* Quick Info */}
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <strong>💡 ¿Por qué subir un CV?</strong> Tu CV nos ayuda a
-                  identificar logros específicos y crear contenido optimizado
-                  para reclutadores. Puedes subir tu CV personal, el de
-                  LinkedIn, o ambos para obtener mejores resultados.
+                <p className="text-sm text-blue-800 text-center">
+                  <strong>💡 Tip:</strong> Si subes ambos CVs, obtendrás
+                  resultados aún más personalizados
                 </p>
               </div>
             </CardContent>
@@ -868,7 +847,9 @@ export function LinkedInOptimizer() {
 
                 {/* Volunteer Español */}
                 {optimizedContent.spanish.volunteer &&
-                  optimizedContent.spanish.volunteer.trim() && (
+                  optimizedContent.spanish.volunteer.trim() &&
+                  optimizedContent.spanish.volunteer !== "null" &&
+                  optimizedContent.spanish.volunteer !== "" && (
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-medium">Voluntariado</h3>
@@ -1134,28 +1115,31 @@ export function LinkedInOptimizer() {
                 </div>
 
                 {/* Volunteer English */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Volunteer Experience</h3>
-                    <Button
-                      onClick={() =>
-                        copyToClipboard(
-                          optimizedContent.english.volunteer || "Not available"
-                        )
-                      }
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy
-                    </Button>
-                  </div>
-                  <Textarea
-                    value={optimizedContent.english.volunteer}
-                    readOnly
-                    className="min-h-[60px]"
-                  />
-                </div>
+                {optimizedContent.english.volunteer &&
+                  optimizedContent.english.volunteer.trim() &&
+                  optimizedContent.english.volunteer !== "null" &&
+                  optimizedContent.english.volunteer !== "" && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">Volunteer Experience</h3>
+                        <Button
+                          onClick={() =>
+                            copyToClipboard(optimizedContent.english.volunteer)
+                          }
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={optimizedContent.english.volunteer}
+                        readOnly
+                        className="min-h-[60px]"
+                      />
+                    </div>
+                  )}
 
                 {/* Accomplishments English */}
                 <div className="mb-4">
