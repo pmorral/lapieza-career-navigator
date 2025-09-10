@@ -224,7 +224,7 @@ export function CVBoost() {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  console.log('currentResult', currentResult);
+  // console.log('currentResult', currentResult);
 
   // Load CV history on component mount
   const loadCVHistory = async () => {
