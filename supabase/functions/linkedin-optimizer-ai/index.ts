@@ -356,7 +356,14 @@ MANDATORY: All sections must have valid and complete content. DO NOT leave any s
 Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and ${secondaryLanguage.toUpperCase()} with the following JSON format:
 {
   "${primaryLanguage === "Spanish" ? "spanish" : "english"}": {
-    "headline": "professional headline max 220 characters, optimized with industry keywords",
+    "headline": "Use only strategic keywords (positions, technologies, tools, industries, skills) or keywords a recruiter would use to search for your profile.
+Don't use long phrases like "Passionate about" or "Focused on."
+Each title should be optimized for recruiter searches, using relevant keywords.
+Maximum 220 characters.
+Example of expected style:
+- Tech Recruiter | IT Talent Acquisition | Recruiting Across LATAM | Psychologist | ETA | Full-Cycle Recruiting | HR People
+- Business Intelligence | Data Analytics | Business Analyst | SQL | Python | BI Energy | Excel |
+- Marketing Analytics | Digital Data | Google Analytics | SQL | BI Tools | Enterprise Meta Suite | Google Ads,
     "summary": "professional summary 3-4 paragraphs (max 2600 characters) with strategic emojis, including value proposition, key experience, quantified achievements and call-to-action",
     "experiences": [
       {
@@ -375,7 +382,14 @@ Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and $
     "interests": "professional interests that complement profile and show passion for the industry (minimum 60 characters)"
   },
   "${primaryLanguage === "Spanish" ? "spanish" : "english"}": {
-    "headline": "titular profesional de máximo 220 caracteres, optimizado con palabras clave del sector",
+    "headline": "Usa solo palabras clave estratégicas (puestos, tecnologías, herramientas, industrias, skills) o palabras clave con las que un reclutador buscaría al perfil.
+  No uses frases largas como “Apasionado por” o “Enfocado en”.
+  Cada headline debe estar optimizado para búsquedas de reclutadores, usando keywords relevantes.
+  Máximo 220 caracteres.
+  Ejemplo de estilo esperado:
+  - Tech Recruiter | IT Talent Aquisition | Recruiting throughout LATAM | Psychologist | ATS | Full Cycle Recruitment | HR People
+  - Business Intelligence | Data Analytics | Business Analyst | SQL | Python | Power BI  | Excel |
+  - Marketing Analytics | Digital Data | Google Analytics | SQL | BI Tools  | Meta Business Suite | Google Ads",
     "summary": "resumen profesional de 3-4 párrafos (máximo 2600 caracteres) con emojis estratégicos, que incluya propuesta de valor, experiencia clave, logros cuantificados y call-to-action",
     "experiences": [
       {
