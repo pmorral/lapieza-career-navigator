@@ -8,6 +8,8 @@ import {
   MessageCircle,
   Phone,
   User,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,6 +36,9 @@ export function RegisterPage() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [userExists, setUserExists] = useState(false);
+  const [existingUserEmail, setExistingUserEmail] = useState("");
+  const [formError, setFormError] = useState("");
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -42,9 +47,53 @@ export function RegisterPage() {
   // Obtener la ruta de donde vino el usuario para redirigir después del registro
   const from = location.state?.from?.pathname || "/dashboard";
 
+  const handleResetPassword = async () => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        existingUserEmail,
+        {
+          redirectTo: `${window.location.origin}/reset-password`,
+        }
+      );
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "No se pudo enviar el email de recuperación",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Email enviado",
+          description:
+            "Revisa tu bandeja de entrada para restablecer tu contraseña",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Ocurrió un error inesperado",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBackToRegister = () => {
+    setUserExists(false);
+    setExistingUserEmail("");
+    setFormError("");
+    setEmail("");
+    setName("");
+    setWhatsapp("");
+    setPassword("");
+    setConfirmPassword("");
+    setAcceptTerms(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setFormError("");
 
     try {
       if (password !== confirmPassword) {
@@ -75,12 +124,44 @@ export function RegisterPage() {
         },
       });
 
+      // Verificar si el usuario ya existe (ahora viene en data con status 200)
+      if (data?.user_exists) {
+        setExistingUserEmail(email);
+        setUserExists(true);
+        return;
+      }
+
+      // Verificar si hay errores o si no fue exitoso
       if (error || !data?.success) {
-        toast({
-          title: "Error al crear cuenta",
-          description: error?.message || "No se pudo crear la cuenta",
-          variant: "destructive",
-        });
+        // Verificar si el error es porque el usuario ya existe
+        const errorMessage = (
+          data?.error ||
+          error?.message ||
+          ""
+        ).toLowerCase();
+        const errorCode = data?.code || "";
+
+        if (
+          errorMessage.includes("already registered") ||
+          errorMessage.includes("user already registered") ||
+          errorMessage.includes("already exists") ||
+          errorMessage.includes("duplicate key") ||
+          errorMessage.includes(
+            "a user with this email address has already been registered"
+          ) ||
+          errorCode === "USER_ALREADY_EXISTS"
+        ) {
+          setExistingUserEmail(email);
+          setUserExists(true);
+          return;
+        }
+
+        // Mostrar error más intuitivo en lugar de solo toast
+        setFormError(
+          data?.error || error?.message || "No se pudo crear la cuenta"
+        );
+        setLoading(false);
+        return;
       } else {
         // Iniciar sesión automáticamente y redirigir a /payment
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -148,6 +229,107 @@ export function RegisterPage() {
     );
   }
 
+  // Mostrar pantalla de usuario existente
+  if (userExists) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <img
+                src="/lovable-uploads/38bdff76-1a8c-4d71-a975-9058214f7ab1.png"
+                alt="Academy by LaPieza"
+                className="h-16"
+              />
+            </div>
+            <p className="text-muted-foreground">
+              Ya tienes una cuenta en Academy by LaPieza
+            </p>
+          </div>
+
+          <Card className="shadow-card">
+            <CardHeader className="space-y-1">
+              <div className="flex items-center justify-center mb-2">
+                <div className="p-3 rounded-full bg-amber-100 dark:bg-amber-900/20">
+                  <AlertCircle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl text-center">
+                ¡Ya tienes cuenta!
+              </CardTitle>
+              <CardDescription className="text-center">
+                El correo <strong>{existingUserEmail}</strong> ya está
+                registrado en nuestra plataforma
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center space-y-4">
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="flex items-center justify-center mb-2">
+                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
+                    <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                      Tu cuenta está lista
+                    </span>
+                  </div>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    Solo necesitas iniciar sesión para acceder a tu dashboard
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <Button
+                    onClick={() => navigate("/login")}
+                    className="w-full"
+                    variant="professional"
+                    size="lg"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Iniciar Sesión
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      ¿No recuerdas tu contraseña?
+                    </p>
+                    <Button
+                      onClick={handleResetPassword}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      Enviar email de recuperación
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <button
+                    type="button"
+                    onClick={handleBackToRegister}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    ← Intentar con otro email
+                  </button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="text-center mt-6">
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ← Volver al inicio
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -170,6 +352,30 @@ export function RegisterPage() {
             <CardDescription className="text-center">
               Completa tus datos para crear tu cuenta en Academy by LaPieza
             </CardDescription>
+
+            {formError && (
+              <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                <div className="flex items-start">
+                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="text-sm font-medium text-red-800 dark:text-red-200 mb-1">
+                      Error al crear cuenta
+                    </h4>
+                    <p className="text-sm text-red-700 dark:text-red-300">
+                      {formError}
+                    </p>
+                    <div className="mt-3">
+                      <button
+                        onClick={() => setFormError("")}
+                        className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 underline"
+                      >
+                        Cerrar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">

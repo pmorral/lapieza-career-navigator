@@ -10,7 +10,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { LandingPage } from "./components/LandingPage";
-import { Dashboard } from "./components/Dashboard";
+import { Dashboard, DashboardWithWhatsApp } from "./components/Dashboard";
 import { PaymentPage } from "./components/PaymentPage";
 import { LoginPage } from "./components/LoginPage";
 import { RegisterPage } from "./components/RegisterPage";
@@ -24,7 +24,6 @@ import NotFound from "./pages/NotFound";
 import { TermsConditions } from "./pages/TermsConditions";
 import { Button } from "./components/ui/button";
 import { TermsAndConditionsAdditionalServices } from "./components/TermsAndConditionsAdditionalServices";
-import { WhatsAppBubble } from "./components/WhatsAppBubble";
 
 const queryClient = new QueryClient();
 
@@ -42,205 +41,198 @@ const AppRoutes = () => {
   }
 
   return (
-    <>
-      <Routes>
-        {/* Ruta raíz - redirigir según estado de autenticación */}
+    <Routes>
+      {/* Ruta raíz - redirigir según estado de autenticación */}
+      <Route
+        path="/"
+        element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />}
+      />
+
+      {/* Ruta específica para landing - siempre accesible */}
+      <Route path="/landing" element={<LandingPage />} />
+
+      {/* Rutas públicas - solo para usuarios no autenticados */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute user={user}>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/register"
+        element={
+          <PublicRoute user={user}>
+            <RegisterPage />
+          </PublicRoute>
+        }
+      />
+
+      {/* Ruta para olvidar contraseña - pública */}
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
+      {/* Ruta para restablecer contraseña - pública */}
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* Ruta para términos y condiciones - pública */}
+      <Route path="/terms-conditions" element={<TermsConditions />} />
+
+      {/* Ruta para términos y condiciones de servicios adicionales - pública */}
+      <Route
+        path="/terms-and-conditions-aditional-services"
+        element={<TermsAndConditionsAdditionalServices />}
+      />
+
+      {/* Ruta de pago - solo para usuarios autenticados SIN suscripción activa */}
+      {user && !subscriptionActive ? (
         <Route
-          path="/"
+          path="/payment"
           element={
-            user ? <Navigate to="/dashboard" replace /> : <LandingPage />
+            <ProtectedRoute user={user}>
+              <PaymentPage />
+            </ProtectedRoute>
           }
         />
+      ) : null}
 
-        {/* Ruta específica para landing - siempre accesible */}
-        <Route path="/landing" element={<LandingPage />} />
-
-        {/* Rutas públicas - solo para usuarios no autenticados */}
-        <Route
-          path="/login"
-          element={
-            <PublicRoute user={user}>
-              <LoginPage />
-            </PublicRoute>
-          }
-        />
-
-        <Route
-          path="/register"
-          element={
-            <PublicRoute user={user}>
-              <RegisterPage />
-            </PublicRoute>
-          }
-        />
-
-        {/* Ruta para olvidar contraseña - pública */}
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-
-        {/* Ruta para restablecer contraseña - pública */}
-        <Route path="/reset-password" element={<ResetPassword />} />
-
-        {/* Ruta para términos y condiciones - pública */}
-        <Route path="/terms-conditions" element={<TermsConditions />} />
-
-        {/* Ruta para términos y condiciones de servicios adicionales - pública */}
-        <Route
-          path="/terms-and-conditions-aditional-services"
-          element={<TermsAndConditionsAdditionalServices />}
-        />
-
-        {/* Ruta de pago - solo para usuarios autenticados SIN suscripción activa */}
-        {user && !subscriptionActive ? (
-          <Route
-            path="/payment"
-            element={
-              <ProtectedRoute user={user}>
-                <PaymentPage />
-              </ProtectedRoute>
-            }
-          />
-        ) : null}
-
-        {/* Rutas del Dashboard - solo para usuarios con suscripción activa */}
-        {user && subscriptionActive ? (
-          <>
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Rutas específicas del dashboard */}
-            <Route
-              path="/dashboard/overview"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="overview" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/interviews"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="interviews" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/cv-boost"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="cv-boost" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/linkedin"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="linkedin" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/job-tracker"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="job-tracker" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/learning"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="learning" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/automated-messages"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="automated-messages" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/services"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="services" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/profile"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="profile" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/membership"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="membership" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/payment"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="payment" />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/dashboard/settings"
-              element={
-                <ProtectedRoute user={user}>
-                  <Dashboard defaultSection="settings" />
-                </ProtectedRoute>
-              }
-            />
-          </>
-        ) : // Si el usuario no tiene suscripción activa, redirigir directamente a payment
-        user ? (
+      {/* Rutas del Dashboard - solo para usuarios con suscripción activa */}
+      {user && subscriptionActive ? (
+        <>
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute user={user}>
-                <Navigate to="/payment" replace />
+                <DashboardWithWhatsApp />
               </ProtectedRoute>
             }
           />
-        ) : null}
 
-        {/* Ruta 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* Rutas específicas del dashboard */}
+          <Route
+            path="/dashboard/overview"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="overview" />
+              </ProtectedRoute>
+            }
+          />
 
-      {/* WhatsApp Bubble - Global en todas las páginas */}
-      <WhatsAppBubble />
-    </>
+          <Route
+            path="/dashboard/interviews"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="interviews" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/cv-boost"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="cv-boost" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/linkedin"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="linkedin" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/job-tracker"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="job-tracker" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/learning"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="learning" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/automated-messages"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="automated-messages" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/services"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="services" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/profile"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="profile" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/membership"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="membership" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/payment"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="payment" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/settings"
+            element={
+              <ProtectedRoute user={user}>
+                <DashboardWithWhatsApp defaultSection="settings" />
+              </ProtectedRoute>
+            }
+          />
+        </>
+      ) : // Si el usuario no tiene suscripción activa, redirigir directamente a payment
+      user ? (
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute user={user}>
+              <Navigate to="/payment" replace />
+            </ProtectedRoute>
+          }
+        />
+      ) : null}
+
+      {/* Ruta 404 */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 };
 

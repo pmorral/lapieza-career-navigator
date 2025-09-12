@@ -67,6 +67,7 @@ import { AutomatedMessages } from "./AutomatedMessages";
 import { CVBoost } from "./CVBoost";
 import { PaymentSettings } from "./PaymentSettings";
 import { JobSuccess } from "./JobSuccess";
+import { WhatsAppBubble } from "./WhatsAppBubble";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -833,80 +834,85 @@ function MembershipDetails() {
               Planes Disponibles
             </CardTitle>
             <CardDescription>
-              Elige el plan que mejor se adapte a tus necesidades profesionales y comienza tu transformación
+              Elige el plan que mejor se adapte a tus necesidades profesionales
+              y comienza tu transformación
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               {/* Plan de 6 meses */}
-               <div className="border border-border rounded-lg p-4">
-                 <h4 className="font-semibold text-lg mb-2">
-                   Academy - 6 Meses
-                 </h4>
-                 <div className="mb-2">
-                   <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold text-center mb-2 animate-pulse">
-                     ¡AHORRA $148!
-                   </div>
-                   <div className="flex items-center gap-2 justify-center">
-                     <span className="text-lg text-muted-foreground line-through">$297</span>
-                     <p className="text-3xl font-bold text-primary">
-                       $149<span className="text-base"> USD</span>
-                     </p>
-                   </div>
-                   <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold text-center mt-1">
-                     50% DESCUENTO LIMITADO
-                   </div>
-                 </div>
-                 <p className="text-sm text-muted-foreground mb-4">
-                   6 meses de acceso completo
-                 </p>
-                 <ul className="space-y-2 text-sm mb-4">
-                   <li>• CV Boost con AI</li>
-                   <li>• LinkedIn Optimizer</li>
-                   <li>• 5 Entrevistas AI</li>
-                   <li>• E-learning Hub</li>
-                   <li>• Job Tracker</li>
-                 </ul>
-                 <Button onClick={handleRenewal} className="w-full">
-                   <CreditCard className="w-4 h-4 mr-2" />
-                   Activar Plan
-                 </Button>
-               </div>
+              {/* Plan de 6 meses */}
+              <div className="border border-border rounded-lg p-4">
+                <h4 className="font-semibold text-lg mb-2">
+                  Academy - 6 Meses
+                </h4>
+                <div className="mb-2">
+                  <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold text-center mb-2 animate-pulse">
+                    ¡AHORRA $148!
+                  </div>
+                  <div className="flex items-center gap-2 justify-center">
+                    <span className="text-lg text-muted-foreground line-through">
+                      $297
+                    </span>
+                    <p className="text-3xl font-bold text-primary">
+                      $149<span className="text-base"> USD</span>
+                    </p>
+                  </div>
+                  <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold text-center mt-1">
+                    50% DESCUENTO LIMITADO
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  6 meses de acceso completo
+                </p>
+                <ul className="space-y-2 text-sm mb-4">
+                  <li>• CV Boost con AI</li>
+                  <li>• LinkedIn Optimizer</li>
+                  <li>• 5 Entrevistas AI</li>
+                  <li>• E-learning Hub</li>
+                  <li>• Job Tracker</li>
+                </ul>
+                <Button onClick={handleRenewal} className="w-full">
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Activar Plan
+                </Button>
+              </div>
 
-               {/* Plan de 12 meses */}
-               <div className="border border-border rounded-lg p-4">
-                 <h4 className="font-semibold text-lg mb-2">
-                   Academy - 12 Meses
-                 </h4>
-                 <div className="mb-2">
-                   <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold text-center mb-2 animate-pulse">
-                     ¡AHORRA $198!
-                   </div>
-                   <div className="flex items-center gap-2 justify-center">
-                     <span className="text-lg text-muted-foreground line-through">$397</span>
-                     <p className="text-3xl font-bold text-primary">
-                       $199<span className="text-base"> USD</span>
-                     </p>
-                   </div>
-                   <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold text-center mt-1">
-                     50% DESCUENTO LIMITADO
-                   </div>
-                 </div>
-                 <p className="text-sm text-muted-foreground mb-4">
-                   12 meses de acceso completo
-                 </p>
-                 <ul className="space-y-2 text-sm mb-4">
-                   <li>• CV Boost con AI</li>
-                   <li>• LinkedIn Optimizer</li>
-                   <li>• 5 Entrevistas AI</li>
-                   <li>• E-learning Hub</li>
-                   <li>• Job Tracker</li>
-                 </ul>
-                 <Button onClick={handleRenewal} className="w-full">
-                   <CreditCard className="w-4 h-4 mr-2" />
-                   Activar Plan
-                 </Button>
-               </div>
+              {/* Plan de 12 meses */}
+              <div className="border border-border rounded-lg p-4">
+                <h4 className="font-semibold text-lg mb-2">
+                  Academy - 12 Meses
+                </h4>
+                <div className="mb-2">
+                  <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-xs font-bold text-center mb-2 animate-pulse">
+                    ¡AHORRA $198!
+                  </div>
+                  <div className="flex items-center gap-2 justify-center">
+                    <span className="text-lg text-muted-foreground line-through">
+                      $397
+                    </span>
+                    <p className="text-3xl font-bold text-primary">
+                      $199<span className="text-base"> USD</span>
+                    </p>
+                  </div>
+                  <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold text-center mt-1">
+                    50% DESCUENTO LIMITADO
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  12 meses de acceso completo
+                </p>
+                <ul className="space-y-2 text-sm mb-4">
+                  <li>• CV Boost con AI</li>
+                  <li>• LinkedIn Optimizer</li>
+                  <li>• 5 Entrevistas AI</li>
+                  <li>• E-learning Hub</li>
+                  <li>• Job Tracker</li>
+                </ul>
+                <Button onClick={handleRenewal} className="w-full">
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Activar Plan
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -1482,5 +1488,16 @@ function UserProfileSection({
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// Componente wrapper para incluir la burbuja de WhatsApp
+export function DashboardWithWhatsApp(props: { defaultSection?: string }) {
+  return (
+    <>
+      <Dashboard {...props} />
+      {/* WhatsApp Bubble - Solo en rutas protegidas */}
+      <WhatsAppBubble />
+    </>
   );
 }

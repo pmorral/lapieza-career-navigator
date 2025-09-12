@@ -66,10 +66,11 @@ serve(async (req) => {
       console.error("❌ Missing required fields");
       return new Response(
         JSON.stringify({
+          success: false,
           error: "Todos los campos son requeridos",
         }),
         {
-          status: 400,
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
@@ -80,10 +81,11 @@ serve(async (req) => {
       console.error("❌ Invalid file type:", cvFile.type);
       return new Response(
         JSON.stringify({
+          success: false,
           error: "Solo se permiten archivos PDF",
         }),
         {
-          status: 400,
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
@@ -94,10 +96,11 @@ serve(async (req) => {
       console.error("❌ File too large:", cvFile.size);
       return new Response(
         JSON.stringify({
+          success: false,
           error: "El archivo debe ser menor a 2MB",
         }),
         {
-          status: 400,
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
@@ -129,11 +132,13 @@ serve(async (req) => {
       console.error("❌ Email already used for trial:", email);
       return new Response(
         JSON.stringify({
+          success: false,
+          trial_limit_reached: true,
           error:
             "Este email ya ha sido usado para una entrevista de prueba gratuita",
         }),
         {
-          status: 400,
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
@@ -215,6 +220,32 @@ serve(async (req) => {
       console.log("✅ User already exists in Auth:", existingUser.id);
       userId = existingUser.id;
       authData = { user: existingUser };
+
+      // Check if user already has a trial interview
+      console.log("🔍 Checking if user already has trial interview...");
+      const { data: existingProfile, error: profileCheckError } = await supabase
+        .from("profiles")
+        .select("trial_interview_used, trial_interview_date")
+        .eq("user_id", userId)
+        .single();
+
+      if (profileCheckError) {
+        console.warn("⚠️ Warning checking profile:", profileCheckError);
+      } else if (existingProfile?.trial_interview_used) {
+        console.log("❌ User already has used trial interview");
+        return new Response(
+          JSON.stringify({
+            success: false,
+            trial_limit_reached: true,
+            message:
+              "Ya has utilizado tu entrevista gratuita. Para más entrevistas, adquiere una membresía.",
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
 
       // Update user metadata if needed
       const { error: updateError } = await supabase.auth.admin.updateUserById(

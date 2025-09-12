@@ -1,4 +1,5 @@
 import { useState } from "react";
+import videoDemo from "../assets/team/video.mp4";
 import {
   Check,
   Star,
@@ -38,7 +39,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { TrialAIInterview } from "./TrialAIInterview";
+import TrialAIInterview from "./TrialAIInterview";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function LandingPage() {
@@ -341,10 +342,15 @@ export function LandingPage() {
           <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer max-w-2xl mx-auto">
             <CardHeader className="pb-4 p-4 md:p-6">
               <div className="relative mb-4">
-                <div className="w-full h-48 md:h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
-                  <div className="w-16 h-16 md:w-20 md:h-20 bg-primary/20 rounded-full flex items-center justify-center">
-                    <Play className="w-8 h-8 md:w-10 md:h-10 text-primary ml-1 md:ml-2" />
-                  </div>
+                <div className="w-full h-80 md:h-80 rounded-lg overflow-hidden">
+                  <video
+                    src={videoDemo}
+                    loop
+                    controls
+                    className="w-full h-full object-cover"
+                  >
+                    Tu navegador no soporta la reproducción de video.
+                  </video>
                 </div>
                 <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs">
                   Video Demo
