@@ -26,8 +26,7 @@ export const WelcomeTutorial = ({ isOpen, onClose }: WelcomeTutorialProps) => {
               ¡Felicidades por dar el primer paso hacia tu transformación profesional!
             </p>
             <p className="text-base text-muted-foreground">
-              Estás a punto de embarcarte en un viaje que cambiará tu carrera para siempre. 
-              Nuestro programa 360° está diseñado para potenciar todas las áreas de tu empleabilidad.
+              Comienzas un programa creado para acompañarte en todo tu proceso de empleabilidad. Nuestro objetivo es darte claridad, estructura y el apoyo necesario para que tomes decisiones seguras en tu carrera.
             </p>
           </div>
         </div>
@@ -35,7 +34,7 @@ export const WelcomeTutorial = ({ isOpen, onClose }: WelcomeTutorialProps) => {
     },
     {
       title: "Conoce a tu Career Coach",
-      subtitle: "Tu guía personalizada hacia el éxito",
+      subtitle: "No estás solo/a en tu búsqueda: aquí comienza tu acompañamiento.",
       content: (
         <div className="text-center space-y-6">
           <div className="w-24 h-24 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
@@ -46,8 +45,7 @@ export const WelcomeTutorial = ({ isOpen, onClose }: WelcomeTutorialProps) => {
               ¡Un Career Coach especializado te acompañará en todo tu proceso!
             </p>
             <p className="text-base text-muted-foreground">
-              Envíanos un mensaje ahora mismo para conocer a tu Career Coach asignado y 
-              recibir tu plan de acción personalizado.
+              Envíanos un mensaje ahora mismo para conocer a tu Career Coach asignado, responder tus dudas y diseñar junto contigo un plan de acción adaptado a tus metas.
             </p>
             <Button 
               className="w-full bg-green-600 hover:bg-green-700 text-white"
