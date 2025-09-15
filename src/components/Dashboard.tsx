@@ -84,6 +84,7 @@ import templateCreativePreview from "@/assets/graduate-resume.png";
 import templateTechPreview from "@/assets/bussines-resume.png";
 import templateMinimalPreview from "@/assets/clasic-resume.png";
 import templateAtsPreview from "@/assets/last-resume.png";
+import { WelcomeTutorial } from "./WelcomeTutorial";
 
 interface DashboardProps {
   defaultSection?: string;
@@ -98,6 +99,7 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
   const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [showWelcomeTutorial, setShowWelcomeTutorial] = useState(false);
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -113,6 +115,21 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
       setActiveSection(sectionFromUrl);
     }
   }, [location.pathname]);
+
+  // Tutorial de bienvenida
+  useEffect(() => {
+    const checkWelcomeTutorial = () => {
+      const tutorialCompleted = localStorage.getItem('welcomeTutorialCompleted');
+      if (!tutorialCompleted && user) {
+        // Delay para que el dashboard se cargue primero
+        setTimeout(() => {
+          setShowWelcomeTutorial(true);
+        }, 1000);
+      }
+    };
+
+    checkWelcomeTutorial();
+  }, [user]);
 
   // Navegar a la URL correspondiente cuando cambie la sección
   const handleSectionChange = (section: string) => {
@@ -499,6 +516,13 @@ export function Dashboard({ defaultSection = "overview" }: DashboardProps) {
 
       {showJobSuccess && (
         <JobSuccess onClose={() => setShowJobSuccess(false)} />
+      )}
+      
+      {showWelcomeTutorial && (
+        <WelcomeTutorial
+          isOpen={showWelcomeTutorial}
+          onClose={() => setShowWelcomeTutorial(false)}
+        />
       )}
     </div>
   );
