@@ -16,7 +16,8 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 function generateTrialInterviewHTML(
   interview: any,
   analysis: any,
-  summary: any
+  summary: any,
+  aiSummary: any
 ): string {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -263,10 +264,10 @@ function generateTrialInterviewHTML(
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>🎉 ¡Tu entrevista AI está lista!</h1>
-          <p>Has completado exitosamente tu entrevista de prueba gratuita</p>
-        </div>
+    <div class="header">
+      <h1>📊 ¡Tu feedback de entrevista está listo!</h1>
+      <p>Aquí tienes tu análisis completo y recomendaciones personalizadas</p>
+    </div>
         
         <div class="content">
           <div class="interview-card">
@@ -283,19 +284,12 @@ function generateTrialInterviewHTML(
                   <span>⏱️</span>
                   <span>Duración: ${interview.duration || "N/A"}</span>
                 </div>
-                <div class="meta-item">
-                  <span class="status-badge" style="background-color: ${getStatusColor(
-                    interview.status
-                  )}">
-                    ${getStatusText(interview.status)}
-                  </span>
-                </div>
               </div>
             </div>
             
             <div class="interview-body">
               ${
-                summary
+                summary && summary.trim()
                   ? `
                 <div class="section">
                   <h3 class="section-title">📋 Resumen de la Entrevista</h3>
@@ -308,25 +302,77 @@ function generateTrialInterviewHTML(
               }
               
               ${
-                analysis && analysis.feedback
+                (!summary || !summary?.trim()) &&
+                (!analysis ||
+                  !analysis?.feedback ||
+                  !Array.isArray(analysis.feedback) ||
+                  analysis.feedback.length === 0) &&
+                (!analysis ||
+                  !analysis?.overall_feedback ||
+                  !analysis.overall_feedback?.trim()) &&
+                (!analysis ||
+                  !analysis?.recommendations ||
+                  !Array.isArray(analysis.recommendations) ||
+                  analysis.recommendations.length === 0) &&
+                (!aiSummary ||
+                  ((!aiSummary?.finalRecommendation ||
+                    (!aiSummary.finalRecommendation?.decision &&
+                      !aiSummary.finalRecommendation?.confidence &&
+                      !aiSummary.finalRecommendation?.reasoning)) &&
+                    (!aiSummary?.hardSkills || !aiSummary.hardSkills?.trim()) &&
+                    (!aiSummary?.softSkills || !aiSummary.softSkills?.trim()) &&
+                    (!aiSummary?.englishLevel ||
+                      !aiSummary.englishLevel?.trim()) &&
+                    (!aiSummary?.keyTechnologies ||
+                      !aiSummary.keyTechnologies?.trim()) &&
+                    (!aiSummary?.technicalExperience ||
+                      !aiSummary.technicalExperience?.trim()) &&
+                    (!aiSummary?.overallScore ||
+                      isNaN(parseInt(aiSummary.overallScore)))))
+                  ? `
+                    <div class="section">
+                      <h3 class="section-title">📋 Información de la Entrevista</h3>
+                      <div class="section-content">
+                        <p>Tu entrevista ha sido completada exitosamente. El análisis detallado y feedback personalizado estarán disponibles próximamente en la plataforma.</p>
+                        <p style="margin-top: 12px; font-size: 14px; color: #6b7280;">
+                          <strong>Próximos pasos:</strong> Inicia sesión en la plataforma para acceder a tu análisis completo y recomendaciones personalizadas.
+                        </p>
+                      </div>
+                    </div>
+              `
+                  : ""
+              }
+              
+              ${
+                analysis &&
+                analysis?.feedback &&
+                Array.isArray(analysis.feedback) &&
+                analysis.feedback.length > 0
                   ? `
                 <div class="section">
                   <h3 class="section-title">💡 Feedback Detallado</h3>
                   <div class="feedback-list">
                     ${analysis.feedback
+                      .filter(
+                        (item: any) =>
+                          item &&
+                          (item?.question || item?.answer || item?.analysis)
+                      )
                       .map(
                         (item: any, index: number) => `
                       <li class="feedback-item">
                         <div class="feedback-question">Pregunta ${index + 1}: ${
-                          item.question || "Pregunta no disponible"
+                          item?.question && item.question?.trim()
+                            ? item.question
+                            : "Pregunta no disponible"
                         }</div>
                         ${
-                          item.answer
+                          item?.answer && item.answer?.trim()
                             ? `<div class="feedback-answer"><strong>Tu respuesta:</strong> ${item.answer}</div>`
                             : ""
                         }
                         ${
-                          item.analysis
+                          item?.analysis && item.analysis?.trim()
                             ? `
                           <div class="feedback-analysis">
                             <strong>Análisis:</strong> ${item.analysis}
@@ -345,7 +391,9 @@ function generateTrialInterviewHTML(
               }
               
               ${
-                analysis && analysis.overall_feedback
+                analysis &&
+                analysis?.overall_feedback &&
+                analysis.overall_feedback?.trim()
                   ? `
                 <div class="section">
                   <h3 class="section-title">🎯 Evaluación General</h3>
@@ -358,13 +406,17 @@ function generateTrialInterviewHTML(
               }
               
               ${
-                analysis && analysis.recommendations
+                analysis &&
+                analysis?.recommendations &&
+                Array.isArray(analysis.recommendations) &&
+                analysis.recommendations.length > 0
                   ? `
                 <div class="section">
                   <h3 class="section-title">🚀 Recomendaciones</h3>
                   <div class="section-content">
                     <ul>
                       ${analysis.recommendations
+                        .filter((rec: string) => rec && rec?.trim())
                         .map((rec: string) => `<li>${rec}</li>`)
                         .join("")}
                     </ul>
@@ -373,12 +425,204 @@ function generateTrialInterviewHTML(
               `
                   : ""
               }
+              
+              ${
+                aiSummary &&
+                aiSummary?.finalRecommendation &&
+                (aiSummary.finalRecommendation?.decision ||
+                  aiSummary.finalRecommendation?.confidence ||
+                  aiSummary.finalRecommendation?.reasoning)
+                  ? `
+                <div class="section">
+                  <h3 class="section-title">🎯 Recomendación Final</h3>
+                  <div class="section-content">
+                    ${
+                      aiSummary.finalRecommendation?.decision
+                        ? `
+                    <p><strong>Decisión:</strong> 
+                      <span style="background-color: ${
+                        aiSummary.finalRecommendation.decision === "YES"
+                          ? "#dcfce7"
+                          : aiSummary.finalRecommendation.decision === "NO"
+                          ? "#fef2f2"
+                          : "#fef3c7"
+                      }; color: ${
+                            aiSummary.finalRecommendation.decision === "YES"
+                              ? "#166534"
+                              : aiSummary.finalRecommendation.decision === "NO"
+                              ? "#991b1b"
+                              : "#92400e"
+                          }; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        ${aiSummary.finalRecommendation.decision}
+                      </span>
+                    </p>
+                    `
+                        : ""
+                    }
+                    ${
+                      aiSummary.finalRecommendation?.confidence
+                        ? `
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                      <strong>Confianza:</strong> ${aiSummary.finalRecommendation.confidence}/5
+                    </p>
+                    `
+                        : ""
+                    }
+                    ${
+                      aiSummary.finalRecommendation?.reasoning
+                        ? `
+                    <p style="margin-top: 8px; font-size: 12px;">
+                      ${aiSummary.finalRecommendation.reasoning}
+                    </p>
+                    `
+                        : ""
+                    }
+                    ${
+                      aiSummary.finalRecommendation?.nextSteps
+                        ? `
+                      <div style="margin-top: 8px;">
+                        <p style="font-size: 12px; font-weight: 600;">Próximos pasos:</p>
+                        <p style="font-size: 12px;">${aiSummary.finalRecommendation.nextSteps}</p>
+                      </div>
+                    `
+                        : ""
+                    }
+                  </div>
+                </div>
+              `
+                  : ""
+              }
+              
+              ${
+                aiSummary &&
+                aiSummary?.hardSkills &&
+                aiSummary.hardSkills?.trim()
+                  ? `
+                <div class="section">
+                  <h3 class="section-title">🔧 Habilidades Técnicas</h3>
+                  <div class="section-content" style="background-color: #eff6ff; border-left: 4px solid #3b82f6;">
+                    <p style="font-size: 12px; white-space: pre-line;">${aiSummary.hardSkills}</p>
+                  </div>
+                </div>
+              `
+                  : ""
+              }
+              
+              ${
+                aiSummary &&
+                aiSummary?.softSkills &&
+                aiSummary.softSkills?.trim()
+                  ? `
+                <div class="section">
+                  <h3 class="section-title">🤝 Habilidades Blandas</h3>
+                  <div class="section-content" style="background-color: #fef3c7; border-left: 4px solid #f59e0b;">
+                    <p style="font-size: 12px; white-space: pre-line;">${aiSummary.softSkills}</p>
+                  </div>
+                </div>
+              `
+                  : ""
+              }
+              
+              ${
+                aiSummary &&
+                aiSummary?.englishLevel &&
+                aiSummary.englishLevel?.trim()
+                  ? `
+                <div class="section">
+                  <h3 class="section-title">🌍 Nivel de Inglés</h3>
+                  <div class="section-content" style="background-color: #f3e8ff; border-left: 4px solid #8b5cf6;">
+                    <p style="font-size: 12px;">${aiSummary.englishLevel}</p>
+                  </div>
+                </div>
+              `
+                  : ""
+              }
+              
+              ${
+                aiSummary &&
+                aiSummary?.keyTechnologies &&
+                aiSummary.keyTechnologies?.trim()
+                  ? `
+                <div class="section">
+                  <h3 class="section-title">💻 Tecnologías Clave</h3>
+                  <div class="section-content" style="background-color: #e0e7ff; border-left: 4px solid #6366f1;">
+                    <p style="font-size: 12px;">${aiSummary.keyTechnologies}</p>
+                  </div>
+                </div>
+              `
+                  : ""
+              }
+              
+              ${
+                aiSummary &&
+                aiSummary?.technicalExperience &&
+                aiSummary.technicalExperience?.trim()
+                  ? `
+                <div class="section">
+                  <h3 class="section-title">⚙️ Experiencia Técnica</h3>
+                  <div class="section-content" style="background-color: #ecfeff; border-left: 4px solid #06b6d4;">
+                    <p style="font-size: 12px;">${aiSummary.technicalExperience}</p>
+                  </div>
+                </div>
+              `
+                  : ""
+              }
+              
+              ${
+                aiSummary &&
+                aiSummary?.overallScore &&
+                !isNaN(parseInt(aiSummary.overallScore)) &&
+                parseInt(aiSummary.overallScore) >= 0
+                  ? `
+                <div class="section">
+                  <h3 class="section-title">📈 Puntuación General</h3>
+                  <div class="section-content" style="background-color: #ecfdf5; border-left: 4px solid #10b981;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
+                      <span style="font-size: 24px; font-weight: bold; color: #065f46;">
+                        ${aiSummary.overallScore}/100
+                      </span>
+                      <div style="flex: 1; background-color: #d1d5db; border-radius: 9999px; height: 8px;">
+                        <div style="background-color: #10b981; height: 8px; border-radius: 9999px; width: ${Math.min(
+                          100,
+                          Math.max(0, parseInt(aiSummary.overallScore))
+                        )}%;"></div>
+                      </div>
+                    </div>
+                    <p style="font-size: 12px; color: #065f46;">
+                      Puntuación basada en habilidades técnicas, comunicación y experiencia
+                    </p>
+                  </div>
+                </div>
+              `
+                  : ""
+              }
             </div>
           </div>
           
+          <!-- Sección de Promoción -->
+          <div style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border-radius: 12px; padding: 24px; margin: 30px 0; text-align: center; color: white;">
+            <h3 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 700;">
+              🎉 ¡Oferta Especial por Tiempo Limitado!
+            </h3>
+            <p style="margin: 0 0 16px 0; font-size: 16px; opacity: 0.95;">
+              Obtén acceso completo a todas las herramientas de Academy
+            </p>
+            <div style="background: rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 16px; margin: 16px 0;">
+              <div style="font-size: 32px; font-weight: 800; margin-bottom: 4px;">
+                50% DE DESCUENTO
+              </div>
+              <div style="font-size: 14px; opacity: 0.9;">
+                Válido solo por 48 horas
+              </div>
+            </div>
+            <p style="margin: 0; font-size: 14px; opacity: 0.9;">
+              Incluye: CV Boost, LinkedIn Optimizer, Entrevistas AI ilimitadas y más
+            </p>
+          </div>
+          
           <div style="text-align: center; margin-top: 30px;">
-            <a href="https://academy.lapieza.io/login" class="cta-button">
-              🚀 Acceder a la Plataforma Completa
+            <a href="https://talento.lapieza.io" class="cta-button">
+              📊 Ver Análisis Completo en la Plataforma
             </a>
          
           </div>
@@ -407,7 +651,7 @@ serve(async (req) => {
 
     // Parse JSON body
     const body = await req.json();
-    console.log("📦 Interview response payload received");
+    console.log("📦 Interview response payload received", body);
 
     const {
       candidateId,
@@ -645,7 +889,8 @@ serve(async (req) => {
           const htmlBody = generateTrialInterviewHTML(
             interview,
             analysis,
-            summary
+            summary,
+            aiSummary
           );
 
           sendable = {

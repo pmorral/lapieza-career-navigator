@@ -242,7 +242,7 @@ export function MockInterviews() {
       // First get all interviews for the user
       const { data: userInterviews, error: interviewsError } = await supabase
         .from("interviews" as any)
-        .select("id, candidate_id, interview_id")
+        .select("id, candidate_id, interview_id, job_title")
         .eq("user_id", user.id);
 
       if (interviewsError) {
@@ -273,7 +273,18 @@ export function MockInterviews() {
         return;
       }
 
-      setInterviewResponses(responses || []);
+      // Combine interview data with responses to include job_title
+      const responsesWithJobTitle = (responses || []).map((response: any) => {
+        const interview = userInterviews.find(
+          (interview: any) => interview.candidate_id === response.candidate_id
+        );
+        return {
+          ...response,
+          job_title: (interview as any)?.job_title || "Sin título",
+        };
+      });
+
+      setInterviewResponses(responsesWithJobTitle);
     } catch (error) {
       console.error("Error in fetchInterviewResponses:", error);
     } finally {
@@ -875,11 +886,8 @@ export function MockInterviews() {
                             <div>
                               <h3 className="font-medium">
                                 Entrevista AI -{" "}
-                                {response.candidate_id?.substring(0, 8)}...
+                                {response.job_title || "Sin título"}
                               </h3>
-                              <p className="text-sm text-muted-foreground">
-                                ID: {response.interview_id_external}
-                              </p>
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-1">
