@@ -14,6 +14,9 @@ import {
   Calendar,
   Trash2,
   Eye,
+  ChevronDown,
+  ChevronRight,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +28,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
@@ -218,6 +222,10 @@ export function CVBoost() {
   >([]);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [expandedHistoryItems, setExpandedHistoryItems] = useState<Set<string>>(
+    new Set()
+  );
+  const [activeTab, setActiveTab] = useState("create");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentResult, setCurrentResult] = useState<CVResult | null>(null);
@@ -225,6 +233,16 @@ export function CVBoost() {
   const { toast } = useToast();
 
   // console.log('currentResult', currentResult);
+
+  const toggleHistoryItem = (itemId: string) => {
+    const newExpanded = new Set(expandedHistoryItems);
+    if (newExpanded.has(itemId)) {
+      newExpanded.delete(itemId);
+    } else {
+      newExpanded.add(itemId);
+    }
+    setExpandedHistoryItems(newExpanded);
+  };
 
   // Load CV history on component mount
   const loadCVHistory = async () => {
@@ -772,7 +790,9 @@ export function CVBoost() {
               {/* Feedback por defecto que siempre aparece */}
               <li className="flex items-start gap-2 text-sm">
                 <span className="text-orange-500 mt-1">•</span>
-                Aunque ajustes tu CV en formato Word, es importante que lo guardes en PDF como "Nombre_Perfil Profesional" para mantener el formato y asegurar compatibilidad con sistemas ATS.
+                Aunque ajustes tu CV en formato Word, es importante que lo
+                guardes en PDF como "Nombre_Perfil Profesional" para mantener el
+                formato y asegurar compatibilidad con sistemas ATS.
               </li>
             </ul>
           </CardContent>
@@ -1066,7 +1086,7 @@ export function CVBoost() {
 
   return (
     <div className="space-y-6">
-      {/* Header with History Toggle */}
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">CV Boost</h1>
@@ -1074,301 +1094,1157 @@ export function CVBoost() {
             Optimiza tu CV con inteligencia artificial
           </p>
         </div>
-        <Button
-          onClick={() => setShowHistory(!showHistory)}
-          variant="outline"
-          size="sm"
-        >
-          <History className="w-4 h-4 mr-2" />
-          {showHistory ? "Ocultar Historial" : "Ver Historial"}
-        </Button>
       </div>
 
-      {/* History Section */}
-      {showHistory && (
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <History className="w-5 h-5 text-primary" />
-              Historial de CVs Optimizados
-            </CardTitle>
-            <CardDescription>Tus CVs optimizados anteriores</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {historyItems.length === 0 ? (
-              <p className="text-muted-foreground text-center py-4">
-                No hay CVs optimizados en el historial
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {historyItems.map((item) => (
-                  <div key={item.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h4 className="font-medium">
-                          {item.original_filename}
-                        </h4>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(item.created_at).toLocaleDateString(
-                            "es-ES"
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => {
-                            setCurrentResult(item.optimized_content);
-                            setActiveView("results");
-                          }}
-                          variant="outline"
-                          size="sm"
-                        >
-                          Ver
-                        </Button>
-                        <Button
-                          onClick={() => deleteHistoryItem(item.id)}
-                          variant="outline"
-                          size="sm"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="create" className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Crear Optimización
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="w-4 h-4" />
+            Historial
+          </TabsTrigger>
+        </TabsList>
 
-      {/* CV History Section */}
-      {isLoading ? (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 animate-spin" />
-              <p className="text-muted-foreground">Cargando historial...</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        cvHistory.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">
-                📚 Historial de CVs Optimizados
-              </CardTitle>
-              <CardDescription>
-                Tus CVs anteriores están disponibles para revisar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {cvHistory.slice(0, 5).map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-primary" />
-                        <div>
-                          <p className="font-medium">{entry.fileName}</p>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>📅 {entry.date}</span>
-                            {entry.score && (
-                              <span className="flex items-center gap-1">
-                                ⭐ Puntuación: {entry.score}/100
-                              </span>
-                            )}
-                            <span>
-                              💡 {entry.feedback?.length || 0} recomendaciones
-                            </span>
+        <TabsContent value="create" className="space-y-6">
+          {/* History Section */}
+          {showHistory && (
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="w-5 h-5 text-primary" />
+                  Historial de CVs Optimizados
+                </CardTitle>
+                <CardDescription>
+                  Tus CVs optimizados anteriores
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {historyItems.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4">
+                    No hay CVs optimizados en el historial
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {historyItems.map((item) => {
+                      const isExpanded = expandedHistoryItems.has(item.id);
+                      return (
+                        <div key={item.id} className="border rounded-lg">
+                          <div className="p-4">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <h4 className="font-medium">
+                                  {item.original_filename}
+                                </h4>
+                                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(item.created_at).toLocaleDateString(
+                                    "es-ES"
+                                  )}
+                                </p>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  onClick={() => toggleHistoryItem(item.id)}
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex items-center gap-1"
+                                >
+                                  {isExpanded ? (
+                                    <>
+                                      <ChevronDown className="w-4 h-4" />
+                                      Ocultar
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ChevronRight className="w-4 h-4" />
+                                      Ver
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  onClick={() => deleteHistoryItem(item.id)}
+                                  variant="outline"
+                                  size="sm"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+
+                          {isExpanded && (
+                            <div className="border-t bg-gray-50 p-4">
+                              <div className="space-y-6">
+                                <div className="flex justify-between items-center">
+                                  <h2 className="text-2xl font-bold text-success">
+                                    ✅ CV Optimizado
+                                  </h2>
+                                </div>
+
+                                {/* Feedback Section */}
+                                {item.optimized_content.feedback &&
+                                  item.optimized_content.feedback.length >
+                                    0 && (
+                                    <Card>
+                                      <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                          <AlertCircle className="w-5 h-5 text-orange-500" />
+                                          Puntos de mejora detectados en tu CV
+                                          anterior
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <ul className="space-y-2">
+                                          {item.optimized_content.feedback.map(
+                                            (point: string, index: number) => (
+                                              <li
+                                                key={index}
+                                                className="flex items-start gap-2 text-sm"
+                                              >
+                                                <span className="text-orange-500 mt-1">
+                                                  •
+                                                </span>
+                                                {point}
+                                              </li>
+                                            )
+                                          )}
+                                          {/* Feedback por defecto que siempre aparece */}
+                                          <li className="flex items-start gap-2 text-sm">
+                                            <span className="text-orange-500 mt-1">
+                                              •
+                                            </span>
+                                            Aunque ajustes tu CV en formato
+                                            Word, es importante que lo guardes
+                                            en PDF como "Nombre_Perfil
+                                            Profesional" para mantener el
+                                            formato profesional
+                                          </li>
+                                        </ul>
+                                      </CardContent>
+                                    </Card>
+                                  )}
+
+                                {/* Sections Card */}
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                      <CheckCircle className="w-5 h-5 text-success" />
+                                      Secciones del CV Optimizado
+                                    </CardTitle>
+                                    <CardDescription>
+                                      Copia cada sección a tu CV o generador de
+                                      CVs preferido
+                                    </CardDescription>
+                                  </CardHeader>
+                                  <CardContent className="space-y-6">
+                                    {/* 1. Personal Information Section */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-medium">
+                                          👤 Nombre + Headline + Datos de
+                                          Contacto
+                                        </h3>
+                                        <Button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              item.optimized_content.sections
+                                                ?.personal ||
+                                                "Información personal optimizada"
+                                            )
+                                          }
+                                          variant="outline"
+                                          size="sm"
+                                        >
+                                          <Copy className="w-4 h-4 mr-2" />
+                                          Copiar
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={
+                                          item.optimized_content.sections
+                                            ?.personal ||
+                                          "Nombre completo\nHeadline profesional\nEmail | Teléfono | Ciudad | LinkedIn\n[Abierto a reubicación - solo si aplicó]\n[Portafolio - si aplica]"
+                                        }
+                                        readOnly
+                                        className="min-h-[120px]"
+                                      />
+                                    </div>
+
+                                    {/* 2. Professional Summary */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-medium">
+                                          🎯 Perfil Profesional (máx. 4 líneas)
+                                        </h3>
+                                        <Button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              item.optimized_content.sections
+                                                ?.summary ||
+                                                item.optimized_content.improvedContent
+                                                  .split("\n")
+                                                  .slice(0, 5)
+                                                  .join("\n")
+                                            )
+                                          }
+                                          variant="outline"
+                                          size="sm"
+                                        >
+                                          <Copy className="w-4 h-4 mr-2" />
+                                          Copiar
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={
+                                          item.optimized_content.sections
+                                            ?.summary ||
+                                          "Perfil profesional conciso que describe experiencia, habilidades principales, sector y objetivo profesional."
+                                        }
+                                        readOnly
+                                        className="min-h-[120px]"
+                                      />
+                                    </div>
+
+                                    {/* 3. Experience Section */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-medium">
+                                          💼 Experiencia Profesional
+                                        </h3>
+                                        <Button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              item.optimized_content.sections
+                                                ?.experience ||
+                                                "Experiencia profesional optimizada"
+                                            )
+                                          }
+                                          variant="outline"
+                                          size="sm"
+                                        >
+                                          <Copy className="w-4 h-4 mr-2" />
+                                          Copiar
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={
+                                          item.optimized_content.sections
+                                            ?.experience ||
+                                          "Las 4-5 experiencias más recientes con 3-7 bullets cada una. Redacción según idioma: ES (pasado 1ra persona/actual infinitivo), EN (pasado/actual gerundio)."
+                                        }
+                                        readOnly
+                                        className="min-h-[200px]"
+                                      />
+                                    </div>
+
+                                    {/* 4. Projects Section (Solo para junior/transición) */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-medium">
+                                          🚀 Proyectos (solo perfiles
+                                          junior/transición)
+                                        </h3>
+                                        <Button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              item.optimized_content.sections
+                                                ?.projects ||
+                                                "Proyectos destacados"
+                                            )
+                                          }
+                                          variant="outline"
+                                          size="sm"
+                                        >
+                                          <Copy className="w-4 h-4 mr-2" />
+                                          Copiar
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={
+                                          item.optimized_content.sections
+                                            ?.projects ||
+                                          "Proyectos relevantes que complementen la experiencia profesional, especialmente para perfiles junior o en transición de carrera."
+                                        }
+                                        readOnly
+                                        className="min-h-[120px]"
+                                      />
+                                    </div>
+
+                                    {/* 5. Skills Section */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-medium">
+                                          🛠️ Skills
+                                        </h3>
+                                        <Button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              item.optimized_content.sections
+                                                ?.skills ||
+                                                "Habilidades técnicas y blandas"
+                                            )
+                                          }
+                                          variant="outline"
+                                          size="sm"
+                                        >
+                                          <Copy className="w-4 h-4 mr-2" />
+                                          Copiar
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={
+                                          item.optimized_content.sections
+                                            ?.skills ||
+                                          "Hard Skills (Básico/Intermedio/Avanzado)\nSoft Skills (Bajo/Medio/Alto)"
+                                        }
+                                        readOnly
+                                        className="min-h-[120px]"
+                                      />
+                                    </div>
+
+                                    {/* 6. Certifications/Courses Section */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-medium">
+                                          📚 Cursos
+                                        </h3>
+                                        <Button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              item.optimized_content.sections
+                                                ?.certifications ||
+                                                "Cursos y certificaciones"
+                                            )
+                                          }
+                                          variant="outline"
+                                          size="sm"
+                                        >
+                                          <Copy className="w-4 h-4 mr-2" />
+                                          Copiar
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={
+                                          item.optimized_content.sections
+                                            ?.certifications ||
+                                          "Cursos, certificaciones y formación continua relevante para el puesto objetivo."
+                                        }
+                                        readOnly
+                                        className="min-h-[100px]"
+                                      />
+                                    </div>
+
+                                    {/* 7. Education Section */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-medium">
+                                          🎓 Educación
+                                        </h3>
+                                        <Button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              item.optimized_content.sections
+                                                ?.education ||
+                                                "Formación académica optimizada"
+                                            )
+                                          }
+                                          variant="outline"
+                                          size="sm"
+                                        >
+                                          <Copy className="w-4 h-4 mr-2" />
+                                          Copiar
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={
+                                          item.optimized_content.sections
+                                            ?.education ||
+                                          "Formación académica formal: títulos, instituciones, fechas y logros académicos relevantes."
+                                        }
+                                        readOnly
+                                        className="min-h-[100px]"
+                                      />
+                                    </div>
+
+                                    {/* 8. Languages Section */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className="font-medium">
+                                          🌍 Idiomas
+                                        </h3>
+                                        <Button
+                                          onClick={() =>
+                                            copyToClipboard(
+                                              item.optimized_content.sections
+                                                ?.languages ||
+                                                "Idiomas con niveles de competencia"
+                                            )
+                                          }
+                                          variant="outline"
+                                          size="sm"
+                                        >
+                                          <Copy className="w-4 h-4 mr-2" />
+                                          Copiar
+                                        </Button>
+                                      </div>
+                                      <Textarea
+                                        value={
+                                          item.optimized_content.sections
+                                            ?.languages ||
+                                          "Idiomas con niveles de competencia claramente definidos (Básico, Intermedio, Avanzado, Nativo)."
+                                        }
+                                        readOnly
+                                        className="min-h-[80px]"
+                                      />
+                                    </div>
+
+                                    {/* Keywords Analysis */}
+                                    {item.optimized_content.keywords &&
+                                      item.optimized_content.keywords.length >
+                                        0 && (
+                                        <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                                            <Sparkles className="w-4 h-4 text-primary" />
+                                            Palabras Clave Incluidas
+                                          </h4>
+                                          <div className="flex flex-wrap gap-2">
+                                            {item.optimized_content.keywords.map(
+                                              (
+                                                keyword: string,
+                                                index: number
+                                              ) => (
+                                                <Badge
+                                                  key={index}
+                                                  variant="secondary"
+                                                  className="text-xs"
+                                                >
+                                                  {keyword}
+                                                </Badge>
+                                              )
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                    <div className="mt-6 p-4 bg-muted rounded-lg">
+                                      <h4 className="font-medium mb-2">
+                                        Configuración aplicada:
+                                      </h4>
+                                      <div className="text-sm text-muted-foreground space-y-1">
+                                        <p>
+                                          • Idioma:{" "}
+                                          {
+                                            item.optimized_content.configApplied
+                                              ?.language
+                                          }
+                                        </p>
+                                        <p>
+                                          • Puesto objetivo:{" "}
+                                          {
+                                            item.optimized_content.configApplied
+                                              ?.targetPosition
+                                          }
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* CV History Section */}
+          {isLoading ? (
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 animate-spin" />
+                  <p className="text-muted-foreground">Cargando historial...</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            cvHistory.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    📚 Historial de CVs Optimizados
+                  </CardTitle>
+                  <CardDescription>
+                    Tus CVs anteriores están disponibles para revisar
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {cvHistory.slice(0, 5).map((entry) => (
+                      <div
+                        key={entry.id}
+                        className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <FileText className="w-5 h-5 text-primary" />
+                            <div>
+                              <p className="font-medium">{entry.fileName}</p>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <span>📅 {entry.date}</span>
+                                {entry.score && (
+                                  <span className="flex items-center gap-1">
+                                    ⭐ Puntuación: {entry.score}/100
+                                  </span>
+                                )}
+                                <span>
+                                  💡 {entry.feedback?.length || 0}{" "}
+                                  recomendaciones
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setCurrentResult(entry.result);
+                            setActiveView("results");
+                          }}
+                        >
+                          👁️ Ver Resultados
+                        </Button>
                       </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setCurrentResult(entry.result);
-                        setActiveView("results");
-                      }}
-                    >
-                      👁️ Ver Resultados
-                    </Button>
+                    ))}
+                    {cvHistory.length > 5 && (
+                      <p className="text-sm text-muted-foreground text-center pt-2">
+                        Y {cvHistory.length - 5} CVs más en tu historial
+                      </p>
+                    )}
                   </div>
-                ))}
-                {cvHistory.length > 5 && (
-                  <p className="text-sm text-muted-foreground text-center pt-2">
-                    Y {cvHistory.length - 5} CVs más en tu historial
-                  </p>
+                </CardContent>
+              </Card>
+            )
+          )}
+
+          {/* Configuration Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Configuración de tu CV</CardTitle>
+                <CardDescription>
+                  Completa tu información para generar un CV optimizado
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      ¿En qué idioma deseas el CV final?
+                    </label>
+                    <select
+                      value={preferences.language}
+                      onChange={(e) =>
+                        setPreferences((prev) => ({
+                          ...prev,
+                          language: e.target.value,
+                        }))
+                      }
+                      className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                      <option value="">Selecciona idioma</option>
+                      <option value="español">Español</option>
+                      <option value="inglés">Inglés</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      ¿A qué puesto estás aplicando?
+                    </label>
+                    <input
+                      type="text"
+                      value={preferences.targetPosition}
+                      onChange={(e) =>
+                        setPreferences((prev) => ({
+                          ...prev,
+                          targetPosition: e.target.value,
+                        }))
+                      }
+                      placeholder="Ej: Marketing Manager, Desarrollador Frontend..."
+                      className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      ¿Estás abiertx a reubicación?
+                    </label>
+                    <select
+                      value={preferences.relocation}
+                      onChange={(e) =>
+                        setPreferences((prev) => ({
+                          ...prev,
+                          relocation: e.target.value,
+                        }))
+                      }
+                      className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                      <option value="">Selecciona una opción</option>
+                      <option value="si">
+                        Sí, estoy abiertx a reubicación
+                      </option>
+                      <option value="no">
+                        No, prefiero trabajar en mi ciudad actual
+                      </option>
+                      <option value="remoto">Prefiero trabajo remoto</option>
+                    </select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Sube tu CV actual</CardTitle>
+                <CardDescription>
+                  Sube tu CV para que la IA lo analice y genere una versión
+                  optimizada
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="cv-upload"
+                  />
+                  <label
+                    htmlFor="cv-upload"
+                    className="cursor-pointer flex flex-col items-center gap-2"
+                  >
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                    <p className="text-sm font-medium">
+                      Arrastra tu CV aquí o haz click
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Solo archivos PDF (máx. 5MB)
+                    </p>
+                  </label>
+                </div>
+
+                {uploadedFile && (
+                  <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                    <FileText className="w-4 h-4 text-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{uploadedFile.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Listo para procesar
+                      </p>
+                    </div>
+                    <CheckCircle className="w-4 h-4 text-success" />
+                  </div>
                 )}
-              </div>
+
+                <Button
+                  onClick={() => uploadedFile && processCV(uploadedFile)}
+                  disabled={
+                    !uploadedFile ||
+                    isProcessing ||
+                    !preferences.language ||
+                    !preferences.targetPosition ||
+                    !preferences.relocation
+                  }
+                  className="w-full"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                      Procesando tu CV... (puede tardar más de 1 minuto)
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generar CV Optimizado
+                    </>
+                  )}
+                </Button>
+
+                {/* Botón para limpiar y procesar un nuevo CV */}
+                {currentResult && (
+                  <Button
+                    onClick={resetState}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Procesar Nuevo CV
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Templates Section */}
+          <TemplatesSection />
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6">
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="w-5 h-5 text-primary" />
+                Historial de CVs Optimizados
+              </CardTitle>
+              <CardDescription>Tus CVs optimizados anteriores</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {historyItems.length === 0 ? (
+                <p className="text-muted-foreground text-center py-4">
+                  No hay CVs optimizados en el historial
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {historyItems.map((item) => {
+                    const isExpanded = expandedHistoryItems.has(item.id);
+                    return (
+                      <div key={item.id} className="border rounded-lg">
+                        <div className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-medium">
+                                {item.original_filename}
+                              </h4>
+                              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(item.created_at).toLocaleDateString(
+                                  "es-ES"
+                                )}
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => toggleHistoryItem(item.id)}
+                                variant="outline"
+                                size="sm"
+                                className="flex items-center gap-1"
+                              >
+                                {isExpanded ? (
+                                  <>
+                                    <ChevronDown className="w-4 h-4" />
+                                    Ocultar
+                                  </>
+                                ) : (
+                                  <>
+                                    <ChevronRight className="w-4 h-4" />
+                                    Ver
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                onClick={() => deleteHistoryItem(item.id)}
+                                variant="outline"
+                                size="sm"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {isExpanded && (
+                          <div className="border-t bg-gray-50 p-4">
+                            <div className="space-y-6">
+                              <div className="flex justify-between items-center">
+                                <h2 className="text-2xl font-bold text-success">
+                                  ✅ CV Optimizado
+                                </h2>
+                              </div>
+
+                              {/* Feedback Section */}
+                              {item.optimized_content.feedback &&
+                                item.optimized_content.feedback.length > 0 && (
+                                  <Card>
+                                    <CardHeader>
+                                      <CardTitle className="flex items-center gap-2">
+                                        <AlertCircle className="w-5 h-5 text-orange-500" />
+                                        Puntos de mejora detectados en tu CV
+                                        anterior
+                                      </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                      <ul className="space-y-2">
+                                        {item.optimized_content.feedback.map(
+                                          (point: string, index: number) => (
+                                            <li
+                                              key={index}
+                                              className="flex items-start gap-2 text-sm"
+                                            >
+                                              <span className="text-orange-500 mt-1">
+                                                •
+                                              </span>
+                                              {point}
+                                            </li>
+                                          )
+                                        )}
+                                        {/* Feedback por defecto que siempre aparece */}
+                                        <li className="flex items-start gap-2 text-sm">
+                                          <span className="text-orange-500 mt-1">
+                                            •
+                                          </span>
+                                          Aunque ajustes tu CV en formato Word,
+                                          es importante que lo guardes en PDF
+                                          como "Nombre_Perfil Profesional" para
+                                          mantener el formato profesional
+                                        </li>
+                                      </ul>
+                                    </CardContent>
+                                  </Card>
+                                )}
+
+                              {/* Sections Card */}
+                              <Card>
+                                <CardHeader>
+                                  <CardTitle className="flex items-center gap-2">
+                                    <FileText className="w-5 h-5 text-primary" />
+                                    Secciones Optimizadas
+                                  </CardTitle>
+                                  <CardDescription>
+                                    Copia cada sección a tu CV o generador de
+                                    CVs preferido
+                                  </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                  {/* Personal Section */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h3 className="font-medium">
+                                        👤 Información Personal
+                                      </h3>
+                                      <Button
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            item.optimized_content.sections
+                                              ?.personal ||
+                                              "Información personal optimizada"
+                                          )
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                      >
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copiar
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      value={
+                                        item.optimized_content.sections
+                                          ?.personal ||
+                                        "Nombre completo\nHeadline profesional\nEmail | Teléfono | Ciudad | LinkedIn\n[Abierto a reubicación - solo si aplicó]\n[Portafolio - si aplica]"
+                                      }
+                                      readOnly
+                                      className="min-h-[100px]"
+                                    />
+                                  </div>
+
+                                  {/* Summary Section */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h3 className="font-medium">
+                                        📝 Resumen Profesional
+                                      </h3>
+                                      <Button
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            item.optimized_content.sections
+                                              ?.summary ||
+                                              item.optimized_content.improvedContent
+                                                .split("\n")
+                                                .slice(0, 5)
+                                                .join("\n")
+                                          )
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                      >
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copiar
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      value={
+                                        item.optimized_content.sections
+                                          ?.summary ||
+                                        "Perfil profesional conciso que describe experiencia, habilidades principales, sector y objetivo profesional."
+                                      }
+                                      readOnly
+                                      className="min-h-[120px]"
+                                    />
+                                  </div>
+
+                                  {/* Experience Section */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h3 className="font-medium">
+                                        💼 Experiencia Profesional
+                                      </h3>
+                                      <Button
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            item.optimized_content.sections
+                                              ?.experience ||
+                                              "Experiencia profesional optimizada"
+                                          )
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                      >
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copiar
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      value={
+                                        item.optimized_content.sections
+                                          ?.experience ||
+                                        "Las 4-5 experiencias más recientes con 3-7 bullets cada una. Redacción según idioma: ES (pasado 1ra persona/actual infinitivo), EN (pasado/actual gerundio)."
+                                      }
+                                      readOnly
+                                      className="min-h-[150px]"
+                                    />
+                                  </div>
+
+                                  {/* Projects Section */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h3 className="font-medium">
+                                        🚀 Proyectos (solo perfiles
+                                        junior/transición)
+                                      </h3>
+                                      <Button
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            item.optimized_content.sections
+                                              ?.projects ||
+                                              "Proyectos destacados"
+                                          )
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                      >
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copiar
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      value={
+                                        item.optimized_content.sections
+                                          ?.projects ||
+                                        "Proyectos relevantes que complementen la experiencia profesional, especialmente para perfiles junior o en transición de carrera."
+                                      }
+                                      readOnly
+                                      className="min-h-[100px]"
+                                    />
+                                  </div>
+
+                                  {/* Skills Section */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h3 className="font-medium">
+                                        🛠️ Habilidades
+                                      </h3>
+                                      <Button
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            item.optimized_content.sections
+                                              ?.skills ||
+                                              "Habilidades técnicas y blandas"
+                                          )
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                      >
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copiar
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      value={
+                                        item.optimized_content.sections
+                                          ?.skills ||
+                                        "Habilidades técnicas y blandas organizadas por categorías y niveles de competencia."
+                                      }
+                                      readOnly
+                                      className="min-h-[80px]"
+                                    />
+                                  </div>
+
+                                  {/* Certifications Section */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h3 className="font-medium">
+                                        🎓 Certificaciones
+                                      </h3>
+                                      <Button
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            item.optimized_content.sections
+                                              ?.certifications ||
+                                              "Cursos y certificaciones"
+                                          )
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                      >
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copiar
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      value={
+                                        item.optimized_content.sections
+                                          ?.certifications ||
+                                        "Cursos, certificaciones y formación continua relevante para el puesto objetivo."
+                                      }
+                                      readOnly
+                                      className="min-h-[80px]"
+                                    />
+                                  </div>
+
+                                  {/* Education Section */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h3 className="font-medium">
+                                        🎓 Educación
+                                      </h3>
+                                      <Button
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            item.optimized_content.sections
+                                              ?.education ||
+                                              "Formación académica optimizada"
+                                          )
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                      >
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copiar
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      value={
+                                        item.optimized_content.sections
+                                          ?.education ||
+                                        "Formación académica formal: títulos, instituciones, fechas y logros académicos relevantes."
+                                      }
+                                      readOnly
+                                      className="min-h-[80px]"
+                                    />
+                                  </div>
+
+                                  {/* Languages Section */}
+                                  <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h3 className="font-medium">
+                                        🌍 Idiomas
+                                      </h3>
+                                      <Button
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            item.optimized_content.sections
+                                              ?.languages ||
+                                              "Idiomas con niveles de competencia"
+                                          )
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                      >
+                                        <Copy className="w-4 h-4 mr-2" />
+                                        Copiar
+                                      </Button>
+                                    </div>
+                                    <Textarea
+                                      value={
+                                        item.optimized_content.sections
+                                          ?.languages ||
+                                        "Idiomas con niveles de competencia claramente definidos (Básico, Intermedio, Avanzado, Nativo)."
+                                      }
+                                      readOnly
+                                      className="min-h-[60px]"
+                                    />
+                                  </div>
+                                </CardContent>
+                              </Card>
+
+                              {/* Keywords Analysis */}
+                              {item.optimized_content.keywords &&
+                                item.optimized_content.keywords.length > 0 && (
+                                  <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                                      <Sparkles className="w-4 h-4 text-primary" />
+                                      Palabras Clave Incluidas
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                      {item.optimized_content.keywords.map(
+                                        (keyword: string, index: number) => (
+                                          <Badge
+                                            key={index}
+                                            variant="secondary"
+                                            className="text-xs"
+                                          >
+                                            {keyword}
+                                          </Badge>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                              <div className="mt-6 p-4 bg-muted rounded-lg">
+                                <h4 className="font-medium mb-2">
+                                  Configuración aplicada:
+                                </h4>
+                                <div className="text-sm text-muted-foreground space-y-1">
+                                  <p>
+                                    • Idioma:{" "}
+                                    {
+                                      item.optimized_content.configApplied
+                                        ?.language
+                                    }
+                                  </p>
+                                  <p>
+                                    • Puesto objetivo:{" "}
+                                    {
+                                      item.optimized_content.configApplied
+                                        ?.targetPosition
+                                    }
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
-        )
-      )}
-
-      {/* Configuration Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuración de tu CV</CardTitle>
-            <CardDescription>
-              Completa tu información para generar un CV optimizado
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  ¿En qué idioma deseas el CV final?
-                </label>
-                <select
-                  value={preferences.language}
-                  onChange={(e) =>
-                    setPreferences((prev) => ({
-                      ...prev,
-                      language: e.target.value,
-                    }))
-                  }
-                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="">Selecciona idioma</option>
-                  <option value="español">Español</option>
-                  <option value="inglés">Inglés</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  ¿A qué puesto estás aplicando?
-                </label>
-                <input
-                  type="text"
-                  value={preferences.targetPosition}
-                  onChange={(e) =>
-                    setPreferences((prev) => ({
-                      ...prev,
-                      targetPosition: e.target.value,
-                    }))
-                  }
-                  placeholder="Ej: Marketing Manager, Desarrollador Frontend..."
-                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  ¿Estás abiertx a reubicación?
-                </label>
-                <select
-                  value={preferences.relocation}
-                  onChange={(e) =>
-                    setPreferences((prev) => ({
-                      ...prev,
-                      relocation: e.target.value,
-                    }))
-                  }
-                  className="w-full p-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="">Selecciona una opción</option>
-                  <option value="si">Sí, estoy abiertx a reubicación</option>
-                  <option value="no">
-                    No, prefiero trabajar en mi ciudad actual
-                  </option>
-                  <option value="remoto">Prefiero trabajo remoto</option>
-                </select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Sube tu CV actual</CardTitle>
-            <CardDescription>
-              Sube tu CV para que la IA lo analice y genere una versión
-              optimizada
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileUpload}
-                className="hidden"
-                id="cv-upload"
-              />
-              <label
-                htmlFor="cv-upload"
-                className="cursor-pointer flex flex-col items-center gap-2"
-              >
-                <Upload className="w-8 h-8 text-muted-foreground" />
-                <p className="text-sm font-medium">
-                  Arrastra tu CV aquí o haz click
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Solo archivos PDF (máx. 5MB)
-                </p>
-              </label>
-            </div>
-
-            {uploadedFile && (
-              <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
-                <FileText className="w-4 h-4 text-primary" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{uploadedFile.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Listo para procesar
-                  </p>
-                </div>
-                <CheckCircle className="w-4 h-4 text-success" />
-              </div>
-            )}
-
-            <Button
-              onClick={() => uploadedFile && processCV(uploadedFile)}
-              disabled={
-                !uploadedFile ||
-                isProcessing ||
-                !preferences.language ||
-                !preferences.targetPosition ||
-                !preferences.relocation
-              }
-              className="w-full"
-            >
-              {isProcessing ? (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2 animate-spin" />
-                  Procesando tu CV... (puede tardar más de 1 minuto)
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Generar CV Optimizado
-                </>
-              )}
-            </Button>
-
-            {/* Botón para limpiar y procesar un nuevo CV */}
-            {currentResult && (
-              <Button onClick={resetState} variant="outline" className="w-full">
-                <Upload className="w-4 h-4 mr-2" />
-                Procesar Nuevo CV
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Templates Section */}
-      <TemplatesSection />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

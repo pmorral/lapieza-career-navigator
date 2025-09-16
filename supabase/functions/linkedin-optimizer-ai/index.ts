@@ -336,22 +336,34 @@ CRITICAL EXTRACTION REQUIREMENTS:
    - **ALL achievements with numbers and metrics** from each position
    - **ALL education and certifications** mentioned
    - **ALL skills (technical and soft skills)** listed anywhere
-   - **ALL volunteer work or additional activities**
-4. **EXPERIENCE EXTRACTION**: 
+   - **ALL volunteer work or additional activities** (only if the profile has limited professional experience)
+4. **VOLUNTEER WORK LOGIC**: 
+   - If the profile shows 3+ years of solid professional experience across multiple roles, OMIT the volunteer section entirely
+   - If the profile shows extensive professional achievements and projects, OMIT the volunteer section
+   - Only include volunteer work for profiles with limited professional experience (junior level, career changers, or recent graduates)
+   - When omitting volunteer work, set the volunteer field to null or empty string
+5. **EXPERIENCE EXTRACTION**: 
    - If the CV mentions 3 jobs, create 3 separate experience entries
    - If the CV mentions 5 jobs, create 5 separate experience entries
    - If the CV mentions 10 jobs, create 10 separate experience entries
    - **EVERY SINGLE JOB** mentioned in the CV must have its own entry
-5. **NO INFORMATION LEFT BEHIND**: If the CV mentions 5 jobs, include all 5. If it lists 20 technologies, include all 20.
-6. **COMBINE ALL SOURCES**: If both CVs are provided, merge ALL information from both sources to create the most complete profile possible.
-7. **USE ONLY REAL DATA**: Base everything on the actual information provided - do not create fictional content.
+6. **NO INFORMATION LEFT BEHIND**: If the CV mentions 5 jobs, include all 5. If it lists 20 technologies, include all 20.
+7. **COMBINE ALL SOURCES**: If both CVs are provided, merge ALL information from both sources to create the most complete profile possible.
+8. **USE ONLY REAL DATA**: Base everything on the actual information provided - do not create fictional content.
 
 MANDATORY: All sections must have valid and complete content. DO NOT leave any section empty or with generic text.
 
 Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and ${secondaryLanguage.toUpperCase()} with the following JSON format:
 {
   "${primaryLanguage === "Spanish" ? "spanish" : "english"}": {
-    "headline": "professional headline max 220 characters, optimized with industry keywords",
+    "headline": "Use only strategic keywords (positions, technologies, tools, industries, skills) or keywords a recruiter would use to search for your profile.
+Don't use long phrases like "Passionate about" or "Focused on."
+Each title should be optimized for recruiter searches, using relevant keywords.
+Maximum 220 characters.
+Example of expected style:
+- Tech Recruiter | IT Talent Acquisition | Recruiting Across LATAM | Psychologist | ETA | Full-Cycle Recruiting | HR People
+- Business Intelligence | Data Analytics | Business Analyst | SQL | Python | BI Energy | Excel |
+- Marketing Analytics | Digital Data | Google Analytics | SQL | BI Tools | Enterprise Meta Suite | Google Ads,
     "summary": "professional summary 3-4 paragraphs (max 2600 characters) with strategic emojis, including value proposition, key experience, quantified achievements and call-to-action",
     "experiences": [
       {
@@ -365,12 +377,19 @@ Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and $
     "skills": ["ALL technical and soft skills mentioned in the CV analysis - include every technology, tool, framework, and skill mentioned"],
     "certifications": "professional certifications with dates, institutions and industry relevance (minimum 80 characters)",
     "projects": "featured professional projects with measurable results, technologies used and impact (minimum 120 characters)",
-    "volunteer": "volunteer experience demonstrating leadership, values and transferable skills (minimum 80 characters)",
+    "volunteer": "volunteer experience demonstrating leadership, values and transferable skills (minimum 80 characters) - OMIT if profile has extensive professional experience",
     "accomplishments": "specific achievements, awards, recognition, publications or relevant presentations (minimum 80 characters)",
     "interests": "professional interests that complement profile and show passion for the industry (minimum 60 characters)"
   },
   "${primaryLanguage === "Spanish" ? "spanish" : "english"}": {
-    "headline": "titular profesional de máximo 220 caracteres, optimizado con palabras clave del sector",
+    "headline": "Usa solo palabras clave estratégicas (puestos, tecnologías, herramientas, industrias, skills) o palabras clave con las que un reclutador buscaría al perfil.
+  No uses frases largas como “Apasionado por” o “Enfocado en”.
+  Cada headline debe estar optimizado para búsquedas de reclutadores, usando keywords relevantes.
+  Máximo 220 caracteres.
+  Ejemplo de estilo esperado:
+  - Tech Recruiter | IT Talent Aquisition | Recruiting throughout LATAM | Psychologist | ATS | Full Cycle Recruitment | HR People
+  - Business Intelligence | Data Analytics | Business Analyst | SQL | Python | Power BI  | Excel |
+  - Marketing Analytics | Digital Data | Google Analytics | SQL | BI Tools  | Meta Business Suite | Google Ads",
     "summary": "resumen profesional de 3-4 párrafos (máximo 2600 caracteres) con emojis estratégicos, que incluya propuesta de valor, experiencia clave, logros cuantificados y call-to-action",
     "experiences": [
       {
@@ -384,7 +403,7 @@ Generate professional LinkedIn content in ${primaryLanguage.toUpperCase()} and $
     "skills": ["TODAS las habilidades técnicas y blandas mencionadas en el análisis del CV - incluir cada tecnología, herramienta, framework y habilidad mencionada"],
     "certifications": "certificaciones profesionales con fechas, instituciones y relevancia para el sector (mínimo 80 caracteres)",
     "projects": "proyectos profesionales destacados con resultados medibles, tecnologías usadas e impacto (mínimo 120 caracteres)",
-    "volunteer": "experiencia de voluntariado que demuestre liderazgo, valores y habilidades transferibles (mínimo 80 caracteres)",
+    "volunteer": "experiencia de voluntariado que demuestre liderazgo, valores y habilidades transferibles (mínimo 80 caracteres) - OMITIR si el perfil tiene experiencia profesional extensa",
     "accomplishments": "logros específicos, premios, reconocimientos, publicaciones o presentaciones relevantes (mínimo 80 caracteres)",
     "interests": "intereses profesionales que complementen el perfil y muestren pasión por el sector (mínimo 60 caracteres)"
   },
@@ -417,7 +436,7 @@ FINAL EXTRACTION CHECKLIST:
 - Did I include ALL achievements with specific numbers?
 - Did I include ALL education and certifications?
 - Did I include ALL skills (both technical and soft skills)?
-- Did I include ALL volunteer work or additional activities?
+- Did I evaluate if volunteer work should be included based on professional experience level?
 - Did I combine information from both CVs if both were provided?
 
 Content must be specific to the analyzed profile, not generic. Infer the professional sector and adapt all content accordingly.`;

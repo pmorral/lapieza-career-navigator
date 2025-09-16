@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { CouponInput } from "./CouponInput";
 import { useAuth } from "@/contexts/AuthContext";
-import { TrialAIInterview } from "./TrialAIInterview";
+import TrialAIInterview from "./TrialAIInterview";
 
 // Tipado mínimo para el cupón aplicado
 type AppliedCoupon = {
@@ -381,19 +381,19 @@ export const PaymentPage = () => {
                     setSelectedPlan(plan.id);
                   }}
                 >
-                {plan.popular && plan.id !== "trial" && (
-                  <div className="absolute -top-3 left-4 right-4 flex gap-2">
-                    <Badge className="bg-primary text-primary-foreground flex-1 text-center">
-                      <Star className="w-3 h-3 mr-1" />
-                      Más Popular
-                    </Badge>
-                    {plan.originalPrice > plan.price && (
-                      <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-bounce">
-                        OFERTA LIMITADA
+                  {plan.popular && plan.id !== "trial" && (
+                    <div className="absolute -top-3 left-4 right-4 flex gap-2">
+                      <Badge className="bg-primary text-primary-foreground flex-1 text-center">
+                        <Star className="w-3 h-3 mr-1" />
+                        Más Popular
                       </Badge>
-                    )}
-                  </div>
-                )}
+                      {plan.originalPrice > plan.price && (
+                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-bounce">
+                          OFERTA LIMITADA
+                        </Badge>
+                      )}
+                    </div>
+                  )}
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div>

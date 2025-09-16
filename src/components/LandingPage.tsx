@@ -1,4 +1,5 @@
 import { useState } from "react";
+import videoDemo from "../assets/team/video.mp4";
 import {
   Check,
   Star,
@@ -38,7 +39,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { TrialAIInterview } from "./TrialAIInterview";
+import TrialAIInterview from "./TrialAIInterview";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function LandingPage() {
@@ -236,7 +237,10 @@ export function LandingPage() {
             </h1>
 
             <p className="text-base md:text-xl lg:text-2xl mb-6 md:mb-8 text-gray-700 max-w-3xl mx-auto">
-              El mercado laboral cambió. Tú también puedes hacerlo. Con el Programa 360 de Academy by LaPieza tendrás la estrategia, acompañamiento y herramientas para destacar donde otros se quedan atrás.
+              El mercado laboral cambió. Tú también puedes hacerlo. Con el
+              Programa 360 de Academy by LaPieza tendrás la estrategia,
+              acompañamiento y herramientas para destacar donde otros se quedan
+              atrás.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 md:gap-6 mb-6 md:mb-8 justify-center">
@@ -284,14 +288,14 @@ export function LandingPage() {
                   trialSection?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
-                 Prueba Gratis
+                Prueba Gratis
                 <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/register")}
               >
                 Regístrate
               </Button>
@@ -338,10 +342,15 @@ export function LandingPage() {
           <Card className="text-center hover:shadow-lg transition-shadow group cursor-pointer max-w-2xl mx-auto">
             <CardHeader className="pb-4 p-4 md:p-6">
               <div className="relative mb-4">
-                <div className="w-full h-48 md:h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
-                  <div className="w-16 h-16 md:w-20 md:h-20 bg-primary/20 rounded-full flex items-center justify-center">
-                    <Play className="w-8 h-8 md:w-10 md:h-10 text-primary ml-1 md:ml-2" />
-                  </div>
+                <div className="w-full h-80 md:h-80 rounded-lg overflow-hidden">
+                  <video
+                    src={videoDemo}
+                    loop
+                    controls
+                    className="w-full h-full object-cover"
+                  >
+                    Tu navegador no soporta la reproducción de video.
+                  </video>
                 </div>
                 <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs">
                   Video Demo
@@ -370,7 +379,7 @@ export function LandingPage() {
               De frustración a claridad: así es el antes y el después
             </h3>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             <Card className="border-destructive/20 bg-destructive/5">
               <CardHeader>
@@ -381,11 +390,12 @@ export function LandingPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Enviar decenas de CVs sin respuesta, entrevistas poco claras, ansiedad y falta de dirección.
+                  Enviar decenas de CVs sin respuesta, entrevistas poco claras,
+                  ansiedad y falta de dirección.
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card className="border-success/20 bg-success/5">
               <CardHeader>
                 <CardTitle className="text-success flex items-center gap-2">
@@ -395,7 +405,8 @@ export function LandingPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Un método probado para diseñar tu perfil, encontrar vacantes ocultas, avanzar en entrevistas y negociar mejores ofertas.
+                  Un método probado para diseñar tu perfil, encontrar vacantes
+                  ocultas, avanzar en entrevistas y negociar mejores ofertas.
                 </p>
               </CardContent>
             </Card>
@@ -412,9 +423,10 @@ export function LandingPage() {
                 No es teoría, es experiencia real
               </h3>
               <p className="text-base md:text-lg text-muted-foreground mb-8">
-                Desde 2020 hemos acompañado a +450 profesionales en Latinoamérica.
+                Desde 2020 hemos acompañado a +450 profesionales en
+                Latinoamérica.
               </p>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
                 <div className="flex items-center gap-3 bg-primary/10 rounded-lg p-4">
                   <span className="text-2xl">👉</span>
@@ -425,13 +437,16 @@ export function LandingPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 bg-primary/10 rounded-lg p-4">
                   <span className="text-2xl">👉</span>
                   <div className="text-left">
-                    <div className="font-bold text-lg text-foreground">Muchos</div>
+                    <div className="font-bold text-lg text-foreground">
+                      Muchos
+                    </div>
                     <div className="text-sm text-muted-foreground">
-                      accedieron a empleos mejor pagados y alineados con sus metas
+                      accedieron a empleos mejor pagados y alineados con sus
+                      metas
                     </div>
                   </div>
                 </div>
@@ -574,11 +589,14 @@ export function LandingPage() {
               Qué lograrás con el programa
             </h3>
             <p className="text-lg text-muted-foreground mb-6">
-              El Programa 360 no termina cuando aceptas una oferta: tendrás un sistema y herramientas que podrás usar a lo largo de tu carrera. Desde crear un CV que supera filtros, hasta practicar entrevistas, negociar ofertas y mantenerte competitivo.
+              El Programa 360 no termina cuando aceptas una oferta: tendrás un
+              sistema y herramientas que podrás usar a lo largo de tu carrera.
+              Desde crear un CV que supera filtros, hasta practicar entrevistas,
+              negociar ofertas y mantenerte competitivo.
             </p>
             <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 mb-8">
               <p className="text-xl font-semibold text-foreground flex items-center justify-center gap-2">
-                 💼 Un programa que cambia tu presente para diseñar tu futuro.
+                💼 Un programa que cambia tu presente para diseñar tu futuro.
               </p>
             </div>
           </div>
@@ -612,7 +630,7 @@ export function LandingPage() {
                   if (user) {
                     navigate("/dashboard");
                   } else {
-                    navigate("/login");
+                    navigate("/register");
                   }
                 }}
               >

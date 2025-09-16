@@ -17,9 +17,12 @@ serve(async (req) => {
 
     if (!email || !password) {
       return new Response(
-        JSON.stringify({ error: "email and password are required" }),
+        JSON.stringify({
+          success: false,
+          error: "email and password are required",
+        }),
         {
-          status: 400,
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
@@ -41,10 +44,43 @@ serve(async (req) => {
     });
 
     if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      console.error("Error creating user:", error);
+
+      // Detectar si el usuario ya existe
+      const errorMessage = error.message.toLowerCase();
+      if (
+        errorMessage.includes("already registered") ||
+        errorMessage.includes("user already exists") ||
+        errorMessage.includes("already exists") ||
+        errorMessage.includes("duplicate") ||
+        errorMessage.includes("email already") ||
+        error.code === "user_already_exists"
+      ) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            user_exists: true,
+            error: "User already registered",
+            code: "USER_ALREADY_EXISTS",
+            message: "Este email ya está registrado en nuestra plataforma",
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: error.message,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     // Crear o actualizar el perfil del usuario con WhatsApp
@@ -75,9 +111,15 @@ serve(async (req) => {
     );
   } catch (e) {
     console.error("admin-signup error:", e);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Internal server error",
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   }
 });

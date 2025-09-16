@@ -324,11 +324,11 @@ Responde EXACTAMENTE en el siguiente formato JSON (NO agregues secciones adicion
     "skills": {
       "hardSkills": {
         "Habilidad técnica 1": "Nivel (Básico/Intermedio/Avanzado)",
-        "Habilidad técnica 2": "Nivel"
-      },
+        "Habilidad técnica 2": "Nivel",
+      } , // toma en cuenta todas las skills técnicas que haya en el CV
       "softSkills": {
         "Habilidad blanda 1": "Nivel (Bajo/Medio/Alto)",
-        "Habilidad blanda 2": "Nivel"
+        "Habilidad blanda 2": "Nivel",
       }
     },
     "projects": [

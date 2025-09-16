@@ -2,8 +2,21 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Key, ArrowLeft, CheckCircle, Clock, RefreshCw } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Mail,
+  Key,
+  ArrowLeft,
+  CheckCircle,
+  Clock,
+  RefreshCw,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -13,7 +26,11 @@ interface TrialEmailVerificationProps {
   onBack: () => void;
 }
 
-export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }: TrialEmailVerificationProps) => {
+const TrialEmailVerification = ({
+  email,
+  onVerificationSuccess,
+  onBack,
+}: TrialEmailVerificationProps) => {
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
@@ -23,9 +40,12 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
   const sendVerificationCode = async () => {
     setIsSendingCode(true);
     try {
-      const { data, error } = await supabase.functions.invoke("send-verification-code", {
-        body: { email, type: "trial_interview" }
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "send-verification-code",
+        {
+          body: { email, type: "trial_interview" },
+        }
+      );
 
       if (error) {
         toast.error(`Error al enviar código: ${error.message}`);
@@ -35,7 +55,7 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
       toast.success("Código de verificación enviado a tu email");
       setCodeSent(true);
       setCountdown(60); // 60 seconds countdown
-      
+
       // Start countdown
       const interval = setInterval(() => {
         setCountdown((prev) => {
@@ -46,7 +66,6 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
           return prev - 1;
         });
       }, 1000);
-
     } catch (error) {
       toast.error("Error al enviar código de verificación");
     } finally {
@@ -63,7 +82,7 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("verify-code", {
-        body: { email, code: verificationCode, type: "trial_interview" }
+        body: { email, code: verificationCode, type: "trial_interview" },
       });
 
       if (error) {
@@ -73,7 +92,6 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
 
       toast.success("¡Email verificado exitosamente!");
       onVerificationSuccess();
-
     } catch (error) {
       toast.error("Error al verificar el código");
     } finally {
@@ -99,11 +117,11 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
           <span className="font-medium text-foreground">{email}</span>
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {!codeSent ? (
-          <Button 
-            onClick={sendVerificationCode} 
+          <Button
+            onClick={sendVerificationCode}
             disabled={isSendingCode}
             className="w-full"
           >
@@ -140,8 +158,8 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
               </p>
             </div>
 
-            <Button 
-              onClick={verifyCode} 
+            <Button
+              onClick={verifyCode}
               disabled={isLoading || !verificationCode.trim()}
               className="w-full"
             >
@@ -182,11 +200,7 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
         )}
 
         <div className="pt-4 border-t">
-          <Button
-            variant="outline"
-            onClick={onBack}
-            className="w-full"
-          >
+          <Button variant="outline" onClick={onBack} className="w-full">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
           </Button>
@@ -195,3 +209,5 @@ export const TrialEmailVerification = ({ email, onVerificationSuccess, onBack }:
     </Card>
   );
 };
+
+export default TrialEmailVerification;

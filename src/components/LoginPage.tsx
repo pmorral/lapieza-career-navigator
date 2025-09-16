@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  ArrowRight,
-  MessageCircle,
-  Phone,
-} from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,19 +11,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [name, setName] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-  const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -51,96 +37,30 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast({
+          title: "Error al iniciar sesión",
+          description: error.message,
+          variant: "destructive",
+        });
+        setLoading(false);
+      } else {
+        setIsAuthenticating(true);
+        toast({
+          title: "¡Bienvenido!",
+          description: "Has iniciado sesión correctamente",
         });
 
-        if (error) {
-          toast({
-            title: "Error al iniciar sesión",
-            description: error.message,
-            variant: "destructive",
-          });
-          setLoading(false);
-        } else {
-          setIsAuthenticating(true);
-          toast({
-            title: "¡Bienvenido!",
-            description: "Has iniciado sesión correctamente",
-          });
-
-          // Esperar un momento para mostrar el loader y luego recargar
-          setTimeout(() => {
-            // Recargar la página para que el AuthContext se actualice correctamente
-            window.location.href = from;
-          }, 1500);
-        }
-      } else {
-        if (password !== confirmPassword) {
-          toast({
-            title: "Error",
-            description: "Las contraseñas no coinciden",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        if (!acceptTerms) {
-          toast({
-            title: "Error",
-            description: "Debes aceptar los términos y condiciones",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Crear el usuario sin verificación por email usando función admin-signup
-        const { data, error } = await supabase.functions.invoke(
-          "admin-signup",
-          {
-            body: {
-              email,
-              password,
-              full_name: name,
-              whatsapp: whatsapp,
-            },
-          }
-        );
-
-        if (error || !data?.success) {
-          toast({
-            title: "Error al crear cuenta",
-            description: error?.message || "No se pudo crear la cuenta",
-            variant: "destructive",
-          });
-        } else {
-          // Iniciar sesión automáticamente y redirigir a /payment
-          const { error: signInError } = await supabase.auth.signInWithPassword(
-            {
-              email,
-              password,
-            }
-          );
-
-          if (signInError) {
-            toast({
-              title: "Error al iniciar sesión",
-              description: signInError.message,
-              variant: "destructive",
-            });
-            return;
-          }
-
-          toast({
-            title: "¡Cuenta creada!",
-            description: "Completa tu membresía para activar tu acceso",
-          });
-
-          // Forzar recarga para que AuthProvider detecte la nueva sesión
-          window.location.href = "/payment";
-        }
+        // Esperar un momento para mostrar el loader y luego recargar
+        setTimeout(() => {
+          // Recargar la página para que el AuthContext se actualice correctamente
+          window.location.href = from;
+        }, 1500);
       }
     } catch (error) {
       toast({
@@ -197,55 +117,21 @@ export function LoginPage() {
             />
           </div>
           <p className="text-muted-foreground">
-            {isLogin ? "Inicia sesión para acceder" : "Crea tu cuenta"}
+            Inicia sesión para acceder a tu cuenta
           </p>
         </div>
 
         <Card className="shadow-card">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">
-              {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+              Iniciar Sesión
             </CardTitle>
             <CardDescription className="text-center">
-              {isLogin
-                ? "Ingresa tus credenciales para acceder a tu cuenta"
-                : "Completa tus datos para crear tu cuenta."}
+              Ingresa tus credenciales para acceder a tu cuenta
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nombre completo</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Tu nombre completo"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-              )}
-
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="whatsapp">WhatsApp</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="whatsapp"
-                      type="tel"
-                      placeholder="+52 55 1234 5678"
-                      className="pl-10"
-                      value={whatsapp}
-                      onChange={(e) => setWhatsapp(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
               <div className="space-y-2">
                 <Label htmlFor="email">Correo electrónico</Label>
                 <div className="relative">
@@ -289,81 +175,15 @@ export function LoginPage() {
                 </div>
               </div>
 
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="confirmPassword"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Confirma tu contraseña"
-                      className="pl-10"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              {!isLogin && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="terms"
-                      checked={acceptTerms}
-                      onCheckedChange={(checked: boolean | "indeterminate") => {
-                        if (checked === true || checked === false) {
-                          setAcceptTerms(checked);
-                        }
-                      }}
-                    />
-                    <Label
-                      htmlFor="terms"
-                      className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Acepto los{" "}
-                      <a
-                        href="/terms-conditions"
-                        target="_blank"
-                        className="text-primary hover:underline"
-                      >
-                        términos y condiciones
-                      </a>
-                    </Label>
-                  </div>
-                </div>
-              )}
-
-              {isLogin && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleForgotPassword}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </button>
-                </div>
-              )}
-
-              {!isLogin && (
-                <Button
+              <div className="flex justify-end">
+                <button
                   type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() =>
-                    window.open(
-                      "https://wa.me/+523337872943?text=Hola%20equipo%20de%20Academy%2C%20tengo%20dudas%20sobre%20mi%20registro%20y%20membres%C3%ADa",
-                      "_blank"
-                    )
-                  }
+                  onClick={handleForgotPassword}
+                  className="text-sm text-primary hover:underline"
                 >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Habla con un asesor por WhatsApp
-                </Button>
-              )}
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
 
               <Button
                 type="submit"
@@ -372,25 +192,19 @@ export function LoginPage() {
                 size="lg"
                 disabled={loading}
               >
-                {loading
-                  ? "Procesando..."
-                  : isLogin
-                  ? "Iniciar Sesión"
-                  : "Crear Cuenta"}
+                {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
                 {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
               </Button>
             </form>
 
             <div className="text-center text-sm">
-              <span className="text-muted-foreground">
-                {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}
-              </span>{" "}
+              <span className="text-muted-foreground">¿No tienes cuenta?</span>{" "}
               <button
                 type="button"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => navigate("/register")}
                 className="text-primary hover:underline font-medium"
               >
-                {isLogin ? "Crear cuenta" : "Accede aquí"}
+                Crear cuenta
               </button>
             </div>
 

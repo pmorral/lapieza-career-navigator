@@ -10,9 +10,10 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { LandingPage } from "./components/LandingPage";
-import { Dashboard } from "./components/Dashboard";
+import { Dashboard, DashboardWithWhatsApp } from "./components/Dashboard";
 import { PaymentPage } from "./components/PaymentPage";
 import { LoginPage } from "./components/LoginPage";
+import { RegisterPage } from "./components/RegisterPage";
 import { ForgotPassword } from "./components/ForgotPassword";
 import { ResetPassword } from "./components/ResetPassword";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -60,6 +61,15 @@ const AppRoutes = () => {
         }
       />
 
+      <Route
+        path="/register"
+        element={
+          <PublicRoute user={user}>
+            <RegisterPage />
+          </PublicRoute>
+        }
+      />
+
       {/* Ruta para olvidar contraseña - pública */}
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
@@ -94,7 +104,7 @@ const AppRoutes = () => {
             path="/dashboard"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard />
+                <DashboardWithWhatsApp />
               </ProtectedRoute>
             }
           />
@@ -104,7 +114,7 @@ const AppRoutes = () => {
             path="/dashboard/overview"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="overview" />
+                <DashboardWithWhatsApp defaultSection="overview" />
               </ProtectedRoute>
             }
           />
@@ -113,7 +123,7 @@ const AppRoutes = () => {
             path="/dashboard/interviews"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="interviews" />
+                <DashboardWithWhatsApp defaultSection="interviews" />
               </ProtectedRoute>
             }
           />
@@ -122,7 +132,7 @@ const AppRoutes = () => {
             path="/dashboard/cv-boost"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="cv-boost" />
+                <DashboardWithWhatsApp defaultSection="cv-boost" />
               </ProtectedRoute>
             }
           />
@@ -131,7 +141,7 @@ const AppRoutes = () => {
             path="/dashboard/linkedin"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="linkedin" />
+                <DashboardWithWhatsApp defaultSection="linkedin" />
               </ProtectedRoute>
             }
           />
@@ -140,7 +150,7 @@ const AppRoutes = () => {
             path="/dashboard/job-tracker"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="job-tracker" />
+                <DashboardWithWhatsApp defaultSection="job-tracker" />
               </ProtectedRoute>
             }
           />
@@ -149,7 +159,7 @@ const AppRoutes = () => {
             path="/dashboard/learning"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="learning" />
+                <DashboardWithWhatsApp defaultSection="learning" />
               </ProtectedRoute>
             }
           />
@@ -158,7 +168,7 @@ const AppRoutes = () => {
             path="/dashboard/automated-messages"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="automated-messages" />
+                <DashboardWithWhatsApp defaultSection="automated-messages" />
               </ProtectedRoute>
             }
           />
@@ -167,7 +177,7 @@ const AppRoutes = () => {
             path="/dashboard/services"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="services" />
+                <DashboardWithWhatsApp defaultSection="services" />
               </ProtectedRoute>
             }
           />
@@ -176,7 +186,7 @@ const AppRoutes = () => {
             path="/dashboard/profile"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="profile" />
+                <DashboardWithWhatsApp defaultSection="profile" />
               </ProtectedRoute>
             }
           />
@@ -185,7 +195,7 @@ const AppRoutes = () => {
             path="/dashboard/membership"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="membership" />
+                <DashboardWithWhatsApp defaultSection="membership" />
               </ProtectedRoute>
             }
           />
@@ -194,7 +204,7 @@ const AppRoutes = () => {
             path="/dashboard/payment"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="payment" />
+                <DashboardWithWhatsApp defaultSection="payment" />
               </ProtectedRoute>
             }
           />
@@ -203,7 +213,7 @@ const AppRoutes = () => {
             path="/dashboard/settings"
             element={
               <ProtectedRoute user={user}>
-                <Dashboard defaultSection="settings" />
+                <DashboardWithWhatsApp defaultSection="settings" />
               </ProtectedRoute>
             }
           />

@@ -12,6 +12,8 @@ import {
   CreditCard,
   Mail,
   RefreshCw,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +26,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -74,51 +77,11 @@ export function MockInterviews() {
   const [isLoadingResponses, setIsLoadingResponses] = useState(false);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const [isAnalyzingExpanded, setIsAnalyzingExpanded] = useState(true);
+  const [activeTab, setActiveTab] = useState("new");
+  const [expandedInterviews, setExpandedInterviews] = useState<Set<string>>(
+    new Set()
+  );
   const { toast } = useToast();
-  const [interviews, setInterviews] = useState<InterviewSession[]>([
-    {
-      id: "1",
-      jobTitle: "Senior Frontend Developer",
-      company: "Tech Corp",
-      date: "2024-01-15",
-      duration: "25 min",
-      score: 85,
-      feedback:
-        "Conocimiento técnico sólido demostrado. Buenas habilidades de comunicación. Confiado al explicar conceptos complejos.",
-      improvements: [
-        "Practice behavioral questions more",
-        "Prepare specific examples for leadership scenarios",
-        "Work on concise answers",
-      ],
-      status: "completed",
-      recordingUrl: "https://example-interview-recording.com/session1.mp3",
-      betterAnswers: [
-        "Para la pregunta 'Háblame de ti', podrías estructurar mejor tu respuesta siguiendo esta guía: 'Soy un desarrollador frontend con 5 años de experiencia especializado en React y TypeScript. En mi trabajo actual en Tech Corp, lidero un equipo de 3 desarrolladores y hemos mejorado el rendimiento de la aplicación en un 40%. Busco nuevos desafíos donde pueda aplicar mi experiencia en arquitectura frontend y mentoría.'",
-        "Cuando te pregunten sobre debugging, proporciona un ejemplo específico: 'Recientemente enfrenté un bug de memoria en nuestra SPA. Utilicé Chrome DevTools para identificar memory leaks, implementé lazy loading para componentes pesados y reduje el uso de memoria en un 60%. Documenté el proceso para el equipo.'",
-      ],
-    },
-    {
-      id: "2",
-      jobTitle: "Full Stack Engineer",
-      company: "StartupXYZ",
-      date: "2024-01-10",
-      duration: "30 min",
-      score: 78,
-      feedback:
-        "Enfoque sólido para resolver problemas. Buen entendimiento del diseño de sistemas. Entusiasta y comprometido.",
-      improvements: [
-        "Improve answer structure (STAR method)",
-        "Practice coding questions out loud",
-        "Research company culture better",
-      ],
-      status: "completed",
-      recordingUrl: "https://example-interview-recording.com/session2.mp3",
-      betterAnswers: [
-        "Para proyectos desafiantes, usa STAR: 'Situación: Nuestro e-commerce tenía problemas de rendimiento. Tarea: Optimizar la velocidad de carga. Acción: Implementé code splitting, optimicé imágenes y usé service workers. Resultado: Redujimos el tiempo de carga en 50% y aumentamos la conversión en 15%.'",
-        "Al hablar de tecnologías, sé específico: 'Sigo blogs como CSS-Tricks, participo en comunidades de React, y dedico 2 horas semanales a experimentar con nuevas herramientas. Recientemente exploré Vite para builds más rápidos en nuestros proyectos.'",
-      ],
-    },
-  ]);
 
   const getSumaryEs = (summary: any): string => {
     return (
@@ -227,6 +190,7 @@ export function MockInterviews() {
         ])
         .order("created_at", { ascending: false })
         .limit(1);
+      console.log("📊 Pending interviews:", pendingInterviews);
 
       if (error) {
         console.error("Error fetching pending interviews:", error);
@@ -278,7 +242,7 @@ export function MockInterviews() {
       // First get all interviews for the user
       const { data: userInterviews, error: interviewsError } = await supabase
         .from("interviews" as any)
-        .select("id, candidate_id, interview_id")
+        .select("id, candidate_id, interview_id, job_title")
         .eq("user_id", user.id);
 
       if (interviewsError) {
@@ -309,7 +273,18 @@ export function MockInterviews() {
         return;
       }
 
-      setInterviewResponses(responses || []);
+      // Combine interview data with responses to include job_title
+      const responsesWithJobTitle = (responses || []).map((response: any) => {
+        const interview = userInterviews.find(
+          (interview: any) => interview.candidate_id === response.candidate_id
+        );
+        return {
+          ...response,
+          job_title: (interview as any)?.job_title || "Sin título",
+        };
+      });
+
+      setInterviewResponses(responsesWithJobTitle);
     } catch (error) {
       console.error("Error in fetchInterviewResponses:", error);
     } finally {
@@ -326,6 +301,35 @@ export function MockInterviews() {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  // Función para verificar si hay entrevistas pendientes
+  const hasPendingInterviews = () => {
+    if (!pendingInterview) return false;
+    const pendingStatuses = [
+      "creating",
+      "processing",
+      "created-pending",
+      "analyzing-interview",
+    ];
+    return pendingStatuses.includes(pendingInterview.status);
+  };
+
+  // Funciones para manejar colapso/expansión de entrevistas
+  const toggleInterviewExpansion = (interviewId: string) => {
+    setExpandedInterviews((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(interviewId)) {
+        newSet.delete(interviewId);
+      } else {
+        newSet.add(interviewId);
+      }
+      return newSet;
+    });
+  };
+
+  const isInterviewExpanded = (interviewId: string) => {
+    return expandedInterviews.has(interviewId);
   };
 
   const startInterview = async () => {
@@ -487,962 +491,1009 @@ export function MockInterviews() {
         </div>
       </div>
 
-      {/* Interview Setup - Show when user has available credits */}
-      {totalInterviews < interviewCredits && (
-        <Card id="interview-setup" className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-primary" />
-              Start AI Interview
-            </CardTitle>
-            <CardDescription>
-              Puedes crear múltiples entrevistas simultáneamente. Cada una
-              contará como un crédito de tu plan.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="text-base font-medium">
-                Idioma de la entrevista *
-              </Label>
-              <RadioGroup
-                value={language}
-                onValueChange={setLanguage}
-                className="mt-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="spanish" id="spanish" />
-                  <Label htmlFor="spanish">Español</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="english" id="english" />
-                  <Label htmlFor="english">Inglés</Label>
-                </div>
-              </RadioGroup>
-            </div>
+      {/* Tabs para Nueva Entrevista e Historial */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="new">Nueva Entrevista</TabsTrigger>
+          <TabsTrigger value="history">Historial</TabsTrigger>
+        </TabsList>
 
-            <div>
-              <Label htmlFor="cv-upload">Subir CV (Opcional)</Label>
-              <div className="mt-2 space-y-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="cv-upload"
-                />
-
-                {!uploadedCV ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-20 border-dashed"
-                  >
-                    <div className="text-center">
-                      <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        Haz clic para subir tu CV (PDF, máximo 2MB)
-                      </p>
-                    </div>
-                  </Button>
-                ) : (
-                  <div className="flex items-center justify-between p-3 bg-accent rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-medium">
-                        {uploadedCV.name}
-                      </span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={removeCV}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+        {/* Tab de Nueva Entrevista */}
+        <TabsContent value="new" className="space-y-6">
+          {/* Mensaje cuando hay entrevistas pendientes */}
+          {hasPendingInterviews() && (
+            <div className="relative overflow-hidden rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-6">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-100/20 to-orange-100/20"></div>
+              <div className="relative flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Clock className="w-6 h-6 text-white animate-pulse" />
                   </div>
-                )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-semibold text-amber-900 mb-1">
+                    Entrevista en Proceso
+                  </h3>
+                  <p className="text-amber-700 text-sm leading-relaxed">
+                    Tienes una entrevista activa. Una vez que la completes o
+                    termine el análisis, podrás crear una nueva entrevista.
+                  </p>
+                  <div className="mt-3 flex items-center gap-2 text-xs text-amber-600">
+                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                    <span>Procesando en segundo plano</span>
+                  </div>
+                </div>
               </div>
             </div>
+          )}
 
-            <div>
-              <Label htmlFor="job-title">Título del puesto *</Label>
-              <Textarea
-                id="job-title"
-                placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                rows={1}
-                className="mt-2"
-              />
-            </div>
+          {/* Interview Setup - Show when user has available credits */}
+          {totalInterviews < interviewCredits && !hasPendingInterviews() && (
+            <Card id="interview-setup" className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                  Start AI Interview
+                </CardTitle>
+                <CardDescription>
+                  Puedes crear múltiples entrevistas simultáneamente. Cada una
+                  contará como un crédito de tu plan.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-base font-medium">
+                    Idioma de la entrevista *
+                  </Label>
+                  <RadioGroup
+                    value={language}
+                    onValueChange={setLanguage}
+                    className="mt-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="spanish" id="spanish" />
+                      <Label htmlFor="spanish">Español</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="english" id="english" />
+                      <Label htmlFor="english">Inglés</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
 
-            <div>
-              <Label htmlFor="job-description">Job Description *</Label>
-              <Textarea
-                id="job-description"
-                placeholder="Paste the job description here..."
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                rows={6}
-                className="mt-2"
-              />
-            </div>
+                <div>
+                  <Label htmlFor="cv-upload">Subir CV (Opcional)</Label>
+                  <div className="mt-2 space-y-3">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      id="cv-upload"
+                    />
 
-            <div className="flex gap-2">
-              <Button
-                onClick={startInterview}
-                disabled={
-                  !jobTitle.trim() ||
-                  !jobDescription.trim() ||
-                  !language ||
-                  !uploadedCV ||
-                  !user ||
-                  isSubmitting
-                }
-                variant="professional"
-                className="flex-1"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                {isSubmitting
-                  ? "Enviando solicitud..."
-                  : usedInterviews >= interviewCredits
-                  ? "Comprar créditos"
-                  : "Solicitar entrevista AI"}
-              </Button>
+                    {!uploadedCV ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full h-20 border-dashed"
+                      >
+                        <div className="text-center">
+                          <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground">
+                            Haz clic para subir tu CV (PDF, máximo 2MB)
+                          </p>
+                        </div>
+                      </Button>
+                    ) : (
+                      <div className="flex items-center justify-between p-3 bg-accent rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-5 h-5 text-primary" />
+                          <span className="text-sm font-medium">
+                            {uploadedCV.name}
+                          </span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={removeCV}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-              <Button
-                variant="outline"
-                onClick={clearForm}
-                disabled={isSubmitting}
-              >
-                Clear
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                <div>
+                  <Label htmlFor="job-title">Título del puesto *</Label>
+                  <Textarea
+                    id="job-title"
+                    placeholder="Ej: Frontend Developer, Data Scientist, Product Manager"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    rows={1}
+                    className="mt-2"
+                  />
+                </div>
 
-      {/* Pending Interview Alert */}
-      {pendingInterview && (
-        <Card
-          className={`shadow-card ${
-            pendingInterview.status === "analyzing-interview"
-              ? "border-blue-200 bg-blue-50"
-              : pendingInterview.status === "created-pending"
-              ? "border-green-200 bg-green-50"
-              : "border-orange-200 bg-orange-50"
-          }`}
-        >
-          <CardHeader>
-            <CardTitle
-              className={`flex items-center gap-2 ${
+                <div>
+                  <Label htmlFor="job-description">Job Description *</Label>
+                  <Textarea
+                    id="job-description"
+                    placeholder="Paste the job description here..."
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    rows={6}
+                    className="mt-2"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    onClick={startInterview}
+                    disabled={
+                      !jobTitle.trim() ||
+                      !jobDescription.trim() ||
+                      !language ||
+                      !uploadedCV ||
+                      !user ||
+                      isSubmitting
+                    }
+                    variant="professional"
+                    className="flex-1"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    {isSubmitting
+                      ? "Enviando solicitud..."
+                      : usedInterviews >= interviewCredits
+                      ? "Comprar créditos"
+                      : "Solicitar entrevista AI"}
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={clearForm}
+                    disabled={isSubmitting}
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Pending Interview Alert */}
+          {pendingInterview && (
+            <Card
+              className={`shadow-card ${
                 pendingInterview.status === "analyzing-interview"
-                  ? "text-blue-800"
+                  ? "border-blue-200 bg-blue-50"
                   : pendingInterview.status === "created-pending"
-                  ? "text-green-800"
-                  : "text-orange-800"
+                  ? "border-green-200 bg-green-50"
+                  : "border-orange-200 bg-orange-50"
               }`}
             >
-              {pendingInterview.status === "analyzing-interview" ? (
-                <>Entrevista siendo analizada</>
-              ) : pendingInterview.status === "created-pending" ? (
-                <>
-                  <Play className="w-5 h-5" />
-                  Entrevista lista para completar
-                </>
-              ) : (
-                <>
-                  <Clock className="w-5 h-5" />
-                  Entrevista en proceso
-                </>
-              )}
-            </CardTitle>
-            <CardDescription
-              className={
-                pendingInterview.status === "analyzing-interview"
-                  ? "text-blue-700"
-                  : pendingInterview.status === "created-pending"
-                  ? "text-green-700"
-                  : "text-orange-700"
-              }
-            >
-              {pendingInterview.status === "analyzing-interview"
-                ? "Tu entrevista está siendo analizada por nuestra IA. Esto puede tomar unos minutos."
-                : pendingInterview.status === "created-pending"
-                ? "Tu entrevista AI está lista. Haz clic en el enlace para comenzar."
-                : "Tienes una entrevista AI siendo creada. Por favor espera a que se complete."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p
-                    className={`font-medium ${
-                      pendingInterview.status === "analyzing-interview"
-                        ? "text-blue-800"
-                        : pendingInterview.status === "created-pending"
-                        ? "text-green-800"
-                        : "text-orange-800"
-                    }`}
-                  >
-                    {pendingInterview.job_title || "Entrevista AI"}
-                  </p>
-                  <p
-                    className={`text-sm ${
-                      pendingInterview.status === "analyzing-interview"
-                        ? "text-blue-600"
-                        : pendingInterview.status === "created-pending"
-                        ? "text-green-600"
-                        : "text-orange-600"
-                    }`}
-                  >
-                    Creada el{" "}
-                    {new Date(pendingInterview.created_at).toLocaleString()}
-                  </p>
-                </div>
-                <Badge
-                  variant="outline"
-                  className={`${
+              <CardHeader>
+                <CardTitle
+                  className={`flex items-center gap-2 ${
                     pendingInterview.status === "analyzing-interview"
-                      ? "border-blue-300 text-blue-700 bg-blue-100"
+                      ? "text-blue-800"
                       : pendingInterview.status === "created-pending"
-                      ? "border-green-300 text-green-700 bg-green-100"
-                      : "border-orange-300 text-orange-700 bg-orange-100"
+                      ? "text-green-800"
+                      : "text-orange-800"
                   }`}
                 >
-                  {pendingInterview.status === "analyzing-interview"
-                    ? "Analizando..."
-                    : pendingInterview.status === "creating"
-                    ? "Creando..."
-                    : pendingInterview.status === "processing"
-                    ? "Procesando..."
-                    : pendingInterview.status === "created-pending"
-                    ? "Lista para completar"
-                    : "Pendiente"}
-                </Badge>
-              </div>
-
-              {/* Vista específica para entrevista siendo analizada */}
-              {pendingInterview.status === "analyzing-interview" && (
-                <div className="bg-blue-100 p-4 rounded-lg border border-blue-300">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-sm font-medium text-blue-800">
-                        🧠 IA Analizando tu Entrevista
-                      </p>
-                      <p className="text-xs text-blue-600">
-                        Procesando respuestas y generando feedback
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        setIsAnalyzingExpanded(!isAnalyzingExpanded)
-                      }
-                      className="h-6 w-6 p-0 text-blue-600 hover:bg-blue-200"
-                    >
-                      {isAnalyzingExpanded ? "−" : "+"}
-                    </Button>
-                  </div>
-
-                  {isAnalyzingExpanded && (
+                  {pendingInterview.status === "analyzing-interview" ? (
+                    <>Entrevista siendo analizada</>
+                  ) : pendingInterview.status === "created-pending" ? (
                     <>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-xs text-blue-700">
-                          <span>• Analizando respuestas de audio</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-blue-700">
-                          <span>• Generando feedback personalizado</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-blue-700">
-                          <span>• Preparando recomendaciones</span>
-                        </div>
-                      </div>
-
-                      <div className="mt-3 p-2 bg-blue-200 rounded text-xs text-blue-800">
-                        <strong>⏱️ Tiempo estimado:</strong> Máximo 25 minutos
-                      </div>
-
-                      {/* Información adicional */}
-                      <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
-                        <p>
-                          <strong>💡 ¿Qué está pasando?</strong>
-                        </p>
-                        <p className="mt-1">
-                          Nuestra IA está procesando tu entrevista para:
-                        </p>
-                        <ul className="mt-1 ml-3 space-y-1">
-                          <li>• Evaluar la claridad de tus respuestas</li>
-                          <li>• Identificar áreas de mejora</li>
-                          <li>• Generar feedback personalizado</li>
-                          <li>• Crear un plan de desarrollo</li>
-                        </ul>
-                      </div>
-
-                      {/* Toggle de auto-refresh */}
-                      <div className="mt-3 flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            id="auto-refresh"
-                            checked={autoRefreshEnabled}
-                            onChange={(e) =>
-                              setAutoRefreshEnabled(e.target.checked)
-                            }
-                            className="w-3 h-3 text-blue-600 bg-blue-100 border-blue-300 rounded focus:ring-blue-500"
-                          />
-                          <label
-                            htmlFor="auto-refresh"
-                            className="text-blue-700"
-                          >
-                            Actualización automática cada 30s
-                          </label>
-                        </div>
-                        <span className="text-blue-600">
-                          {autoRefreshEnabled ? "🔄 Activado" : "⏸️ Pausado"}
-                        </span>
-                      </div>
+                      <Play className="w-5 h-5" />
+                      Entrevista lista para completar
+                    </>
+                  ) : (
+                    <>
+                      <Clock className="w-5 h-5" />
+                      Entrevista en proceso
                     </>
                   )}
-                </div>
-              )}
-
-              {/* Vista para entrevista lista */}
-              {pendingInterview.status === "created-pending" &&
-                pendingInterview.interview_url && (
-                  <div className="bg-green-100 p-4 rounded-lg border border-green-300">
-                    <p className="text-sm font-medium text-green-800 mb-2">
-                      🎯 ¡Tu entrevista está lista!
-                    </p>
-                    <Button
-                      asChild
-                      className="w-full bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      <a
-                        href={pendingInterview.interview_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Play className="w-4 h-4 mr-2" />
-                        Comenzar entrevista AI
-                      </a>
-                    </Button>
-                    <p className="text-xs text-green-600 mt-2">
-                      ⏰ La entrevista durará aproximadamente 15 minutos
-                    </p>
-                  </div>
-                )}
-
-              {/* Vista para otros estados */}
-              {pendingInterview.status !== "created-pending" &&
-                pendingInterview.status !== "analyzing-interview" && (
-                  <div className="bg-orange-100 p-3 rounded-lg">
-                    <p className="text-sm text-orange-800">
-                      <strong>Estado:</strong>{" "}
-                      {pendingInterview.api_message || "Entrevista en proceso"}
-                    </p>
-                    <p className="text-xs text-orange-600 mt-1">
-                      Recibirás un email cuando esté lista para completar.
-                    </p>
-                  </div>
-                )}
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={checkPendingInterviews}
-                disabled={isLoadingPending}
-                className={`${
-                  pendingInterview.status === "analyzing-interview"
-                    ? "border-blue-300 text-blue-700 hover:bg-blue-100"
+                </CardTitle>
+                <CardDescription
+                  className={
+                    pendingInterview.status === "analyzing-interview"
+                      ? "text-blue-700"
+                      : pendingInterview.status === "created-pending"
+                      ? "text-green-700"
+                      : "text-orange-700"
+                  }
+                >
+                  {pendingInterview.status === "analyzing-interview"
+                    ? "Tu entrevista está siendo analizada por nuestra IA. Esto puede tomar unos minutos."
                     : pendingInterview.status === "created-pending"
-                    ? "border-green-300 text-green-700 hover:bg-green-100"
-                    : "border-orange-300 text-orange-700 hover:bg-orange-100"
-                }`}
-              >
-                {isLoadingPending ? (
-                  <>
-                    <Clock className="w-4 h-4 mr-2 animate-spin" />
-                    Verificando...
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Actualizar estado
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Removed Interview in Progress - now handled by LaPieza URL */}
-
-      {/* Interview History */}
-      {interviewResponses?.length > 0 && (
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-primary" />
-              Historial de Entrevistas AI
-            </CardTitle>
-            <CardDescription>
-              Revisa tus entrevistas completadas y el análisis de IA
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingResponses ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="flex items-center gap-2">
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Cargando entrevistas...</span>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {interviewResponses.map((response) => (
-                  <div key={response.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="font-medium">
-                          Entrevista AI -{" "}
-                          {response.candidate_id?.substring(0, 8)}...
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          ID: {response.interview_id_external}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <Badge variant="outline" className="text-xs">
-                          {response.status || "Completada"}
-                        </Badge>
-                      </div>
+                    ? "Tu entrevista AI está lista. Haz clic en el enlace para comenzar."
+                    : "Tienes una entrevista AI siendo creada. Por favor espera a que se complete."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p
+                        className={`font-medium ${
+                          pendingInterview.status === "analyzing-interview"
+                            ? "text-blue-800"
+                            : pendingInterview.status === "created-pending"
+                            ? "text-green-800"
+                            : "text-orange-800"
+                        }`}
+                      >
+                        {pendingInterview.job_title || "Entrevista AI"}
+                      </p>
+                      <p
+                        className={`text-sm ${
+                          pendingInterview.status === "analyzing-interview"
+                            ? "text-blue-600"
+                            : pendingInterview.status === "created-pending"
+                            ? "text-green-600"
+                            : "text-orange-600"
+                        }`}
+                      >
+                        Creada el{" "}
+                        {new Date(pendingInterview.created_at).toLocaleString()}
+                      </p>
                     </div>
+                    <Badge
+                      variant="outline"
+                      className={`${
+                        pendingInterview.status === "analyzing-interview"
+                          ? "border-blue-300 text-blue-700 bg-blue-100"
+                          : pendingInterview.status === "created-pending"
+                          ? "border-green-300 text-green-700 bg-green-100"
+                          : "border-orange-300 text-orange-700 bg-orange-100"
+                      }`}
+                    >
+                      {pendingInterview.status === "analyzing-interview"
+                        ? "Analizando..."
+                        : pendingInterview.status === "creating"
+                        ? "Creando..."
+                        : pendingInterview.status === "processing"
+                        ? "Procesando..."
+                        : pendingInterview.status === "created-pending"
+                        ? "Lista para completar"
+                        : "Pendiente"}
+                    </Badge>
+                  </div>
 
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <span>
-                          {response.started_at && response.ended_at
-                            ? `${Math.round(
-                                (response.ended_at - response.started_at) /
-                                  60000
-                              )} min`
-                            : "Duración no disponible"}
-                        </span>
-                      </div>
-                      <span>
-                        {response.created_at
-                          ? new Date(response.created_at).toLocaleDateString()
-                          : "Fecha no disponible"}
-                      </span>
-                    </div>
-
-                    {response.summary && (
-                      <div className="mb-4">
-                        <h4 className="font-medium text-success mb-2">
-                          Resumen de la Entrevista
-                        </h4>
-                        <div className="text-sm whitespace-pre-line p-3 bg-accent rounded-lg">
-                          {getSumaryEs(response)}
+                  {/* Vista específica para entrevista siendo analizada */}
+                  {pendingInterview.status === "analyzing-interview" && (
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Clock className="w-4 h-4 text-blue-600 animate-pulse" />
                         </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-blue-800">
+                            Analizando tu entrevista
+                          </p>
+                          <p className="text-xs text-blue-600">
+                            Tiempo estimado: máximo 25 minutos
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 p-3 bg-white rounded border border-blue-100">
+                        <div className="flex items-center gap-2 text-blue-700">
+                          <Mail className="w-4 h-4" />
+                          <span className="text-sm">
+                            Te notificaremos por email cuando esté listo
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Vista para entrevista lista */}
+                  {pendingInterview.status === "created-pending" &&
+                    pendingInterview.interview_url && (
+                      <div className="bg-green-100 p-4 rounded-lg border border-green-300">
+                        <p className="text-sm font-medium text-green-800 mb-2">
+                          🎯 ¡Tu entrevista está lista!
+                        </p>
+                        <Button
+                          asChild
+                          className="w-full bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <a
+                            href={pendingInterview.interview_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            Comenzar entrevista AI
+                          </a>
+                        </Button>
+                        <p className="text-xs text-green-600 mt-2">
+                          ⏰ La entrevista durará aproximadamente 15 minutos
+                        </p>
                       </div>
                     )}
 
-                    {response?.ai_summary && (
-                      <div className="space-y-6 mb-4">
-                        {/* Resumen General */}
-                        {response.ai_summary.summary_translations && (
-                          <div>
-                            <h4 className="font-medium text-success mb-2">
-                              📋 Resumen General
-                            </h4>
-                            <div className="text-sm p-3 bg-accent rounded-lg">
-                              {response?.ai_summary?.summary_translations?.find(
-                                (translation: any) => translation.lang === "es"
-                              )?.text || response?.ai_summary.summary}
-                            </div>
-                          </div>
-                        )}
+                  {/* Vista para otros estados */}
+                  {pendingInterview.status !== "created-pending" &&
+                    pendingInterview.status !== "analyzing-interview" && (
+                      <div className="bg-orange-100 p-3 rounded-lg">
+                        <p className="text-sm text-orange-800">
+                          <strong>Estado:</strong>{" "}
+                          {pendingInterview.api_message ||
+                            "Entrevista en proceso"}
+                        </p>
+                        <p className="text-xs text-orange-600 mt-1">
+                          Recibirás un email cuando esté lista para completar.
+                        </p>
+                      </div>
+                    )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
-                        {/* Recomendación Final */}
-                        {response?.ai_summary?.finalRecommendation && (
-                          <div>
-                            <h4 className="font-medium text-primary mb-2">
-                              🎯 Recomendación Final
-                            </h4>
-                            <div className="text-sm p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
-                              <p className="font-medium">
-                                Decisión:{" "}
-                                <span
-                                  className={`px-2 py-1 rounded text-xs ${
-                                    response?.ai_summary?.finalRecommendation
-                                      ?.decision === "YES"
-                                      ? "bg-green-100 text-green-800"
-                                      : response?.ai_summary
-                                          ?.finalRecommendation?.decision ===
-                                        "NO"
-                                      ? "bg-red-100 text-red-800"
-                                      : "bg-yellow-100 text-yellow-800"
-                                  }`}
-                                >
-                                  {
-                                    response?.ai_summary?.finalRecommendation
-                                      ?.decision
-                                  }
-                                </span>
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Confianza:{" "}
-                                {
-                                  response?.ai_summary?.finalRecommendation
-                                    ?.confidence
-                                }
-                                /5
-                              </p>
-                              <p className="mt-2 text-xs">
-                                {
-                                  response?.ai_summary?.finalRecommendation
-                                    ?.reasoning
-                                }
-                              </p>
-                              {response?.ai_summary?.finalRecommendation
-                                ?.nextSteps && (
-                                <div className="mt-2">
-                                  <p className="text-xs font-medium">
-                                    Próximos pasos:
-                                  </p>
-                                  <p className="text-xs">
-                                    {
-                                      response?.ai_summary?.finalRecommendation
-                                        ?.nextSteps
-                                    }
-                                  </p>
-                                </div>
+        {/* Tab de Historial */}
+        <TabsContent value="history" className="space-y-6">
+          {/* Interview History */}
+          {interviewResponses?.length > 0 ? (
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary" />
+                  Historial de Entrevistas AI
+                </CardTitle>
+                <CardDescription>
+                  Revisa tus entrevistas completadas y el análisis de IA
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingResponses ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Cargando entrevistas...</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {interviewResponses.map((response) => (
+                      <div key={response.id} className="border rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2 flex-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                toggleInterviewExpansion(response.id)
+                              }
+                              className="h-6 w-6 p-0 hover:bg-gray-100"
+                            >
+                              {isInterviewExpanded(response.id) ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
                               )}
+                            </Button>
+                            <div>
+                              <h3 className="font-medium">
+                                Entrevista AI -{" "}
+                                {response.job_title || "Sin título"}
+                              </h3>
                             </div>
                           </div>
-                        )}
-
-                        {/* Habilidades Técnicas */}
-                        {response?.ai_summary?.hardSkills && (
-                          <div>
-                            <h4 className="font-medium text-blue-600 mb-2">
-                              🔧 Habilidades Técnicas
-                            </h4>
-                            <div className="text-sm p-3 bg-blue-50 rounded-lg border-l-2 border-blue-600">
-                              <p className="text-xs whitespace-pre-line">
-                                {response?.ai_summary?.hardSkills}
-                              </p>
-                            </div>
+                          <div className="flex flex-col items-end gap-1">
+                            <Badge variant="outline" className="text-xs">
+                              {response.status || "Completada"}
+                            </Badge>
                           </div>
-                        )}
+                        </div>
 
-                        {/* Habilidades Blandas */}
-                        {response?.ai_summary?.softSkills && (
-                          <div>
-                            <h4 className="font-medium text-warning mb-2">
-                              🤝 Habilidades Blandas
-                            </h4>
-                            <div className="text-sm p-3 bg-warning/5 rounded-lg border-l-2 border-warning">
-                              <p className="text-xs whitespace-pre-line">
-                                {response?.ai_summary?.softSkills}
-                              </p>
-                            </div>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            <span>
+                              {response.started_at && response.ended_at
+                                ? `${Math.round(
+                                    (response.ended_at - response.started_at) /
+                                      60000
+                                  )} min`
+                                : "Duración no disponible"}
+                            </span>
                           </div>
-                        )}
+                          <span>
+                            {response.created_at
+                              ? new Date(
+                                  response.created_at
+                                ).toLocaleDateString()
+                              : "Fecha no disponible"}
+                          </span>
+                        </div>
 
-                        {/* Nivel de Inglés */}
-                        {response?.ai_summary?.englishLevel && (
-                          <div>
-                            <h4 className="font-medium text-purple-600 mb-2">
-                              🌍 Nivel de Inglés
-                            </h4>
-                            <div className="text-sm p-3 bg-purple-50 rounded-lg border-l-2 border-purple-600">
-                              <p className="text-xs">
-                                {response?.ai_summary?.englishLevel}
-                              </p>
-                            </div>
-                          </div>
-                        )}
+                        {/* Contenido detallado - solo visible cuando está expandida */}
+                        {isInterviewExpanded(response.id) && (
+                          <div className="space-y-4">
+                            {response.summary && (
+                              <div className="mb-4">
+                                <h4 className="font-medium text-success mb-2">
+                                  Resumen de la Entrevista
+                                </h4>
+                                <div className="text-sm whitespace-pre-line p-3 bg-accent rounded-lg">
+                                  {getSumaryEs(response)}
+                                </div>
+                              </div>
+                            )}
 
-                        {/* Tecnologías Clave */}
-                        {response?.ai_summary?.keyTechnologies && (
-                          <div>
-                            <h4 className="font-medium text-indigo-600 mb-2">
-                              💻 Tecnologías Clave
-                            </h4>
-                            <div className="text-sm p-3 bg-indigo-50 rounded-lg border-l-2 border-indigo-600">
-                              <p className="text-xs">
-                                {response?.ai_summary?.keyTechnologies}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Experiencia Técnica */}
-                        {response?.ai_summary?.technicalExperience && (
-                          <div>
-                            <h4 className="font-medium text-cyan-600 mb-2">
-                              ⚙️ Experiencia Técnica
-                            </h4>
-                            <div className="text-sm p-3 bg-cyan-50 rounded-lg border-l-2 border-cyan-600">
-                              <p className="text-xs">
-                                {response?.ai_summary?.technicalExperience}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Feedback del Candidato */}
-                        {response?.ai_summary?.candidateFeedback && (
-                          <div>
-                            <h4 className="font-medium text-green-600 mb-2">
-                              💬 Feedback del Candidato
-                            </h4>
-                            <div className="text-sm p-3 bg-green-50 rounded-lg border-l-2 border-green-600">
-                              <div className="space-y-3">
-                                {response?.ai_summary?.candidateFeedback
-                                  ?.feedback && (
+                            {response?.ai_summary && (
+                              <div className="space-y-6 mb-4">
+                                {/* Resumen General */}
+                                {response.ai_summary.summary_translations && (
                                   <div>
-                                    <p className="text-xs font-medium text-green-800">
-                                      📝 Feedback General:
-                                    </p>
-                                    <p className="text-xs mt-1">
-                                      {
-                                        response?.ai_summary?.candidateFeedback
-                                          ?.feedback
-                                      }
-                                    </p>
+                                    <h4 className="font-medium text-success mb-2">
+                                      📋 Resumen General
+                                    </h4>
+                                    <div className="text-sm p-3 bg-accent rounded-lg">
+                                      {response?.ai_summary?.summary_translations?.find(
+                                        (translation: any) =>
+                                          translation.lang === "es"
+                                      )?.text || response?.ai_summary.summary}
+                                    </div>
                                   </div>
                                 )}
 
-                                {response?.ai_summary?.candidateFeedback
-                                  ?.starMethodology && (
+                                {/* Recomendación Final */}
+                                {response?.ai_summary?.finalRecommendation && (
                                   <div>
-                                    <p className="text-xs font-medium text-green-800">
-                                      ⭐ Metodología STAR:
-                                    </p>
-                                    <p className="text-xs mt-1">
-                                      {
-                                        response?.ai_summary?.candidateFeedback
-                                          ?.starMethodology
-                                      }
-                                    </p>
-                                  </div>
-                                )}
-
-                                {response?.ai_summary?.candidateFeedback
-                                  ?.actionableAdvice && (
-                                  <div>
-                                    <p className="text-xs font-medium text-green-800">
-                                      💡 Consejos Accionables:
-                                    </p>
-                                    <ul className="list-disc list-inside mt-1 space-y-1">
-                                      {response?.ai_summary?.candidateFeedback?.actionableAdvice?.map(
-                                        (advice: string, index: number) => (
-                                          <li key={index} className="text-xs">
-                                            {advice}
-                                          </li>
-                                        )
-                                      )}
-                                    </ul>
-                                  </div>
-                                )}
-
-                                {response?.ai_summary?.candidateFeedback
-                                  ?.areasForImprovement && (
-                                  <div>
-                                    <p className="text-xs font-medium text-green-800">
-                                      🎯 Áreas de Mejora:
-                                    </p>
-                                    <ul className="list-disc list-inside mt-1 space-y-1">
-                                      {response?.ai_summary?.candidateFeedback?.areasForImprovement?.map(
-                                        (area: string, index: number) => (
-                                          <li key={index} className="text-xs">
-                                            {area}
-                                          </li>
-                                        )
-                                      )}
-                                    </ul>
-                                  </div>
-                                )}
-
-                                {response?.ai_summary?.candidateFeedback
-                                  ?.salaryRange && (
-                                  <div>
-                                    <p className="text-xs font-medium text-green-800">
-                                      💰 Expectativas Salariales:
-                                    </p>
-                                    <p className="text-xs mt-1">
-                                      {
-                                        response?.ai_summary?.candidateFeedback
-                                          ?.salaryRange
-                                      }
-                                    </p>
-                                  </div>
-                                )}
-
-                                {response?.ai_summary?.candidateFeedback
-                                  ?.impactMetrics && (
-                                  <div>
-                                    <p className="text-xs font-medium text-green-800">
-                                      📊 Métricas de Impacto:
-                                    </p>
-                                    <div className="mt-1 space-y-1">
-                                      {response?.ai_summary?.candidateFeedback
-                                        ?.impactMetrics?.strengths && (
-                                        <div>
+                                    <h4 className="font-medium text-primary mb-2">
+                                      🎯 Recomendación Final
+                                    </h4>
+                                    <div className="text-sm p-3 bg-primary/5 rounded-lg border-l-2 border-primary">
+                                      <p className="font-medium">
+                                        Decisión:{" "}
+                                        <span
+                                          className={`px-2 py-1 rounded text-xs ${
+                                            response?.ai_summary
+                                              ?.finalRecommendation
+                                              ?.decision === "YES"
+                                              ? "bg-green-100 text-green-800"
+                                              : response?.ai_summary
+                                                  ?.finalRecommendation
+                                                  ?.decision === "NO"
+                                              ? "bg-red-100 text-red-800"
+                                              : "bg-yellow-100 text-yellow-800"
+                                          }`}
+                                        >
+                                          {
+                                            response?.ai_summary
+                                              ?.finalRecommendation?.decision
+                                          }
+                                        </span>
+                                      </p>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        Confianza:{" "}
+                                        {
+                                          response?.ai_summary
+                                            ?.finalRecommendation?.confidence
+                                        }
+                                        /5
+                                      </p>
+                                      <p className="mt-2 text-xs">
+                                        {
+                                          response?.ai_summary
+                                            ?.finalRecommendation?.reasoning
+                                        }
+                                      </p>
+                                      {response?.ai_summary?.finalRecommendation
+                                        ?.nextSteps && (
+                                        <div className="mt-2">
                                           <p className="text-xs font-medium">
-                                            Fortalezas:
+                                            Próximos pasos:
                                           </p>
-                                          <ul className="list-disc list-inside ml-2">
-                                            {response?.ai_summary?.candidateFeedback?.impactMetrics?.strengths?.map(
-                                              (
-                                                strength: string,
-                                                index: number
-                                              ) => (
-                                                <li
-                                                  key={index}
-                                                  className="text-xs"
-                                                >
-                                                  {strength}
-                                                </li>
-                                              )
-                                            )}
-                                          </ul>
-                                        </div>
-                                      )}
-                                      {response?.ai_summary?.candidateFeedback
-                                        ?.impactMetrics?.achievements && (
-                                        <div>
-                                          <p className="text-xs font-medium">
-                                            Logros:
+                                          <p className="text-xs">
+                                            {
+                                              response?.ai_summary
+                                                ?.finalRecommendation?.nextSteps
+                                            }
                                           </p>
-                                          <ul className="list-disc list-inside ml-2">
-                                            {response?.ai_summary?.candidateFeedback?.impactMetrics?.achievements?.map(
-                                              (
-                                                achievement: string,
-                                                index: number
-                                              ) => (
-                                                <li
-                                                  key={index}
-                                                  className="text-xs"
-                                                >
-                                                  {achievement}
-                                                </li>
-                                              )
-                                            )}
-                                          </ul>
-                                        </div>
-                                      )}
-                                      {response?.ai_summary?.candidateFeedback
-                                        ?.impactMetrics?.improvements && (
-                                        <div>
-                                          <p className="text-xs font-medium">
-                                            Mejoras:
-                                          </p>
-                                          <ul className="list-disc list-inside ml-2">
-                                            {response?.ai_summary?.candidateFeedback?.impactMetrics?.improvements?.map(
-                                              (
-                                                improvement: string,
-                                                index: number
-                                              ) => (
-                                                <li
-                                                  key={index}
-                                                  className="text-xs"
-                                                >
-                                                  {improvement}
-                                                </li>
-                                              )
-                                            )}
-                                          </ul>
                                         </div>
                                       )}
                                     </div>
                                   </div>
                                 )}
 
-                                {response?.ai_summary?.candidateFeedback
-                                  ?.improvementSimulation && (
+                                {/* Habilidades Técnicas */}
+                                {response?.ai_summary?.hardSkills && (
                                   <div>
-                                    <p className="text-xs font-medium text-green-800">
-                                      🔄 Simulación de Mejoras:
-                                    </p>
-                                    <ul className="list-disc list-inside mt-1 space-y-1">
-                                      {response?.ai_summary?.candidateFeedback?.improvementSimulation?.map(
-                                        (simulation: string, index: number) => (
-                                          <li key={index} className="text-xs">
-                                            {simulation}
-                                          </li>
-                                        )
-                                      )}
-                                    </ul>
+                                    <h4 className="font-medium text-blue-600 mb-2">
+                                      🔧 Habilidades Técnicas
+                                    </h4>
+                                    <div className="text-sm p-3 bg-blue-50 rounded-lg border-l-2 border-blue-600">
+                                      <p className="text-xs whitespace-pre-line">
+                                        {response?.ai_summary?.hardSkills}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Habilidades Blandas */}
+                                {response?.ai_summary?.softSkills && (
+                                  <div>
+                                    <h4 className="font-medium text-warning mb-2">
+                                      🤝 Habilidades Blandas
+                                    </h4>
+                                    <div className="text-sm p-3 bg-warning/5 rounded-lg border-l-2 border-warning">
+                                      <p className="text-xs whitespace-pre-line">
+                                        {response?.ai_summary?.softSkills}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Nivel de Inglés */}
+                                {response?.ai_summary?.englishLevel && (
+                                  <div>
+                                    <h4 className="font-medium text-purple-600 mb-2">
+                                      🌍 Nivel de Inglés
+                                    </h4>
+                                    <div className="text-sm p-3 bg-purple-50 rounded-lg border-l-2 border-purple-600">
+                                      <p className="text-xs">
+                                        {response?.ai_summary?.englishLevel}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Tecnologías Clave */}
+                                {response?.ai_summary?.keyTechnologies && (
+                                  <div>
+                                    <h4 className="font-medium text-indigo-600 mb-2">
+                                      💻 Tecnologías Clave
+                                    </h4>
+                                    <div className="text-sm p-3 bg-indigo-50 rounded-lg border-l-2 border-indigo-600">
+                                      <p className="text-xs">
+                                        {response?.ai_summary?.keyTechnologies}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Experiencia Técnica */}
+                                {response?.ai_summary?.technicalExperience && (
+                                  <div>
+                                    <h4 className="font-medium text-cyan-600 mb-2">
+                                      ⚙️ Experiencia Técnica
+                                    </h4>
+                                    <div className="text-sm p-3 bg-cyan-50 rounded-lg border-l-2 border-cyan-600">
+                                      <p className="text-xs">
+                                        {
+                                          response?.ai_summary
+                                            ?.technicalExperience
+                                        }
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Feedback del Candidato */}
+                                {response?.ai_summary?.candidateFeedback && (
+                                  <div>
+                                    <h4 className="font-medium text-green-600 mb-2">
+                                      💬 Feedback del Candidato
+                                    </h4>
+                                    <div className="text-sm p-3 bg-green-50 rounded-lg border-l-2 border-green-600">
+                                      <div className="space-y-3">
+                                        {response?.ai_summary?.candidateFeedback
+                                          ?.feedback && (
+                                          <div>
+                                            <p className="text-xs font-medium text-green-800">
+                                              📝 Feedback General:
+                                            </p>
+                                            <p className="text-xs mt-1">
+                                              {
+                                                response?.ai_summary
+                                                  ?.candidateFeedback?.feedback
+                                              }
+                                            </p>
+                                          </div>
+                                        )}
+
+                                        {response?.ai_summary?.candidateFeedback
+                                          ?.starMethodology && (
+                                          <div>
+                                            <p className="text-xs font-medium text-green-800">
+                                              ⭐ Metodología STAR:
+                                            </p>
+                                            <p className="text-xs mt-1">
+                                              {
+                                                response?.ai_summary
+                                                  ?.candidateFeedback
+                                                  ?.starMethodology
+                                              }
+                                            </p>
+                                          </div>
+                                        )}
+
+                                        {response?.ai_summary?.candidateFeedback
+                                          ?.actionableAdvice && (
+                                          <div>
+                                            <p className="text-xs font-medium text-green-800">
+                                              💡 Consejos Accionables:
+                                            </p>
+                                            <ul className="list-disc list-inside mt-1 space-y-1">
+                                              {response?.ai_summary?.candidateFeedback?.actionableAdvice?.map(
+                                                (
+                                                  advice: string,
+                                                  index: number
+                                                ) => (
+                                                  <li
+                                                    key={index}
+                                                    className="text-xs"
+                                                  >
+                                                    {advice}
+                                                  </li>
+                                                )
+                                              )}
+                                            </ul>
+                                          </div>
+                                        )}
+
+                                        {response?.ai_summary?.candidateFeedback
+                                          ?.areasForImprovement && (
+                                          <div>
+                                            <p className="text-xs font-medium text-green-800">
+                                              🎯 Áreas de Mejora:
+                                            </p>
+                                            <ul className="list-disc list-inside mt-1 space-y-1">
+                                              {response?.ai_summary?.candidateFeedback?.areasForImprovement?.map(
+                                                (
+                                                  area: string,
+                                                  index: number
+                                                ) => (
+                                                  <li
+                                                    key={index}
+                                                    className="text-xs"
+                                                  >
+                                                    {area}
+                                                  </li>
+                                                )
+                                              )}
+                                            </ul>
+                                          </div>
+                                        )}
+
+                                        {response?.ai_summary?.candidateFeedback
+                                          ?.salaryRange && (
+                                          <div>
+                                            <p className="text-xs font-medium text-green-800">
+                                              💰 Expectativas Salariales:
+                                            </p>
+                                            <p className="text-xs mt-1">
+                                              {
+                                                response?.ai_summary
+                                                  ?.candidateFeedback
+                                                  ?.salaryRange
+                                              }
+                                            </p>
+                                          </div>
+                                        )}
+
+                                        {response?.ai_summary?.candidateFeedback
+                                          ?.impactMetrics && (
+                                          <div>
+                                            <p className="text-xs font-medium text-green-800">
+                                              📊 Métricas de Impacto:
+                                            </p>
+                                            <div className="mt-1 space-y-1">
+                                              {response?.ai_summary
+                                                ?.candidateFeedback
+                                                ?.impactMetrics?.strengths && (
+                                                <div>
+                                                  <p className="text-xs font-medium">
+                                                    Fortalezas:
+                                                  </p>
+                                                  <ul className="list-disc list-inside ml-2">
+                                                    {response?.ai_summary?.candidateFeedback?.impactMetrics?.strengths?.map(
+                                                      (
+                                                        strength: string,
+                                                        index: number
+                                                      ) => (
+                                                        <li
+                                                          key={index}
+                                                          className="text-xs"
+                                                        >
+                                                          {strength}
+                                                        </li>
+                                                      )
+                                                    )}
+                                                  </ul>
+                                                </div>
+                                              )}
+                                              {response?.ai_summary
+                                                ?.candidateFeedback
+                                                ?.impactMetrics
+                                                ?.achievements && (
+                                                <div>
+                                                  <p className="text-xs font-medium">
+                                                    Logros:
+                                                  </p>
+                                                  <ul className="list-disc list-inside ml-2">
+                                                    {response?.ai_summary?.candidateFeedback?.impactMetrics?.achievements?.map(
+                                                      (
+                                                        achievement: string,
+                                                        index: number
+                                                      ) => (
+                                                        <li
+                                                          key={index}
+                                                          className="text-xs"
+                                                        >
+                                                          {achievement}
+                                                        </li>
+                                                      )
+                                                    )}
+                                                  </ul>
+                                                </div>
+                                              )}
+                                              {response?.ai_summary
+                                                ?.candidateFeedback
+                                                ?.impactMetrics
+                                                ?.improvements && (
+                                                <div>
+                                                  <p className="text-xs font-medium">
+                                                    Mejoras:
+                                                  </p>
+                                                  <ul className="list-disc list-inside ml-2">
+                                                    {response?.ai_summary?.candidateFeedback?.impactMetrics?.improvements?.map(
+                                                      (
+                                                        improvement: string,
+                                                        index: number
+                                                      ) => (
+                                                        <li
+                                                          key={index}
+                                                          className="text-xs"
+                                                        >
+                                                          {improvement}
+                                                        </li>
+                                                      )
+                                                    )}
+                                                  </ul>
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                        )}
+
+                                        {response?.ai_summary?.candidateFeedback
+                                          ?.improvementSimulation && (
+                                          <div>
+                                            <p className="text-xs font-medium text-green-800">
+                                              🔄 Simulación de Mejoras:
+                                            </p>
+                                            <ul className="list-disc list-inside mt-1 space-y-1">
+                                              {response?.ai_summary?.candidateFeedback?.improvementSimulation?.map(
+                                                (
+                                                  simulation: string,
+                                                  index: number
+                                                ) => (
+                                                  <li
+                                                    key={index}
+                                                    className="text-xs"
+                                                  >
+                                                    {simulation}
+                                                  </li>
+                                                )
+                                              )}
+                                            </ul>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Análisis de Comunicación */}
+                                {response?.ai_summary
+                                  ?.communicationAnalysis && (
+                                  <div>
+                                    <h4 className="font-medium text-pink-600 mb-2">
+                                      🗣️ Análisis de Comunicación
+                                    </h4>
+                                    <div className="text-sm p-3 bg-pink-50 rounded-lg border-l-2 border-pink-600">
+                                      <div className="space-y-2">
+                                        {response?.ai_summary
+                                          ?.communicationAnalysis
+                                          ?.communicationStrengths && (
+                                          <p className="text-xs">
+                                            <strong>Fortalezas:</strong>{" "}
+                                            {
+                                              response?.ai_summary
+                                                ?.communicationAnalysis
+                                                ?.communicationStrengths
+                                            }
+                                          </p>
+                                        )}
+                                        {response?.ai_summary
+                                          ?.communicationAnalysis
+                                          ?.communicationWeaknesses && (
+                                          <p className="text-xs">
+                                            <strong>Debilidades:</strong>{" "}
+                                            {
+                                              response?.ai_summary
+                                                ?.communicationAnalysis
+                                                ?.communicationWeaknesses
+                                            }
+                                          </p>
+                                        )}
+                                        {response?.ai_summary
+                                          ?.communicationAnalysis
+                                          ?.alternativeSuggestions && (
+                                          <div className="text-xs">
+                                            <strong>
+                                              Sugerencias alternativas:
+                                            </strong>
+                                            <ul className="list-disc list-inside mt-1">
+                                              {response?.ai_summary?.communicationAnalysis?.alternativeSuggestions?.map(
+                                                (
+                                                  suggestion: string,
+                                                  index: number
+                                                ) => (
+                                                  <li key={index}>
+                                                    {suggestion}
+                                                  </li>
+                                                )
+                                              )}
+                                            </ul>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Evaluación de Potencial */}
+                                {response?.ai_summary?.potentialAssessment && (
+                                  <div>
+                                    <h4 className="font-medium text-teal-600 mb-2">
+                                      🚀 Evaluación de Potencial
+                                    </h4>
+                                    <div className="text-sm p-3 bg-teal-50 rounded-lg border-l-2 border-teal-600">
+                                      <div className="space-y-2">
+                                        {response?.ai_summary
+                                          ?.potentialAssessment
+                                          ?.growthPotential && (
+                                          <p className="text-xs">
+                                            <strong>
+                                              Potencial de crecimiento:
+                                            </strong>{" "}
+                                            {
+                                              response?.ai_summary
+                                                ?.potentialAssessment
+                                                ?.growthPotential
+                                            }
+                                          </p>
+                                        )}
+                                        {response?.ai_summary
+                                          ?.potentialAssessment
+                                          ?.careerTrajectory && (
+                                          <p className="text-xs">
+                                            <strong>
+                                              Trayectoria profesional:
+                                            </strong>{" "}
+                                            {
+                                              response?.ai_summary
+                                                ?.potentialAssessment
+                                                ?.careerTrajectory
+                                            }
+                                          </p>
+                                        )}
+                                        {response?.ai_summary
+                                          ?.potentialAssessment
+                                          ?.leadershipReadiness && (
+                                          <p className="text-xs">
+                                            <strong>
+                                              Preparación para liderazgo:
+                                            </strong>{" "}
+                                            {
+                                              response?.ai_summary
+                                                ?.potentialAssessment
+                                                ?.leadershipReadiness
+                                            }
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Filosofía y Enfoque */}
+                                {response?.ai_summary
+                                  ?.philosophyAndApproach && (
+                                  <div>
+                                    <h4 className="font-medium text-amber-600 mb-2">
+                                      🎯 Filosofía y Enfoque
+                                    </h4>
+                                    <div className="text-sm p-3 bg-amber-50 rounded-lg border-l-2 border-amber-600">
+                                      <p className="text-xs">
+                                        {
+                                          response?.ai_summary
+                                            ?.philosophyAndApproach
+                                        }
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Puntuación General */}
+                                {response?.ai_summary?.overallScore && (
+                                  <div>
+                                    <h4 className="font-medium text-emerald-600 mb-2">
+                                      📈 Puntuación General
+                                    </h4>
+                                    <div className="text-sm p-3 bg-emerald-50 rounded-lg border-l-2 border-emerald-600">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-lg font-bold">
+                                          {response?.ai_summary?.overallScore}
+                                          /100
+                                        </span>
+                                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                          <div
+                                            className="bg-emerald-600 h-2 rounded-full"
+                                            style={{
+                                              width: `${response?.ai_summary?.overallScore}%`,
+                                            }}
+                                          ></div>
+                                        </div>
+                                      </div>
+                                    </div>
                                   </div>
                                 )}
                               </div>
-                            </div>
-                          </div>
-                        )}
+                            )}
 
-                        {/* Análisis de Comunicación */}
-                        {response?.ai_summary?.communicationAnalysis && (
-                          <div>
-                            <h4 className="font-medium text-pink-600 mb-2">
-                              🗣️ Análisis de Comunicación
-                            </h4>
-                            <div className="text-sm p-3 bg-pink-50 rounded-lg border-l-2 border-pink-600">
-                              <div className="space-y-2">
-                                {response?.ai_summary?.communicationAnalysis
-                                  ?.communicationStrengths && (
-                                  <p className="text-xs">
-                                    <strong>Fortalezas:</strong>{" "}
-                                    {
-                                      response?.ai_summary
-                                        ?.communicationAnalysis
-                                        ?.communicationStrengths
-                                    }
-                                  </p>
-                                )}
-                                {response?.ai_summary?.communicationAnalysis
-                                  ?.communicationWeaknesses && (
-                                  <p className="text-xs">
-                                    <strong>Debilidades:</strong>{" "}
-                                    {
-                                      response?.ai_summary
-                                        ?.communicationAnalysis
-                                        ?.communicationWeaknesses
-                                    }
-                                  </p>
-                                )}
-                                {response?.ai_summary?.communicationAnalysis
-                                  ?.alternativeSuggestions && (
-                                  <div className="text-xs">
-                                    <strong>Sugerencias alternativas:</strong>
-                                    <ul className="list-disc list-inside mt-1">
-                                      {response?.ai_summary?.communicationAnalysis?.alternativeSuggestions?.map(
-                                        (suggestion: string, index: number) => (
-                                          <li key={index}>{suggestion}</li>
-                                        )
-                                      )}
-                                    </ul>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Evaluación de Potencial */}
-                        {response?.ai_summary?.potentialAssessment && (
-                          <div>
-                            <h4 className="font-medium text-teal-600 mb-2">
-                              🚀 Evaluación de Potencial
-                            </h4>
-                            <div className="text-sm p-3 bg-teal-50 rounded-lg border-l-2 border-teal-600">
-                              <div className="space-y-2">
-                                {response?.ai_summary?.potentialAssessment
-                                  ?.growthPotential && (
-                                  <p className="text-xs">
-                                    <strong>Potencial de crecimiento:</strong>{" "}
-                                    {
-                                      response?.ai_summary?.potentialAssessment
-                                        ?.growthPotential
-                                    }
-                                  </p>
-                                )}
-                                {response?.ai_summary?.potentialAssessment
-                                  ?.careerTrajectory && (
-                                  <p className="text-xs">
-                                    <strong>Trayectoria profesional:</strong>{" "}
-                                    {
-                                      response?.ai_summary?.potentialAssessment
-                                        ?.careerTrajectory
-                                    }
-                                  </p>
-                                )}
-                                {response?.ai_summary?.potentialAssessment
-                                  ?.leadershipReadiness && (
-                                  <p className="text-xs">
-                                    <strong>Preparación para liderazgo:</strong>{" "}
-                                    {
-                                      response?.ai_summary?.potentialAssessment
-                                        ?.leadershipReadiness
-                                    }
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Filosofía y Enfoque */}
-                        {response?.ai_summary?.philosophyAndApproach && (
-                          <div>
-                            <h4 className="font-medium text-amber-600 mb-2">
-                              🎯 Filosofía y Enfoque
-                            </h4>
-                            <div className="text-sm p-3 bg-amber-50 rounded-lg border-l-2 border-amber-600">
-                              <p className="text-xs">
-                                {response?.ai_summary?.philosophyAndApproach}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Puntuación General */}
-                        {response?.ai_summary?.overallScore && (
-                          <div>
-                            <h4 className="font-medium text-emerald-600 mb-2">
-                              📈 Puntuación General
-                            </h4>
-                            <div className="text-sm p-3 bg-emerald-50 rounded-lg border-l-2 border-emerald-600">
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg font-bold">
-                                  {response?.ai_summary?.overallScore}/100
-                                </span>
-                                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                  <div
-                                    className="bg-emerald-600 h-2 rounded-full"
-                                    style={{
-                                      width: `${response?.ai_summary?.overallScore}%`,
-                                    }}
-                                  ></div>
-                                </div>
-                              </div>
+                            <div className="mt-4 pt-3 border-t flex gap-2 flex-wrap">
+                              {response.recording_url && (
+                                <Button variant="outline" size="sm" asChild>
+                                  <a
+                                    href={response.recording_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    🎧 Escuchar grabación
+                                  </a>
+                                </Button>
+                              )}
                             </div>
                           </div>
                         )}
                       </div>
-                    )}
-
-                    <div className="mt-4 pt-3 border-t flex gap-2 flex-wrap">
-                      {response.recording_url && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a
-                            href={response.recording_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            🎧 Escuchar grabación
-                          </a>
-                        </Button>
-                      )}
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="shadow-card">
+              <CardContent className="text-center py-8">
+                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground mb-2">
+                  No hay entrevistas completadas
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Una vez que completes una entrevista AI, aparecerá aquí con tu
+                  feedback detallado.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
 
       <InterviewCredits
         isOpen={showCreditsDialog}
