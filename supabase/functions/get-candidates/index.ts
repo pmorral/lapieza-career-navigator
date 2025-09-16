@@ -1,5 +1,48 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+
+// Types
+interface GetCandidatesRequest {
+  limit?: number;
+  offset?: number;
+  search_name?: string;
+  search_email?: string;
+}
+
+interface CandidateData {
+  user_id?: string; // Temporal para testing
+  full_name: string;
+  email: string;
+  created_at: string;
+  has_active_subscription: boolean;
+  interview_responses_count: number;
+  cv_optimizations_count: number;
+  linkedin_optimizations_count: number;
+}
+
+interface PaginationMeta {
+  total: number;
+  limit: number;
+  offset: number;
+  pages: number;
+  current_page: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
+interface GetCandidatesResponse {
+  success: boolean;
+  data: CandidateData[];
+  pagination: PaginationMeta;
+  message?: string;
+}
+
+interface GetCandidatesErrorResponse {
+  success: false;
+  message: string;
+  error?: string;
+}
+
 const supabaseUrl = Deno.env.get("SUPABASE_URL");
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const corsHeaders = {
@@ -18,7 +61,7 @@ serve(async (req) => {
     // Inicializar cliente Supabase con service role
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     // Parsear parámetros de la request
-    let params = {};
+    let params: GetCandidatesRequest = {};
     if (req.method === "GET") {
       const url = new URL(req.url);
       params = {
@@ -200,7 +243,7 @@ serve(async (req) => {
     );
 
     // Enriquecer datos de candidatos con conteos
-    const enrichedCandidates = candidates.map((candidate) => ({
+    const enrichedCandidates: CandidateData[] = candidates.map((candidate) => ({
       full_name: candidate.full_name,
       email: candidate.email,
       created_at: candidate.created_at,
@@ -217,7 +260,7 @@ serve(async (req) => {
     const current_page = Math.floor(offset / limit) + 1;
 
     // Procesar y retornar resultados
-    const response = {
+    const response: GetCandidatesResponse = {
       success: true,
       data: enrichedCandidates,
       pagination: {
