@@ -244,6 +244,7 @@ serve(async (req) => {
 
     // Enriquecer datos de candidatos con conteos
     const enrichedCandidates: CandidateData[] = candidates.map((candidate) => ({
+      user_id: candidate.user_id,
       full_name: candidate.full_name,
       email: candidate.email,
       created_at: candidate.created_at,
