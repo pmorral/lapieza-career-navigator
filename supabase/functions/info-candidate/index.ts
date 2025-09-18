@@ -76,37 +76,11 @@ serve(async (req) => {
         .eq("user_id", user_id)
         .single(),
 
-      // 2. Todas sus entrevistas (incluye feedback/respuestas)
+      // 2. Todas sus entrevistas
       supabase
-        .from("interview_responses")
-        .select(
-          `
-          interview_id_external,
-          assistant_id,
-          type,
-          started_at,
-          ended_at,
-          transcript,
-          recording_url,
-          stereo_recording_url,
-          web_call_url,
-          status,
-          ended_reason,
-          created_at_external,
-          updated_at_external,
-          org_id,
-          cost,
-          cost_breakdown,
-          costs,
-          summary,
-          summary_translations,
-          ai_summary,
-          analysis,
-          monitor,
-          transport
-        `
-        )
-        .eq("candidate_id", user_id)
+        .from("interviews")
+        .select("*")
+        .eq("user_id", user_id)
         .order("created_at", { ascending: false }),
 
       // 3. Sus optimizaciones de CV
@@ -172,10 +146,67 @@ serve(async (req) => {
       console.error("❌ Error getting LinkedIn optimizations:", linkedinError);
     }
 
+    // Obtener las respuestas de cada entrevista
+    let interviewsWithResponses: any[] = [];
+
+    if (interviews && interviews.length > 0) {
+      // Extraer los interview_ids
+      const interviewIds = interviews.map((interview) => interview.id);
+
+      // Buscar las respuestas usando interview_id_external
+      const { data: interviewResponses, error: responsesError } = await supabase
+        .from("interview_responses")
+        .select(
+          `
+          interview_id_external,
+          assistant_id,
+          type,
+          started_at,
+          ended_at,
+          transcript,
+          recording_url,
+          stereo_recording_url,
+          web_call_url,
+          status,
+          ended_reason,
+          created_at_external,
+          updated_at_external,
+          org_id,
+          cost,
+          cost_breakdown,
+          costs,
+          summary,
+          summary_translations,
+          ai_summary,
+          analysis,
+          monitor,
+          transport
+        `
+        )
+        .in("interview_id_external", interviewIds);
+
+      if (responsesError) {
+        console.error("❌ Error getting interview responses:", responsesError);
+      }
+
+      // Combinar entrevistas con sus respuestas
+      interviewsWithResponses = interviews.map((interview) => {
+        const responses =
+          interviewResponses?.filter(
+            (response) => response.interview_id_external === interview.id
+          ) || [];
+
+        return {
+          ...interview,
+          responses: responses,
+        };
+      });
+    }
+
     // Construir la respuesta
     const candidateData = {
       profile,
-      interviews: interviews || [],
+      interviews: interviewsWithResponses,
       cv_optimizations: cvOptimizations || [],
       linkedin_optimizations: linkedinOptimizations || [],
     };
@@ -184,6 +215,10 @@ serve(async (req) => {
       user_id,
       profile_found: !!profile,
       interviews_count: interviews?.length || 0,
+      interview_responses_count: interviewsWithResponses.reduce(
+        (total, interview) => total + interview.responses.length,
+        0
+      ),
       cv_optimizations_count: cvOptimizations?.length || 0,
       linkedin_optimizations_count: linkedinOptimizations?.length || 0,
     });

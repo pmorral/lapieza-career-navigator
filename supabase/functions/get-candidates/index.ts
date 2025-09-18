@@ -219,9 +219,9 @@ serve(async (req) => {
         ] = await Promise.all([
           // Contar interview_responses por usuario
           supabase
-            .from("interview_responses")
+            .from("interviews")
             .select("*", { count: "exact", head: true })
-            .eq("candidate_id", userId),
+            .eq("user_id", userId),
 
           // Contar cv_optimizations por usuario
           supabase
